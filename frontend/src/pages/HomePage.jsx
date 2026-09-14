@@ -8,6 +8,21 @@ import { CourseCard } from '../components/common/CourseCard';
 import { BlogCard } from '../components/common/BlogCard';
 import { YouTubeVideoCard } from '../components/common/YouTubeVideoCard';
 import { EventCard } from '../components/common/EventCard';
+import {
+  GraduationCap,
+  FileDown,
+  Building2,
+  Phone,
+  ArrowRight,
+  Sparkles,
+  Award,
+  Briefcase,
+  Users,
+  ShieldCheck,
+  Wrench,
+  CheckCircle2,
+  BookOpen
+} from 'lucide-react';
 
 // Curated real promotional & activity videos from RPITSSR official YouTube channel (@rpitssr_edu)
 const promotionalVideos = [
@@ -82,7 +97,8 @@ const CountUpNumber = ({ end, duration = 2000 }) => {
 };
 
 export const HomePage = () => {
-  const { t, language } = useLanguage();
+  const { t, currentLanguage, language } = useLanguage();
+  const isKhmer = currentLanguage === 'km' || language === 'km';
   const [courses, setCourses] = useState([]);
   const [posts, setPosts] = useState([]);
   const [events, setEvents] = useState([]);
@@ -166,46 +182,156 @@ export const HomePage = () => {
 
   return (
     <div>
-      {/* 1. Hero Slider Area */}
-      <section className="slider-area hero-full-showcase" style={{ paddingTop: '0px' }}>
-        <div
-          className="single-slider d-flex align-items-end bg_cover position-relative"
-          style={{
-            backgroundImage: 'url(/images/teacher-all.jpg)',
-            backgroundPosition: 'center bottom',
-            backgroundSize: 'cover',
-            backgroundRepeat: 'no-repeat',
-            width: '100%',
-          }}
-        >
-          <div className="container" style={{ position: 'relative', zIndex: 2 }}></div>
+      {/* 1. Purpose-Driven Hero Section */}
+      <section className="modern-home-hero">
+        <div className="modern-home-hero-overlay"></div>
+        <div className="container position-relative" style={{ zIndex: 2 }}>
+          <div className="modern-home-hero-content">
+            <div className="home-hero-badge">
+              <Sparkles size={16} />
+              <span>{isKhmer ? 'វិទ្យាស្ថានបណ្តុះបណ្តាលវិជ្ជាជីវៈ និងបច្ចេកវិទ្យាកម្រិតខ្ពស់' : 'Leading Technical & Vocational Institute'}</span>
+            </div>
+
+            <h1 className="home-hero-title">
+              {isKhmer ? (
+                <>
+                  វិទ្យាស្ថានពហុបច្ចេកទេស<br />
+                  <span style={{ color: '#ffaf00' }}>ភូមិភាគតេជោសែនសៀមរាប</span>
+                </>
+              ) : (
+                <>
+                  Regional Polytechnic Institute<br />
+                  <span style={{ color: '#ffaf00' }}>Techo Sen Siem Reap</span>
+                </>
+              )}
+            </h1>
+
+            <p className="home-hero-subtitle">
+              {isKhmer
+                ? '«ជំនាញពិត ជីវិតប្រសើរ» — បណ្តុះបណ្តាលជំនាញបច្ចេកទេស និងវិជ្ជាជីវៈកម្រិតខ្ពស់ គុណភាពស្តង់ដារជាតិ និងអន្តរជាតិ ដើម្បីកសាងអនាគតការងារដ៏រឹងមាំជូនយុវជនកម្ពុជា។'
+                : 'Empowering Cambodian youth with market-ready vocational skills, modern technological knowledge, and high employment opportunities.'}
+            </p>
+
+            <div className="home-hero-actions">
+              <Link to="/courses" className="home-hero-btn-primary" onClick={scrollToTop}>
+                <GraduationCap size={18} />
+                <span>{isKhmer ? 'ស្វែងយល់ពីជំនាញ' : 'Explore Programs'}</span>
+                <ArrowRight size={16} />
+              </Link>
+              <Link to="/contact" className="home-hero-btn-secondary" onClick={scrollToTop}>
+                <span>{isKhmer ? 'ចុះឈ្មោះចូលរៀន' : 'Enroll Now'}</span>
+              </Link>
+              <Link to="/downloads" className="home-hero-btn-outline" onClick={scrollToTop}>
+                <FileDown size={16} />
+                <span>{isKhmer ? 'មជ្ឈមណ្ឌលទាញយក' : 'Download Center'}</span>
+              </Link>
+            </div>
+
+            <div className="home-hero-trust-bar">
+              <div className="home-trust-item">
+                <CheckCircle2 size={16} />
+                <span>{isKhmer ? 'អាហារូបករណ៍ ១០០% របស់រាជរដ្ឋាភិបាល' : '100% Gov Scholarships'}</span>
+              </div>
+              <div className="home-trust-item">
+                <CheckCircle2 size={16} />
+                <span>{isKhmer ? 'ឱកាសការងារខ្ពស់ជាង ៩៥% ក្រោយបញ្ចប់' : '95%+ Job Placement'}</span>
+              </div>
+              <div className="home-trust-item">
+                <CheckCircle2 size={16} />
+                <span>{isKhmer ? 'ចុះកម្មសិក្សាផ្ទាល់នៅសហគ្រាសដៃគូ' : 'Enterprise Internship'}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* 2. Campus Image Gallery Feature Area */}
-      <section className="features-area single-campus">
+      {/* 2. Quick Access Gateways */}
+      <section className="home-gateways-section">
         <div className="container">
-          <div className="features-wrapper">
-            <div className="row justify-content-end">
-              <div className="col-lg-8">
-                <h2 className="features-title">
-                  Visit our <span>Campus <br /> with</span> Image Gallery
-                </h2>
-              </div>
-            </div>
-            <div className="row justify-content-end">
-              <div className="col-lg-11">
-                <div className="features-image">
-                  <img
-                    className="campus-image"
-                    src="/images/gallery/school.jpg"
-                    width="1061"
-                    height="387"
-                    alt="Campus gallery"
-                  />
+          <div className="home-gateways-grid">
+            {/* Gateway 1: Programs */}
+            <Link to="/courses" className="home-gateway-card" onClick={scrollToTop}>
+              <div>
+                <div className="home-gateway-icon-wrap" style={{ background: '#eff6ff', color: '#1e73be' }}>
+                  <GraduationCap size={24} />
                 </div>
+                <h3 className="home-gateway-title">
+                  {isKhmer ? 'ជំនាញ និងវគ្គសិក្សា' : 'Academic Programs'}
+                </h3>
+                <p className="home-gateway-desc">
+                  {isKhmer
+                    ? 'កម្រិតបរិញ្ញាបត្របច្ចេកវិទ្យា សញ្ញាបត្រជាន់ខ្ពស់បច្ចេកទេស និងវគ្គ TVET 1.5M'
+                    : 'Bachelor of Technology, Higher Diploma, and 1.5M TVET Programs.'}
+                </p>
               </div>
-            </div>
+              <span className="home-gateway-action">
+                <span>{isKhmer ? 'ស្វែងយល់បន្ថែម' : 'Learn More'}</span>
+                <ArrowRight size={15} />
+              </span>
+            </Link>
+
+            {/* Gateway 2: Download Center */}
+            <Link to="/downloads" className="home-gateway-card" onClick={scrollToTop}>
+              <div>
+                <div className="home-gateway-icon-wrap" style={{ background: '#ecfdf5', color: '#059669' }}>
+                  <FileDown size={24} />
+                </div>
+                <h3 className="home-gateway-title">
+                  {isKhmer ? 'មជ្ឈមណ្ឌលទាញយក' : 'Download Center'}
+                </h3>
+                <p className="home-gateway-desc">
+                  {isKhmer
+                    ? 'ទម្រង់ពាក្យសុំ ឯកសារសិក្សា បទបញ្ជាផ្ទៃក្នុង និងឯកសាររដ្ឋបាលផ្លូវការ'
+                    : 'Application forms, brochures, curriculum guides, and official circulars.'}
+                </p>
+              </div>
+              <span className="home-gateway-action" style={{ color: '#059669' }}>
+                <span>{isKhmer ? 'ទាញយកឯកសារ' : 'View Downloads'}</span>
+                <ArrowRight size={15} />
+              </span>
+            </Link>
+
+            {/* Gateway 3: Organization / Leadership */}
+            <Link to="/organization" className="home-gateway-card" onClick={scrollToTop}>
+              <div>
+                <div className="home-gateway-icon-wrap" style={{ background: '#fffbeb', color: '#d97706' }}>
+                  <Building2 size={24} />
+                </div>
+                <h3 className="home-gateway-title">
+                  {isKhmer ? 'រចនាសម្ព័ន្ធដឹកនាំ' : 'Institute Leadership'}
+                </h3>
+                <p className="home-gateway-desc">
+                  {isKhmer
+                    ? 'ស្វែងយល់ពីរចនាសម្ព័ន្ធគ្រប់គ្រង ថ្នាក់ដឹកនាំ មហាវិទ្យាល័យ និងដេប៉ាតឺម៉ង់'
+                    : 'Governance, organizational structure, directorate, and academic faculties.'}
+                </p>
+              </div>
+              <span className="home-gateway-action" style={{ color: '#d97706' }}>
+                <span>{isKhmer ? 'មើលរចនាសម្ព័ន្ធ' : 'View Structure'}</span>
+                <ArrowRight size={15} />
+              </span>
+            </Link>
+
+            {/* Gateway 4: Contact / Admissions */}
+            <Link to="/contact" className="home-gateway-card" onClick={scrollToTop}>
+              <div>
+                <div className="home-gateway-icon-wrap" style={{ background: '#fdf2f8', color: '#db2777' }}>
+                  <Phone size={24} />
+                </div>
+                <h3 className="home-gateway-title">
+                  {isKhmer ? 'ទំនាក់ទំនង & ចុះឈ្មោះ' : 'Admissions & Inquiries'}
+                </h3>
+                <p className="home-gateway-desc">
+                  {isKhmer
+                    ? 'ប្រឹក្សាផ្តល់ព័ត៌មានចុះឈ្មោះចូលរៀន ទីតាំងវិទ្យាស្ថាន និងបណ្តាញទំនាក់ទំនង'
+                    : 'Admissions counseling, campus location map, and direct support.'}
+                </p>
+              </div>
+              <span className="home-gateway-action" style={{ color: '#db2777' }}>
+                <span>{isKhmer ? 'ទាក់ទងមកយើង' : 'Contact Us'}</span>
+                <ArrowRight size={15} />
+              </span>
+            </Link>
           </div>
         </div>
       </section>
@@ -244,49 +370,101 @@ export const HomePage = () => {
                 </div>
               )}
             </div>
+
+            {courses.length > 0 && (
+              <div className="text-center mt-40">
+                <Link to="/courses" className="home-hero-btn-primary" style={{ display: 'inline-flex' }} onClick={scrollToTop}>
+                  <BookOpen size={18} />
+                  <span>{isKhmer ? 'មើលជំនាញ និងវគ្គសិក្សាទាំងអស់' : 'Browse All Courses & Programs'}</span>
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </section>
 
-      {/* 4. Specialty Features Area */}
-      <section className="specialty-area">
+      {/* 4. Why Choose RPITSSR (Key Advantages) */}
+      <section className="home-why-section">
         <div className="container">
-          <div className="row no-gutters wow fadeInUpBig" data-wow-duration="1s" data-wow-delay="0.2s">
-            <div className="col-sm-4">
-              <div className="single-specialty mt-30">
-                <div className="specialty-box">
-                  <div className="box-icon">
-                    <img src="/images/icon/icon-1.webp" width="70" height="70" alt="icon" />
-                  </div>
-                  <div className="box-content">
-                    <p>Skill Based Scholarships</p>
-                  </div>
-                </div>
+          <div className="row justify-content-center mb-40">
+            <div className="col-lg-8 text-center">
+              <div className="section-title-2">
+                <span className="video-section-badge" style={{ display: 'inline-flex', marginBottom: '10px' }}>
+                  <Award size={14} /> {isKhmer ? 'ឧត្តមភាពវិទ្យាស្ថាន' : 'Why RPITSSR'}
+                </span>
+                <h2 className="title" style={{ fontSize: '2rem', fontWeight: 800, color: '#07294D' }}>
+                  {isKhmer ? 'ហេតុអ្វីជ្រើសរើសសិក្សានៅ RPITSSR?' : 'Why Choose RPITSSR?'}
+                </h2>
+                <span className="line" style={{ margin: '12px auto' }}></span>
+                <p style={{ color: '#64748b', fontSize: '0.98rem' }}>
+                  {isKhmer
+                    ? 'វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប ផ្តល់ជូននូវការបណ្តុះបណ្តាលដែលផ្សារភ្ជាប់ទ្រឹស្តីទៅនឹងការអនុវត្តជាក់ស្តែង ដើម្បីធានាបាននូវជំនាញពិតប្រាកដ។'
+                    : 'Providing world-class vocational training combining theoretical knowledge with hands-on enterprise practice.'}
+                </p>
               </div>
             </div>
-            <div className="col-sm-4">
-              <div className="single-specialty active mt-30">
-                <div className="specialty-box">
-                  <div className="box-icon">
-                    <img src="/images/icon/icon-2.webp" width="70" height="70" alt="icon" />
-                  </div>
-                  <div className="box-content">
-                    <p>Download Prospectus</p>
-                  </div>
-                </div>
+          </div>
+
+          <div className="home-why-grid">
+            {/* Card 1: Modern Labs */}
+            <div className="home-why-card">
+              <div className="home-why-icon-box" style={{ background: '#eff6ff', color: '#1e73be' }}>
+                <Wrench size={26} />
               </div>
+              <h4 className="home-why-card-title">
+                {isKhmer ? 'បន្ទប់ពិសោធន៍ & រោងជាងទំនើប' : 'Modern Labs & Workshops'}
+              </h4>
+              <p className="home-why-card-desc">
+                {isKhmer
+                  ? 'បំពាក់ដោយឧបករណ៍ និងបច្ចេកវិទ្យាសិក្សាស្របតាមស្តង់ដារឧស្សាហកម្មជាក់ស្តែង សម្រាប់សិស្ស-និស្សិតអនុវត្តផ្ទាល់។'
+                  : 'Equipped with industry-standard machinery and simulation software for hands-on learning.'}
+              </p>
             </div>
-            <div className="col-sm-4">
-              <div className="single-specialty mt-30">
-                <div className="specialty-box">
-                  <div className="box-icon">
-                    <img src="/images/icon/icon-3.webp" width="70" height="70" alt="icon" />
-                  </div>
-                  <div className="box-content">
-                    <p>After Course Certification</p>
-                  </div>
-                </div>
+
+            {/* Card 2: Faculty */}
+            <div className="home-why-card">
+              <div className="home-why-icon-box" style={{ background: '#fef3c7', color: '#d97706' }}>
+                <Users size={26} />
               </div>
+              <h4 className="home-why-card-title">
+                {isKhmer ? 'សាស្ត្រាចារ្យ & គ្រូបណ្តុះបណ្តាលជំនាញ' : 'Experienced Faculty'}
+              </h4>
+              <p className="home-why-card-desc">
+                {isKhmer
+                  ? 'គ្រូបណ្តុះបណ្តាលមានបទពិសោធន៍វិជ្ជាជីវៈច្បាស់លាស់ ទទួលបានការបណ្តុះបណ្តាលទាំងក្នុងនិងក្រៅប្រទេស។'
+                  : 'Certified instructors with extensive field experience and modern pedagogical training.'}
+              </p>
+            </div>
+
+            {/* Card 3: Job Placement */}
+            <div className="home-why-card">
+              <div className="home-why-icon-box" style={{ background: '#ecfdf5', color: '#059669' }}>
+                <Briefcase size={26} />
+              </div>
+              <h4 className="home-why-card-title">
+                {isKhmer ? 'ឱកាសការងារ ៩៥%+ ខ្ពស់' : 'High Job Placement Rate'}
+              </h4>
+              <p className="home-why-card-desc">
+                {isKhmer
+                  ? 'កិច្ចសហប្រតិបត្តិការជាមួយសហគ្រាស និងក្រុមហ៊ុនដៃគូរាប់រយ ជួយផ្តល់កម្មសិក្សា និងការងារភ្លាមៗក្រោយបញ្ចប់។'
+                  : 'Strong corporate partnerships offering internships and direct recruitment opportunities.'}
+              </p>
+            </div>
+
+            {/* Card 4: Scholarship & Free Training */}
+            <div className="home-why-card">
+              <div className="home-why-icon-box" style={{ background: '#fdf2f8', color: '#db2777' }}>
+                <ShieldCheck size={26} />
+              </div>
+              <h4 className="home-why-card-title">
+                {isKhmer ? 'អាហារូបករណ៍ ១០០% & ឧបត្ថម្ភ' : 'Scholarships & Stipends'}
+              </h4>
+              <p className="home-why-card-desc">
+                {isKhmer
+                  ? 'វគ្គសិក្សាអាហារូបករណ៍ ១០០% របស់រាជរដ្ឋាភិបាល (TVET 1.5M) រៀនដោយឥតគិតថ្លៃ ព្រមទាំងទទួលបានប្រាក់ឧបត្ថម្ភប្រចាំខែ។'
+                  : 'Free tuition and monthly stipends under the National TVET 1.5M training framework.'}
+              </p>
             </div>
           </div>
         </div>
