@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { CourseCard } from '../components/common/CourseCard';
+import { GraduationCap, Users } from 'lucide-react';
 import api from '../api/client';
 
 export const CoursesPage = () => {
-  const { t } = useLanguage();
+  const { t, currentLanguage, language } = useLanguage();
+  const isKhmer = currentLanguage === 'km' || language === 'km';
   const [courses, setCourses] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -157,11 +159,19 @@ export const CoursesPage = () => {
       {/* 3. Top Courses Area */}
       <section className="top-courses-area">
         <div className="container">
-          <div className="row">
-            <div className="col-lg-8">
-              <div className="section-title mt-40">
-                <h2 className="title">{t('courses.topCourses')}</h2>
-                <p>{t('courses.topCoursesDesc')}</p>
+          <div className="row justify-content-center mb-40">
+            <div className="col-lg-8 text-center">
+              <div className="section-title-2 mt-40">
+                <span className="video-section-badge" style={{ display: 'inline-flex', marginBottom: '10px' }}>
+                  <GraduationCap size={14} /> {isKhmer ? 'ជំនាញ & វគ្គសិក្សា' : 'Academic Programs'}
+                </span>
+                <h2 className="title" style={{ fontSize: '2rem', fontWeight: 800, color: '#07294D' }}>
+                  {t('courses.topCourses')}
+                </h2>
+                <span className="line" style={{ margin: '12px auto' }}></span>
+                <p style={{ color: '#64748b', fontSize: '0.98rem', maxWidth: '680px', margin: '0 auto' }}>
+                  {t('courses.topCoursesDesc')}
+                </p>
               </div>
             </div>
           </div>
@@ -208,11 +218,21 @@ export const CoursesPage = () => {
       {/* 4. Teachers Area */}
       <section className="teachers-area">
         <div className="container">
-          <div className="row">
-            <div className="col-lg-8">
-              <div className="section-title mt-40">
-                <h2 className="title">Meet our Teachers</h2>
-                <p>Our expert faculty members are dedicated to providing quality education and guidance</p>
+          <div className="row justify-content-center mb-40">
+            <div className="col-lg-8 text-center">
+              <div className="section-title-2 mt-40">
+                <span className="video-section-badge" style={{ display: 'inline-flex', marginBottom: '10px' }}>
+                  <Users size={14} /> {isKhmer ? 'សាស្ត្រាចារ្យ & គ្រូបណ្តុះបណ្តាល' : 'Faculty Members'}
+                </span>
+                <h2 className="title" style={{ fontSize: '2rem', fontWeight: 800, color: '#07294D' }}>
+                  {isKhmer ? 'សាស្ត្រាចារ្យ និងគ្រូបណ្តុះបណ្តាលរបស់យើង' : 'Meet Our Expert Faculty'}
+                </h2>
+                <span className="line" style={{ margin: '12px auto' }}></span>
+                <p style={{ color: '#64748b', fontSize: '0.98rem', maxWidth: '680px', margin: '0 auto' }}>
+                  {isKhmer
+                    ? 'គ្រូបណ្តុះបណ្តាលជំនាញ និងសាស្ត្រាចារ្យប្រកបដោយវិជ្ជាជីវៈខ្ពស់ យកចិត្តទុកដាក់ក្នុងការផ្ទេរចំណេះដឹង និងបណ្តុះបណ្តាលសមត្ថភាពជាក់ស្តែងជូនសិស្ស-និស្សិត។'
+                    : 'Our expert faculty members are dedicated to providing quality education, practical mentoring, and career guidance.'}
+                </p>
               </div>
             </div>
           </div>

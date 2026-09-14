@@ -339,11 +339,19 @@ export const HomePage = () => {
       {/* 3. Top Courses Area */}
       <section className="top-courses-area">
         <div className="container">
-          <div className="row">
-            <div className="col-lg-8">
-              <div className="section-title mt-40">
-                <h2 className="title">{t('home.topCourses')}</h2>
-                <p>{t('home.coursesDescription')}</p>
+          <div className="row justify-content-center mb-40">
+            <div className="col-lg-8 text-center">
+              <div className="section-title-2 mt-40">
+                <span className="video-section-badge" style={{ display: 'inline-flex', marginBottom: '10px' }}>
+                  <GraduationCap size={14} /> {isKhmer ? 'ជំនាញ & វគ្គសិក្សា' : 'Academic Programs'}
+                </span>
+                <h2 className="title" style={{ fontSize: '2rem', fontWeight: 800, color: '#07294D' }}>
+                  {t('home.topCourses')}
+                </h2>
+                <span className="line" style={{ margin: '12px auto' }}></span>
+                <p style={{ color: '#64748b', fontSize: '0.98rem', maxWidth: '680px', margin: '0 auto' }}>
+                  {t('home.coursesDescription')}
+                </p>
               </div>
             </div>
           </div>

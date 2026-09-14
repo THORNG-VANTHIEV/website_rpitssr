@@ -532,6 +532,19 @@ i {
   gap: 7px !important;
 }
 
+/* Neutralize legacy section-title vertical divider bar */
+.section-title .title::before {
+  display: none !important;
+}
+
+.section-title {
+  display: block !important;
+}
+
+.section-title p {
+  padding-left: 0 !important;
+}
+
 /* Navigation Header Stacking Context - Always sits above page content */
 .modern-header {
   position: relative !important;
