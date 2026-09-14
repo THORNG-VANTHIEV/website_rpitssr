@@ -336,7 +336,149 @@ export const HomePage = () => {
         </div>
       </section>
 
-      {/* 3. Top Courses Area */}
+      {/* 3. Key Institutional Facts & Figures Showcase */}
+      <section className="home-stats-section">
+        <div className="container">
+          <div className="row justify-content-center mb-40">
+            <div className="col-lg-8 text-center">
+              <div className="section-title-2">
+                <span className="video-section-badge" style={{ display: 'inline-flex', marginBottom: '10px' }}>
+                  <Sparkles size={14} /> {isKhmer ? 'ស្ថិតិ & សមិទ្ធផល' : 'Facts & Figures'}
+                </span>
+                <h2 className="title" style={{ fontSize: '2rem', fontWeight: 800, color: '#07294D' }}>
+                  {isKhmer ? 'ស្ថិតិ និងសមិទ្ធផលសំខាន់ៗរបស់វិទ្យាស្ថាន' : 'Key Facts & Figures at a Glance'}
+                </h2>
+                <span className="line" style={{ margin: '12px auto' }}></span>
+                <p style={{ color: '#64748b', fontSize: '0.98rem', maxWidth: '680px', margin: '0 auto' }}>
+                  {isKhmer
+                    ? 'ឆ្លុះបញ្ចាំងពីទំហំ គុណភាពបណ្តុះបណ្តាល និងកិត្យានុភាពជាគ្រឹះស្ថានអប់រំបច្ចេកទេសឈានមុខគេក្នុងខេត្តសៀមរាប'
+                    : 'Reflecting our scale, academic excellence, and prestige as the premier polytechnic institute in Siem Reap'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="row g-4 justify-content-center">
+            {/* Stat 1: Students */}
+            <div className="col-lg-3 col-sm-6">
+              <div className="home-stat-card">
+                <div
+                  className="home-stat-icon-wrap"
+                  style={{ backgroundColor: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}
+                >
+                  <GraduationCap size={28} />
+                </div>
+                <div className="home-stat-number-wrap">
+                  <span className="home-stat-number-val">
+                    <CountUpNumber end={3652} duration={2000} />
+                  </span>
+                  <span className="home-stat-number-plus">+</span>
+                </div>
+                <div className="home-stat-title-kh">
+                  {isKhmer ? 'និស្សិតកំពុងសិក្សា' : 'Enrolled Students'}
+                </div>
+                <div className="home-stat-subtitle-en">Students</div>
+                <span
+                  className="badge rounded-pill mt-2 px-3 py-1.5"
+                  style={{ backgroundColor: '#eff6ff', color: '#1e73be', fontSize: '0.75rem', fontWeight: '600', border: '1px solid #dbeafe' }}
+                >
+                  <i className="fas fa-certificate me-1" style={{ color: '#0284c7' }}></i>
+                  {isKhmer ? 'TVET & បរិញ្ញាបត្រ' : 'TVET & Degree'}
+                </span>
+              </div>
+            </div>
+
+            {/* Stat 2: Faculties */}
+            <div className="col-lg-3 col-sm-6">
+              <div className="home-stat-card">
+                <div
+                  className="home-stat-icon-wrap"
+                  style={{ backgroundColor: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa' }}
+                >
+                  <Users size={28} />
+                </div>
+                <div className="home-stat-number-wrap">
+                  <span className="home-stat-number-val">
+                    <CountUpNumber end={105} duration={2000} />
+                  </span>
+                  <span className="home-stat-number-plus">+</span>
+                </div>
+                <div className="home-stat-title-kh">
+                  {isKhmer ? 'សាស្ត្រាចារ្យ & គ្រូបណ្តុះបណ្តាល' : 'Faculty Members'}
+                </div>
+                <div className="home-stat-subtitle-en">Faculties</div>
+                <span
+                  className="badge rounded-pill mt-2 px-3 py-1.5"
+                  style={{ backgroundColor: '#fff7ed', color: '#c2410c', fontSize: '0.75rem', fontWeight: '600', border: '1px solid #fed7aa' }}
+                >
+                  <i className="fas fa-star me-1" style={{ color: '#f59e0b' }}></i>
+                  {isKhmer ? 'ជំនាញច្បាស់លាស់' : 'Certified Experts'}
+                </span>
+              </div>
+            </div>
+
+            {/* Stat 3: Programs / Courses */}
+            <div className="col-lg-3 col-sm-6">
+              <div className="home-stat-card">
+                <div
+                  className="home-stat-icon-wrap"
+                  style={{ backgroundColor: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}
+                >
+                  <BookOpen size={28} />
+                </div>
+                <div className="home-stat-number-wrap">
+                  <span className="home-stat-number-val">
+                    <CountUpNumber end={120} duration={2000} />
+                  </span>
+                  <span className="home-stat-number-plus">+</span>
+                </div>
+                <div className="home-stat-title-kh">
+                  {isKhmer ? 'ជំនាញ & វគ្គបណ្តុះបណ្តាល' : 'Courses & Programs'}
+                </div>
+                <div className="home-stat-subtitle-en">Programs</div>
+                <span
+                  className="badge rounded-pill mt-2 px-3 py-1.5"
+                  style={{ backgroundColor: '#faf5ff', color: '#6d28d9', fontSize: '0.75rem', fontWeight: '600', border: '1px solid #e9d5ff' }}
+                >
+                  <i className="fas fa-bolt me-1" style={{ color: '#9333ea' }}></i>
+                  {isKhmer ? 'ជំនាញទីផ្សារ ៤.០' : 'Industry 4.0'}
+                </span>
+              </div>
+            </div>
+
+            {/* Stat 4: Awards Win */}
+            <div className="col-lg-3 col-sm-6">
+              <div className="home-stat-card">
+                <div
+                  className="home-stat-icon-wrap"
+                  style={{ backgroundColor: '#fefce8', color: '#ca8a04', border: '1px solid #fef08a' }}
+                >
+                  <Award size={28} />
+                </div>
+                <div className="home-stat-number-wrap">
+                  <span className="home-stat-number-val">
+                    <CountUpNumber end={30} duration={2000} />
+                  </span>
+                  <span className="home-stat-number-plus">+</span>
+                </div>
+                <div className="home-stat-title-kh">
+                  {isKhmer ? 'ពានរង្វាន់ & ស្នាដៃឆ្នើម' : 'National Awards'}
+                </div>
+                <div className="home-stat-subtitle-en">Awards Win</div>
+                <span
+                  className="badge rounded-pill mt-2 px-3 py-1.5"
+                  style={{ backgroundColor: '#fefce8', color: '#a16207', fontSize: '0.75rem', fontWeight: '600', border: '1px solid #fef08a' }}
+                >
+                  <i className="fas fa-trophy me-1" style={{ color: '#eab308' }}></i>
+                  {isKhmer ? 'ស្តង់ដារគុណភាពជាតិ' : 'National Standards'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Top Courses Area */}
       <section className="top-courses-area home-top-courses-area">
         <div className="container">
           <div className="row justify-content-center mb-40">
@@ -610,99 +752,6 @@ export const HomePage = () => {
               <span>{t('home.viewMore') || 'មើលព្រឹត្តិការណ៍ទាំងអស់'}</span>
               <i className="fas fa-arrow-right"></i>
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 7. Modern Counter / Stats Showcase */}
-      <section className="modern-counter-section">
-        <div className="container">
-          <div className="modern-counter-container">
-            <div className="counter-grid-wrapper">
-              {/* Stat 1: Students */}
-              <div className="modern-stat-card stat-card-students">
-                <div className="stat-icon-wrapper">
-                  <i className="fas fa-user-graduate"></i>
-                </div>
-                <div className="stat-number-wrap">
-                  <span className="stat-number-val">
-                    <CountUpNumber end={3652} duration={2000} />
-                  </span>
-                  <span className="stat-number-plus">+</span>
-                </div>
-                <div className="stat-title-kh">
-                  {language === 'km' ? 'និស្សិតកំពុងសិក្សា' : 'Enrolled Students'}
-                </div>
-                <div className="stat-subtitle-en">Students</div>
-                <div className="stat-highlight-pill">
-                  <i className="fas fa-certificate" style={{ color: '#38bdf8' }}></i>
-                  <span>TVET & បរិញ្ញាបត្រ</span>
-                </div>
-              </div>
-
-              {/* Stat 2: Faculties */}
-              <div className="modern-stat-card stat-card-faculties">
-                <div className="stat-icon-wrapper">
-                  <i className="fas fa-chalkboard-teacher"></i>
-                </div>
-                <div className="stat-number-wrap">
-                  <span className="stat-number-val">
-                    <CountUpNumber end={105} duration={2000} />
-                  </span>
-                  <span className="stat-number-plus">+</span>
-                </div>
-                <div className="stat-title-kh">
-                  {language === 'km' ? 'សាស្ត្រាចារ្យ & គ្រូបណ្តុះបណ្តាល' : 'Faculty Members'}
-                </div>
-                <div className="stat-subtitle-en">Faculties</div>
-                <div className="stat-highlight-pill">
-                  <i className="fas fa-star" style={{ color: '#fb923c' }}></i>
-                  <span>ជំនាញច្បាស់លាស់</span>
-                </div>
-              </div>
-
-              {/* Stat 3: Branches / Programs */}
-              <div className="modern-stat-card stat-card-branches">
-                <div className="stat-icon-wrapper">
-                  <i className="fas fa-sitemap"></i>
-                </div>
-                <div className="stat-number-wrap">
-                  <span className="stat-number-val">
-                    <CountUpNumber end={120} duration={2000} />
-                  </span>
-                  <span className="stat-number-plus">+</span>
-                </div>
-                <div className="stat-title-kh">
-                  {language === 'km' ? 'ជំនាញ & វគ្គបណ្តុះបណ្តាល' : 'Courses & Programs'}
-                </div>
-                <div className="stat-subtitle-en">Branches</div>
-                <div className="stat-highlight-pill">
-                  <i className="fas fa-bolt" style={{ color: '#c084fc' }}></i>
-                  <span>ជំនាញទីផ្សារ ៤.០</span>
-                </div>
-              </div>
-
-              {/* Stat 4: Awards Win */}
-              <div className="modern-stat-card stat-card-awards">
-                <div className="stat-icon-wrapper">
-                  <i className="fas fa-trophy"></i>
-                </div>
-                <div className="stat-number-wrap">
-                  <span className="stat-number-val">
-                    <CountUpNumber end={30} duration={2000} />
-                  </span>
-                  <span className="stat-number-plus">+</span>
-                </div>
-                <div className="stat-title-kh">
-                  {language === 'km' ? 'ពានរង្វាន់ & ស្នាដៃឆ្នើម' : 'National Awards'}
-                </div>
-                <div className="stat-subtitle-en">Awards Win</div>
-                <div className="stat-highlight-pill">
-                  <i className="fas fa-award" style={{ color: '#facc15' }}></i>
-                  <span>ស្តង់ដារគុណភាពជាតិ</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
