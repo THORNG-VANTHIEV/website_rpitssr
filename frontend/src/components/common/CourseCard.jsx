@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
+import { Clock, ChevronRight, Edit3, Award } from 'lucide-react';
 
 export const CourseCard = ({ course }) => {
-  const { t } = useLanguage();
+  const { t, currentLanguage, language } = useLanguage();
+  const isKhmer = currentLanguage === 'km' || language === 'km';
   if (!course) return null;
 
   const resolveImage = (url) => {
@@ -22,53 +24,65 @@ export const CourseCard = ({ course }) => {
     ? (typeof course.category === 'object' ? course.category.name : course.category)
     : (course.title ? course.title.split(' ')[0] : 'TVET');
 
-  const feeVal = course.fee === '0' || course.fee === 0 || !course.fee || course.fee === 'Free'
-    ? '0'
-    : String(course.fee).replace('$', '');
+  const isFree = course.fee === '0' || course.fee === 0 || !course.fee || String(course.fee).toLowerCase() === 'free';
+  const feeVal = isFree ? '0' : String(course.fee).replace('$', '');
 
   return (
-    <div className="single-courses">
+    <div className="single-courses modern-course-card">
       {imageUrl && (
-        <div className="courses-image" style={{ marginBottom: '15px' }}>
+        <div className="courses-image">
           <Link to={`/courses-details/${course.id}`} onClick={() => window.scrollTo(0, 0)}>
             <img
               src={imageUrl}
               alt={course.title}
               onError={(e) => { e.target.src = '/images/courses/Course 3.jpg'; }}
-              style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '8px', display: 'block' }}
+              loading="lazy"
             />
           </Link>
+          {isFree && (
+            <span className="course-card-badge-free">
+              <Award size={12} />
+              <span>{isKhmer ? 'អាហារូបករណ៍ ១០០%' : '100% Scholarship'}</span>
+            </span>
+          )}
         </div>
       )}
 
-      <Link to={`/courses-details/${course.id}`} className="category" onClick={() => window.scrollTo(0, 0)}>
-        #{categoryTag}
-      </Link>
-
-      <h4 className="courses-title">
-        <Link to={`/courses-details/${course.id}`} onClick={() => window.scrollTo(0, 0)}>
-          {course.title}
+      <div className="course-card-content">
+        <Link to={`/courses-details/${course.id}`} className="category" onClick={() => window.scrollTo(0, 0)}>
+          #{categoryTag}
         </Link>
-      </h4>
 
-      <div className="duration-fee">
-        <p className="duration">
-          {t('courses.duration') || 'Duration'}: <span> {course.duration || '៤ ឆ្នាំ'}</span>
-        </p>
-        <p className="fee">
-          {t('courses.fee') || 'Fee'}: <span> ${feeVal}</span>
-        </p>
-      </div>
+        <h4 className="courses-title">
+          <Link to={`/courses-details/${course.id}`} onClick={() => window.scrollTo(0, 0)}>
+            {course.title}
+          </Link>
+        </h4>
 
-      <div className="courses-link">
-        <Link className="apply" to="/register" onClick={() => window.scrollTo(0, 0)}>
-          <i className="fas fa-edit" style={{ fontSize: '11px' }}></i>
-          <span>{t('courses.onlineApply') || 'Apply'}</span>
-        </Link>
-        <Link className="more" to={`/courses-details/${course.id}`} onClick={() => window.scrollTo(0, 0)}>
-          <span>{t('courses.readMore') || 'Read more'}</span>
-          <i className="fas fa-chevron-right"></i>
-        </Link>
+        <div className="duration-fee">
+          <div className="duration">
+            <Clock size={13} className="course-meta-icon" />
+            <span>{course.duration || (isKhmer ? '៤ ឆ្នាំ' : '4 Years')}</span>
+          </div>
+          <div className="fee">
+            {isFree ? (
+              <span className="course-fee-free-tag">{isKhmer ? 'ឥតគិតថ្លៃ' : 'Free ($0)'}</span>
+            ) : (
+              <span className="course-fee-val">${feeVal}</span>
+            )}
+          </div>
+        </div>
+
+        <div className="courses-link">
+          <Link className="apply" to="/register" onClick={() => window.scrollTo(0, 0)}>
+            <Edit3 size={13} />
+            <span>{isKhmer ? 'ដាក់ពាក្យ' : 'Apply'}</span>
+          </Link>
+          <Link className="more" to={`/courses-details/${course.id}`} onClick={() => window.scrollTo(0, 0)}>
+            <span>{isKhmer ? 'អានបន្ថែម' : 'Details'}</span>
+            <ChevronRight size={14} />
+          </Link>
+        </div>
       </div>
     </div>
   );
