@@ -545,6 +545,38 @@ i {
   padding-left: 0 !important;
 }
 
+/* Top Courses Section Spacing & Bottom Breathing Room */
+.top-courses-area {
+  padding-bottom: 60px !important;
+}
+
+.home-top-courses-area {
+  padding-bottom: 100px !important;
+}
+
+.home-courses-all-btn-wrap {
+  margin-top: 52px !important;
+  margin-bottom: 0 !important;
+}
+
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .home-top-courses-area {
+    padding-bottom: 80px !important;
+  }
+  .home-courses-all-btn-wrap {
+    margin-top: 42px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .home-top-courses-area {
+    padding-bottom: 65px !important;
+  }
+  .home-courses-all-btn-wrap {
+    margin-top: 36px !important;
+  }
+}
+
 /* Navigation Header Stacking Context - Always sits above page content */
 .modern-header {
   position: relative !important;

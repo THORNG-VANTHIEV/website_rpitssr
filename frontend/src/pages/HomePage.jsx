@@ -337,7 +337,7 @@ export const HomePage = () => {
       </section>
 
       {/* 3. Top Courses Area */}
-      <section className="top-courses-area">
+      <section className="top-courses-area home-top-courses-area">
         <div className="container">
           <div className="row justify-content-center mb-40">
             <div className="col-lg-8 text-center">
@@ -380,7 +380,7 @@ export const HomePage = () => {
             </div>
 
             {courses.length > 0 && (
-              <div className="text-center mt-40">
+              <div className="home-courses-all-btn-wrap text-center">
                 <Link to="/courses" className="home-hero-btn-primary" style={{ display: 'inline-flex' }} onClick={scrollToTop}>
                   <BookOpen size={18} />
                   <span>{isKhmer ? 'មើលជំនាញ និងវគ្គសិក្សាទាំងអស់' : 'Browse All Courses & Programs'}</span>
