@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Allow ALL social media bots complete access
+User-agent: facebookexternalhit
+User-agent: Facebot
+User-agent: Twitterbot
+User-agent: LinkedInBot
+User-agent: WhatsApp
+User-agent: Slackbot
+Allow: /
+
+# Sitemap
+Sitemap: https://www.rpitssr.edu.kh/sitemap.xml

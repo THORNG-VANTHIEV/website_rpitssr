@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://rpitssr.edu.kh/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <lastmod>2025-01-12</lastmod>
+  </url>
+
+  <!-- About Us -->
+  <url>
+    <loc>https://rpitssr.edu.kh/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-01-12</lastmod>
+  </url>
+
+  <!-- Courses -->
+  <url>
+    <loc>https://rpitssr.edu.kh/courses</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <lastmod>2025-01-12</lastmod>
+  </url>
+
+  <!-- Events -->
+  <url>
+    <loc>https://rpitssr.edu.kh/events</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-01-12</lastmod>
+  </url>
+
+  <!-- News/Blog -->
+  <url>
+    <loc>https://rpitssr.edu.kh/news</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-01-12</lastmod>
+  </url>
+
+  <!-- Teachers -->
+  <url>
+    <loc>https://rpitssr.edu.kh/teachers</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2025-01-12</lastmod>
+  </url>
+
+  <!-- Gallery -->
+  <url>
+    <loc>https://rpitssr.edu.kh/gallery</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+    <lastmod>2025-01-12</lastmod>
+  </url>
+
+  <!-- Contact -->
+  <url>
+    <loc>https://rpitssr.edu.kh/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2025-01-12</lastmod>
+  </url>
+
+  <!-- Exam Results -->
+  <url>
+    <loc>https://rpitssr.edu.kh/exam-results</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-01-12</lastmod>
+  </url>
+
+  <!-- FAQs -->
+  <url>
+    <loc>https://rpitssr.edu.kh/faqs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <lastmod>2025-01-12</lastmod>
+  </url>
+
+</urlset>

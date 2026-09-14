@@ -1,0 +1,62 @@
+[
+    {
+        "id": 2,
+        "title": "National TVET Day Exhibition 2026",
+        "time": "08:00 AM - 05:00 PM",
+        "date": "2026-06-15T00:00:00.000000Z",
+        "place": "RPITSSR Grand Conference Hall",
+        "imageUrl": "\/images\/gallery\/gallery 1.jpg",
+        "description": "Showcasing cutting-edge student projects, robotics, renewable solar implementations, and industrial partnership booths.",
+        "overview": null,
+        "speakers": null,
+        "schedule": null,
+        "fee": null,
+        "createdAt": "2026-09-12T08:37:12.000000Z",
+        "updatedAt": "2026-09-12T08:37:12.000000Z"
+    },
+    {
+        "id": 3,
+        "title": "Siem Reap Technical Career Fair & Skills Matching",
+        "time": "08:30 AM - 04:30 PM",
+        "date": "2026-07-20T00:00:00.000000Z",
+        "place": "Main Campus Courtyard",
+        "imageUrl": "\/images\/gallery\/gallery 2.jpg",
+        "description": "Over 40 leading employers and manufacturing companies conducting on-the-spot interviews for graduating students.",
+        "overview": null,
+        "speakers": null,
+        "schedule": null,
+        "fee": null,
+        "createdAt": "2026-09-12T08:37:12.000000Z",
+        "updatedAt": "2026-09-12T08:37:12.000000Z"
+    },
+    {
+        "id": 4,
+        "title": "ASEAN Renewable Energy & IoT Workshop",
+        "time": "09:00 AM - 12:00 PM",
+        "date": "2026-08-10T00:00:00.000000Z",
+        "place": "STEM Innovation Center, RPITSSR",
+        "imageUrl": "\/images\/gallery\/gallery 3.jpg",
+        "description": "Technical workshop exploring photovoltaic solar design, sensor analytics, and automated smart grid maintenance.",
+        "overview": null,
+        "speakers": null,
+        "schedule": null,
+        "fee": null,
+        "createdAt": "2026-09-12T08:37:12.000000Z",
+        "updatedAt": "2026-09-12T08:37:12.000000Z"
+    },
+    {
+        "id": 5,
+        "title": "Annual Student Graduation & Certification Ceremony",
+        "time": "07:30 AM - 11:30 AM",
+        "date": "2026-09-05T00:00:00.000000Z",
+        "place": "Grand Auditorium",
+        "imageUrl": "\/images\/gallery\/gallery 7.jpg",
+        "description": "Conferral of Associate and Bachelor degrees for the graduating cohort with government delegates in attendance.",
+        "overview": null,
+        "speakers": null,
+        "schedule": null,
+        "fee": null,
+        "createdAt": "2026-09-12T08:37:12.000000Z",
+        "updatedAt": "2026-09-12T08:37:12.000000Z"
+    }
+]
