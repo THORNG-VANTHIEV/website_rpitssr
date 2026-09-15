@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\AdminBlogPostController;
+use App\Http\Controllers\Api\Admin\AdminBookController;
 use App\Http\Controllers\Api\Admin\AdminCategoryController;
 use App\Http\Controllers\Api\Admin\AdminCourseController;
 use App\Http\Controllers\Api\Admin\AdminDocumentController;
@@ -106,6 +107,11 @@ Route::get('/promotions/active', [PromotionController::class, 'active']);
 Route::get('/documents', [DocumentController::class, 'index']);
 Route::get('/documents/{id}', [DocumentController::class, 'show']);
 Route::post('/documents/{id}/download', [DocumentController::class, 'incrementDownload']);
+
+// Public Library Catalog
+Route::get('/books', [AdminBookController::class, 'getBooks']);
+Route::get('/books/{id}', [AdminBookController::class, 'getBook']);
+Route::get('/book-categories', [AdminBookController::class, 'getCategories']);
 
 // Public Contact Form
 Route::post('/contact', function (\Illuminate\Http\Request $request) {
@@ -283,6 +289,23 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::get('/backups', [AdminToolController::class, 'getBackups']);
     Route::post('/backups', [AdminToolController::class, 'createBackup']);
     Route::delete('/backups/{id}', [AdminToolController::class, 'deleteBackup']);
+
+    // Library & Books Management CRUD
+    Route::get('/books', [AdminBookController::class, 'getBooks']);
+    Route::get('/books/{id}', [AdminBookController::class, 'getBook']);
+    Route::post('/books', [AdminBookController::class, 'storeBook']);
+    Route::put('/books/{id}', [AdminBookController::class, 'updateBook']);
+    Route::delete('/books/{id}', [AdminBookController::class, 'deleteBook']);
+    Route::post('/books/upload', [AdminBookController::class, 'uploadCover']);
+
+    Route::get('/book-categories', [AdminBookController::class, 'getCategories']);
+    Route::post('/book-categories', [AdminBookController::class, 'storeCategory']);
+    Route::put('/book-categories/{id}', [AdminBookController::class, 'updateCategory']);
+    Route::delete('/book-categories/{id}', [AdminBookController::class, 'deleteCategory']);
+
+    Route::get('/borrowings', [AdminBookController::class, 'getBorrowings']);
+    Route::post('/borrowings', [AdminBookController::class, 'storeBorrowing']);
+    Route::post('/borrowings/{id}/return', [AdminBookController::class, 'returnBorrowing']);
 
     // System Logs
     Route::get('/logs', [AdminToolController::class, 'getLogs']);

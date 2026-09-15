@@ -44,6 +44,7 @@ import { AdminBannersPage } from './pages/admin/AdminBannersPage';
 import { AdminPromotionsPage } from './pages/admin/AdminPromotionsPage';
 import { AdminPromotionalVideosPage } from './pages/admin/AdminPromotionalVideosPage';
 import { AdminLibraryPage } from './pages/admin/AdminLibraryPage';
+import { AdminBooksPage } from './pages/admin/AdminBooksPage';
 import { AdminBlogPostsPage } from './pages/admin/AdminBlogPostsPage';
 import { AdminBlogCategoriesPage } from './pages/admin/AdminBlogCategoriesPage';
 import { AdminCommentsPage } from './pages/admin/AdminCommentsPage';
@@ -150,6 +151,8 @@ function App() {
               <Route path="scrolling-banners" element={<AdminBannersPage />} />
               <Route path="promotions" element={<AdminPromotionsPage />} />
               <Route path="special-broadcasts" element={<AdminPromotionsPage />} />
+              <Route path="books" element={<AdminBooksPage />} />
+              <Route path="library-books" element={<AdminBooksPage />} />
               <Route path="library" element={<AdminLibraryPage />} />
               <Route path="library-categories" element={<AdminLibraryPage />} />
               <Route path="borrowings" element={<AdminLibraryPage />} />
