@@ -11,15 +11,31 @@ class AdminEventController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $limit = (int) $request->input('limit', 20);
-        $events = Event::orderBy('date', 'desc')->paginate($limit);
+        $query = Event::with('category');
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('place', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('speakers', 'like', "%{$search}%");
+            });
+        }
+
+        $limit = (int) $request->input('limit', 100);
+        $events = $query->orderBy('date', 'desc')->paginate($limit);
 
         return response()->json($events->items(), 200);
     }
 
     public function show($id): JsonResponse
     {
-        $event = Event::find($id);
+        $event = Event::with('category')->find($id);
 
         if (!$event) {
             return response()->json(['error' => 'Event not found'], 404);
@@ -35,6 +51,7 @@ class AdminEventController extends Controller
             'time' => 'nullable|string',
             'date' => 'required|date',
             'place' => 'nullable|string',
+            'category_id' => 'nullable|integer',
             'imageUrl' => 'nullable|string',
             'description' => 'nullable|string',
             'overview' => 'nullable|string',
@@ -44,6 +61,7 @@ class AdminEventController extends Controller
         ]);
 
         $event = Event::create($validated);
+        $event->load('category');
 
         return response()->json($event, 201);
     }
@@ -61,6 +79,7 @@ class AdminEventController extends Controller
             'time' => 'nullable|string',
             'date' => 'sometimes|required|date',
             'place' => 'nullable|string',
+            'category_id' => 'nullable|integer',
             'imageUrl' => 'nullable|string',
             'description' => 'nullable|string',
             'overview' => 'nullable|string',
@@ -70,6 +89,7 @@ class AdminEventController extends Controller
         ]);
 
         $event->update($validated);
+        $event->load('category');
 
         return response()->json($event, 200);
     }
