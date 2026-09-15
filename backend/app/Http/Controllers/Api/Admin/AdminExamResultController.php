@@ -42,7 +42,7 @@ class AdminExamResultController extends Controller
             });
         }
 
-        $limit = (int) $request->input('limit', 20);
+        $limit = (int) $request->input('limit', 100);
         $results = $query->orderBy('id', 'desc')->paginate($limit);
 
         return response()->json([
