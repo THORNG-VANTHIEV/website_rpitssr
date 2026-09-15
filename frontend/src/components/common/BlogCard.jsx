@@ -29,7 +29,7 @@ const formatKhmerDate = (dateStr, isKhmer) => {
 };
 
 // Category styling resolver following AGENTS.md pastel palette
-const getCategoryStyle = (catName) => {
+export const getCategoryStyle = (catName) => {
   const c = (catName || '').toLowerCase();
   if (c.includes('scholar') || c.includes('អាហារូបករណ៍') || c.includes('promotion')) {
     return { background: '#fffbeb', color: '#b45309', border: '1px solid #fde68a' };
@@ -46,19 +46,13 @@ const getCategoryStyle = (catName) => {
   return { background: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' };
 };
 
-export const BlogCard = ({ post, featured = false }) => {
-  if (!post) return null;
-
-  const { t, language, currentLanguage } = useLanguage();
-  const isKhmer = (currentLanguage || language) === 'km';
-  const imageUrl = post.imageUrl || post.image_url || '/images/blog-placeholder.jpg';
-
-  // Category resolution
+// Category name resolver helper
+export const resolveCategoryName = (post, isKhmer) => {
   let categoryName = isKhmer ? 'ព័ត៌មានទូទៅ' : 'Campus News';
-  if (post.category) {
+  if (post?.category) {
     if (typeof post.category === 'object' && post.category.name) categoryName = post.category.name;
     else if (typeof post.category === 'string') categoryName = post.category;
-  } else if (post.tags) {
+  } else if (post?.tags) {
     let tags = [];
     if (Array.isArray(post.tags)) tags = post.tags;
     else if (typeof post.tags === 'string') {
@@ -74,7 +68,7 @@ export const BlogCard = ({ post, featured = false }) => {
       if (typeof first === 'object' && first.name) categoryName = first.name;
       else if (typeof first === 'string') categoryName = first;
     }
-  } else if (post.title) {
+  } else if (post?.title) {
     const titleLower = post.title.toLowerCase();
     if (titleLower.includes('scholar') || titleLower.includes('អាហារូបករណ៍') || titleLower.includes('១០០%')) {
       categoryName = isKhmer ? 'អាហារូបករណ៍' : 'Scholarships';
@@ -87,7 +81,6 @@ export const BlogCard = ({ post, featured = false }) => {
     }
   }
 
-  // Automatic translation for standard categories
   if (isKhmer) {
     const catLower = (categoryName || '').toLowerCase();
     if (catLower === 'promotion' || catLower.includes('scholar')) categoryName = 'អាហារូបករណ៍';
@@ -97,6 +90,18 @@ export const BlogCard = ({ post, featured = false }) => {
     else if (catLower === 'achievement' || catLower.includes('achieve')) categoryName = 'សមិទ្ធផល & គុណភាព';
     else if (catLower === 'education') categoryName = 'ការអប់រំបណ្តុះបណ្តាល';
   }
+
+  return categoryName;
+};
+
+export const BlogCard = ({ post, featured = false }) => {
+  if (!post) return null;
+
+  const { t, language, currentLanguage } = useLanguage();
+  const isKhmer = (currentLanguage || language) === 'km';
+  const imageUrl = post.imageUrl || post.image_url || '/images/blog-placeholder.jpg';
+
+  const categoryName = resolveCategoryName(post, isKhmer);
 
   const dateStr = post.publishedAt || post.createdAt || post.created_at;
   const formattedDate = formatKhmerDate(dateStr, isKhmer);

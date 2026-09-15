@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
-import { BlogCard } from '../components/common/BlogCard';
+import { BlogCard, getCategoryStyle, resolveCategoryName } from '../components/common/BlogCard';
 import { getCleanExcerpt } from '../utils/textUtils';
 import client from '../api/client';
 
@@ -349,21 +349,22 @@ export const BlogPage = () => {
           </div>
 
           {/* ACTIVE RESULTS SUMMARY */}
-          <div className="d-flex align-items-center justify-content-between mb-4 px-1">
-            <div className="text-muted small d-flex align-items-center flex-wrap gap-1.5">
-              <span>{t('blog.showing_count') || 'បង្ហាញ'}</span>
+          <div className="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4 pb-2 px-1">
+            <div className="blog-results-counter-pill">
+              <i className="fas fa-layer-group text-primary"></i>
+              <span className="text-muted">{t('blog.showing_count') || 'បង្ហាញ'}</span>
               <strong style={{ color: '#07294D' }}>
                 {isKhmer
                   ? filteredPosts.length.toString().split('').map(d => ['០','១','២','៣','៤','៥','៦','៧','៨','៩'][d] || d).join('')
                   : filteredPosts.length}
               </strong>
-              <span>{t('blog.of_count') || 'នៃ'}</span>
+              <span className="text-muted">{t('blog.of_count') || 'នៃ'}</span>
               <strong style={{ color: '#07294D' }}>
                 {isKhmer
                   ? posts.length.toString().split('').map(d => ['០','១','២','៣','៤','៥','៦','៧','៨','៩'][d] || d).join('')
                   : posts.length}
               </strong>
-              <span>{t('blog.articles_count') || 'អត្ថបទ'}</span>
+              <span className="text-muted">{t('blog.articles_count') || 'អត្ថបទ'}</span>
               {activeCategory !== 'all' && (
                 <span className="ms-2 badge bg-primary text-white rounded-pill px-2.5 py-1">
                   {categories.find(c => c.key === activeCategory)?.label}
@@ -438,67 +439,87 @@ export const BlogPage = () => {
           ) : (
             <>
               {/* 4. FLAGSHIP SPOTLIGHT STORY (WHEN VIEWING ALL ON PAGE 1) */}
-              {spotlightPost && (
-                <div className="mb-5">
-                  <div className="blog-spotlight-card">
-                    <div className="row g-0 align-items-stretch">
-                      <div className="col-lg-6">
-                        <div className="blog-spotlight-img-wrap">
-                          <Link to={`/blog-details/${spotlightPost.id || spotlightPost.slug}`} className="d-block w-100 h-100">
-                            <img
-                              src={spotlightPost.imageUrl || spotlightPost.image_url || '/images/blog.webp'}
-                              alt={spotlightPost.title}
-                              onError={(e) => { e.target.src = '/images/blog.webp'; }}
-                            />
-                          </Link>
-                          <div className="blog-spotlight-ribbon">
-                            <i className="fas fa-star me-1.5"></i>
-                            <span>{t('blog.featured_story') || 'ព័ត៌មានលេចធ្លោពិសេស'}</span>
+              {spotlightPost && (() => {
+                const spotlightCatName = resolveCategoryName(spotlightPost, isKhmer);
+                const spotlightCatStyle = getCategoryStyle(spotlightCatName);
+                return (
+                  <div className="mb-5 pb-2">
+                    <div className="blog-spotlight-card">
+                      <div className="row g-0 align-items-stretch">
+                        <div className="col-lg-6">
+                          <div className="blog-spotlight-img-wrap">
+                            <Link to={`/blog-details/${spotlightPost.id || spotlightPost.slug}`} className="d-block w-100 h-100">
+                              <img
+                                src={spotlightPost.imageUrl || spotlightPost.image_url || '/images/blog.webp'}
+                                alt={spotlightPost.title}
+                                onError={(e) => { e.target.src = '/images/blog.webp'; }}
+                              />
+                            </Link>
+                            <div className="blog-spotlight-ribbon">
+                              <i className="fas fa-star me-1.5"></i>
+                              <span>{t('blog.featured_story') || 'ព័ត៌មានលេចធ្លោពិសេស'}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="col-lg-6 d-flex flex-column justify-content-center p-4 p-md-5">
-                        <div className="d-flex align-items-center gap-3 text-muted small mb-2">
-                          <span className="d-inline-flex align-items-center gap-1.5">
-                            <i className="far fa-calendar-alt text-primary"></i>
-                            {formatKhmerDate(spotlightPost.publishedAt || spotlightPost.createdAt, isKhmer)}
-                          </span>
-                          <span>•</span>
-                          <span className="d-inline-flex align-items-center gap-1.5">
-                            <i className="far fa-user text-primary"></i>
-                            {spotlightPost.author || 'RPITSSR Press'}
-                          </span>
-                        </div>
+                        <div className="col-lg-6 blog-spotlight-body">
+                          {/* Category Tag & Metadata */}
+                          <div className="d-flex align-items-center flex-wrap gap-2.5 mb-3">
+                            <span className="blog-spotlight-cat-tag" style={spotlightCatStyle}>
+                              {spotlightCatName}
+                            </span>
+                            <span className="text-muted small d-inline-flex align-items-center gap-1.5 ms-1">
+                              <i className="far fa-calendar-alt text-primary"></i>
+                              {formatKhmerDate(spotlightPost.publishedAt || spotlightPost.createdAt, isKhmer)}
+                            </span>
+                            <span className="text-muted small">•</span>
+                            <span className="text-muted small d-inline-flex align-items-center gap-1.5">
+                              <i className="far fa-user text-primary"></i>
+                              {spotlightPost.author || 'RPITSSR Press'}
+                            </span>
+                          </div>
 
-                        <h3 className="fw-bold mb-3" style={{ color: '#07294D', fontSize: '1.65rem', lineHeight: 1.4 }}>
-                          <Link
-                            to={`/blog-details/${spotlightPost.id || spotlightPost.slug}`}
-                            style={{ color: 'inherit', textDecoration: 'none' }}
-                          >
-                            {spotlightPost.title}
-                          </Link>
-                        </h3>
+                          {/* Spotlight Title */}
+                          <h3 className="blog-spotlight-title">
+                            <Link to={`/blog-details/${spotlightPost.id || spotlightPost.slug}`}>
+                              {spotlightPost.title}
+                            </Link>
+                          </h3>
 
-                        <p className="text-muted mb-4" style={{ lineHeight: 1.7, fontSize: '0.96rem' }}>
-                          {getCleanExcerpt(spotlightPost, 220)}
-                        </p>
+                          {/* Excerpt */}
+                          <p className="blog-spotlight-excerpt">
+                            {getCleanExcerpt(spotlightPost, 240)}
+                          </p>
 
-                        <div className="d-flex align-items-center gap-3 mt-auto">
-                          <Link
-                            to={`/blog-details/${spotlightPost.id || spotlightPost.slug}`}
-                            className="btn btn-primary rounded-pill px-4 py-2.5 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm"
-                            style={{ backgroundColor: '#07294D', borderColor: '#07294D' }}
-                          >
-                            <span>{t('blog.read_full_story') || 'អានព័ត៌មានលម្អិត'}</span>
-                            <i className="fas fa-arrow-right"></i>
-                          </Link>
+                          {/* Action Footer */}
+                          <div className="blog-spotlight-footer d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <Link
+                              to={`/blog-details/${spotlightPost.id || spotlightPost.slug}`}
+                              className="blog-spotlight-btn"
+                            >
+                              <span>{t('blog.read_full_story') || 'អានព័ត៌មានលម្អិត'}</span>
+                              <i className="fas fa-arrow-right"></i>
+                            </Link>
+
+                            <div className="d-flex align-items-center gap-3 text-muted small">
+                              <span className="d-inline-flex align-items-center gap-1.5">
+                                <i className="far fa-clock text-primary"></i>
+                                <span>{isKhmer ? 'អាន ៣ នាទី' : '3 min read'}</span>
+                              </span>
+                              {spotlightPost.viewCount !== undefined && spotlightPost.viewCount > 0 && (
+                                <span className="d-inline-flex align-items-center gap-1.5">
+                                  <i className="far fa-eye text-secondary"></i>
+                                  <span>{spotlightPost.viewCount}</span>
+                                </span>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {/* 5. ARTICLES GRID */}
               <div className="row g-4">
