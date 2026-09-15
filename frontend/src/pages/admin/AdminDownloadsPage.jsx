@@ -9,29 +9,37 @@ import {
   UploadCloud,
   Download,
   Star,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
   Eye,
   Edit2,
   Trash2,
   Plus,
   X,
-  File,
-  Filter,
-  BarChart3
+  RotateCw,
+  Search,
+  Building2,
+  CheckSquare,
+  AlertTriangle,
+  Sparkles,
+  ExternalLink,
+  Layers,
+  FileSpreadsheet,
+  FileCode,
+  Archive
 } from 'lucide-react';
 
 const CATEGORY_OPTIONS = [
-  { value: 'admissions', labelKm: 'ចុះឈ្មោះ & អាហារូបករណ៍', labelEn: 'Admissions & Scholarships', color: '#10b981' },
-  { value: 'calendars', labelKm: 'ប្រតិទិន & កាលវិភាគ', labelEn: 'Calendars & Timetables', color: '#3b82f6' },
-  { value: 'handbooks', labelKm: 'បទបញ្ជា & សៀវភៅណែនាំ', labelEn: 'Handbooks & Regulations', color: '#f59e0b' },
-  { value: 'adminForms', labelKm: 'បែបបទរដ្ឋបាល & សេវាសិស្ស', labelEn: 'Admin & Student Forms', color: '#8b5cf6' },
-  { value: 'general', labelKm: 'ឯកសារទូទៅ', labelEn: 'General Documents', color: '#64748b' }
+  { value: 'admissions', labelKm: 'ចុះឈ្មោះ & អាហារូបករណ៍', labelEn: 'Admissions & Scholarships', bg: '#fefce8', color: '#ca8a04', border: '#fef08a' },
+  { value: 'calendars', labelKm: 'ប្រតិទិន & កាលវិភាគ', labelEn: 'Calendars & Timetables', bg: '#eff6ff', color: '#1e73be', border: '#dbeafe' },
+  { value: 'handbooks', labelKm: 'បទបញ្ជា & សៀវភៅណែនាំ', labelEn: 'Handbooks & Regulations', bg: '#fff7ed', color: '#ea580c', border: '#fed7aa' },
+  { value: 'adminForms', labelKm: 'បែបបទរដ្ឋបាល & សេវាសិស្ស', labelEn: 'Admin & Student Forms', bg: '#faf5ff', color: '#7c3aed', border: '#e9d5ff' },
+  { value: 'general', labelKm: 'ឯកសារទូទៅ', labelEn: 'General Documents', bg: '#f1f5f9', color: '#475569', border: '#cbd5e1' }
 ];
 
 export const AdminDownloadsPage = () => {
-  const { currentLanguage } = useLanguage();
-  const isKhmer = currentLanguage === 'km';
+  const { currentLanguage, language } = useLanguage();
+  const isKhmer = (currentLanguage || language) === 'km';
 
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,7 +47,18 @@ export const AdminDownloadsPage = () => {
   const [editingDoc, setEditingDoc] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
+
+  // Filter & Search State
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Preview Lightbox Modal
+  const [previewDoc, setPreviewDoc] = useState(null);
+
+  // Delete Confirmation Modal
+  const [docToDelete, setDocToDelete] = useState(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -70,6 +89,8 @@ export const AdminDownloadsPage = () => {
         setDocuments(res.data.data);
       } else if (Array.isArray(res.data)) {
         setDocuments(res.data);
+      } else if (res.data?.data) {
+        setDocuments(res.data.data);
       } else {
         setDocuments([]);
       }
@@ -92,6 +113,29 @@ export const AdminDownloadsPage = () => {
     const popular = documents.filter((d) => d.is_popular).length;
     return { total, downloads, active, popular };
   }, [documents]);
+
+  // Filtered Documents
+  const filteredDocuments = useMemo(() => {
+    return documents.filter((d) => {
+      const matchSearch =
+        searchTerm === '' ||
+        d.title_km?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        d.title_en?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        d.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        d.description_km?.toLowerCase().includes(searchTerm.toLowerCase());
+
+      let matchCategory = true;
+      if (selectedCategory === 'all') {
+        matchCategory = true;
+      } else if (selectedCategory === 'popular') {
+        matchCategory = Boolean(d.is_popular);
+      } else {
+        matchCategory = d.category === selectedCategory;
+      }
+
+      return matchSearch && matchCategory;
+    });
+  }, [documents, selectedCategory, searchTerm]);
 
   // Open Modal for Create
   const openAddModal = () => {
@@ -141,6 +185,15 @@ export const AdminDownloadsPage = () => {
     setModalOpen(true);
   };
 
+  const openPreview = (doc) => {
+    setPreviewDoc(doc);
+  };
+
+  const openDeleteModal = (doc) => {
+    setDocToDelete(doc);
+    setDeleteModalOpen(true);
+  };
+
   // File Upload Handler
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -165,7 +218,7 @@ export const AdminDownloadsPage = () => {
       }
     } catch (err) {
       console.error('File upload error:', err);
-      alert('Failed to upload file. Allowed: PDF, Word, Excel, ZIP (Max 25MB).');
+      alert(isKhmer ? 'ការផ្ទុកឯកសារបរាជ័យ។ (គាំទ្រ PDF, Word, Excel, ZIP)' : 'Failed to upload file. Allowed: PDF, Word, Excel, ZIP (Max 25MB).');
     } finally {
       setUploadingFile(false);
     }
@@ -201,7 +254,7 @@ export const AdminDownloadsPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title_km.trim()) {
-      alert('Please enter Document Title in Khmer.');
+      alert(isKhmer ? 'សូមបញ្ចូលចំណងជើងជាភាសាខ្មែរ។' : 'Please enter Document Title in Khmer.');
       return;
     }
 
@@ -223,21 +276,26 @@ export const AdminDownloadsPage = () => {
       fetchData();
     } catch (err) {
       console.error('Save failed:', err);
-      alert('Failed to save document.');
+      alert(isKhmer ? 'ការរក្សាទុកឯកសារបរាជ័យ។' : 'Failed to save document.');
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Delete Handler
-  const handleDelete = async (doc) => {
-    if (!window.confirm(`Are you sure you want to delete "${doc.title_km}"?`)) return;
+  // Confirm Delete
+  const handleConfirmDelete = async () => {
+    if (!docToDelete) return;
+    setDeleting(true);
     try {
-      await api.delete(`/admin/documents/${doc.id}`);
+      await api.delete(`/admin/documents/${docToDelete.id}`);
+      setDeleteModalOpen(false);
+      setDocToDelete(null);
       fetchData();
     } catch (err) {
       console.error('Delete failed:', err);
-      alert('Failed to delete document.');
+      alert(isKhmer ? 'ការលុបឯកសារបរាជ័យ។' : 'Failed to delete document.');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -245,7 +303,9 @@ export const AdminDownloadsPage = () => {
   const handleTogglePopular = async (doc) => {
     try {
       await api.post(`/admin/documents/${doc.id}/toggle-popular`);
-      fetchData();
+      setDocuments((prev) =>
+        prev.map((d) => (d.id === doc.id ? { ...d, is_popular: !d.is_popular } : d))
+      );
     } catch (err) {
       console.error('Toggle popular failed:', err);
     }
@@ -255,37 +315,44 @@ export const AdminDownloadsPage = () => {
   const handleToggleActive = async (doc) => {
     try {
       await api.post(`/admin/documents/${doc.id}/toggle-active`);
-      fetchData();
+      setDocuments((prev) =>
+        prev.map((d) => (d.id === doc.id ? { ...d, is_active: !d.is_active } : d))
+      );
     } catch (err) {
       console.error('Toggle active failed:', err);
     }
   };
 
-  // Filtered by selected category tab
-  const displayedDocuments = useMemo(() => {
-    if (selectedCategory === 'all') return documents;
-    return documents.filter((d) => d.category === selectedCategory);
-  }, [documents, selectedCategory]);
+  // Helper for Format Badge Class
+  const getFormatBadgeClass = (fileType = 'pdf') => {
+    const ft = (fileType || '').toLowerCase();
+    if (ft === 'pdf') return 'admin-doc-format-pdf';
+    if (ft === 'xlsx' || ft === 'xls') return 'admin-doc-format-xlsx';
+    if (ft === 'docx' || ft === 'doc') return 'admin-doc-format-docx';
+    if (ft === 'zip' || ft === 'rar') return 'admin-doc-format-zip';
+    return 'admin-doc-format-docx';
+  };
 
-  // Data Table Columns
+  // Helper for Category Metadata
+  const getCategoryMeta = (catVal) => {
+    return CATEGORY_OPTIONS.find((c) => c.value === catVal) || {
+      value: catVal,
+      labelKm: catVal,
+      labelEn: catVal,
+      bg: '#f1f5f9',
+      color: '#475569',
+      border: '#cbd5e1',
+    };
+  };
+
+  // Columns for AdminDataTable
   const columns = [
     {
       header: isKhmer ? 'កូដ & ចំណងជើងឯកសារ' : 'Code & Document Title',
       render: (row) => (
         <div style={{ maxWidth: '380px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-            <span
-              style={{
-                fontFamily: 'monospace',
-                fontSize: '0.75rem',
-                fontWeight: '700',
-                padding: '2px 8px',
-                borderRadius: '6px',
-                backgroundColor: '#eff6ff',
-                color: '#1e73be',
-                border: '1px solid #bfdbfe',
-              }}
-            >
+            <span className="admin-doc-code-badge">
               {row.code || 'FORM-DOC'}
             </span>
             {row.is_popular && (
@@ -295,22 +362,33 @@ export const AdminDownloadsPage = () => {
                   alignItems: 'center',
                   gap: '4px',
                   fontSize: '0.72rem',
-                  fontWeight: '700',
+                  fontWeight: 800,
                   padding: '2px 8px',
                   borderRadius: '9999px',
-                  backgroundColor: '#fef3c7',
+                  backgroundColor: '#fefce8',
                   color: '#b45309',
+                  border: '1px solid #fde68a',
                 }}
               >
-                <Star size={11} fill="#f59e0b" color="#f59e0b" /> {isKhmer ? 'ឯកសារពេញនិយម' : 'Top Form'}
+                <Star size={11} fill="#b45309" color="#b45309" />
+                {isKhmer ? 'ពេញនិយម' : 'Top Form'}
               </span>
             )}
           </div>
-          <div style={{ fontWeight: '700', color: 'var(--admin-primary)', fontSize: '0.92rem', lineHeight: '1.4' }}>
+          <div
+            style={{
+              fontWeight: 800,
+              color: '#07294D',
+              fontSize: '0.94rem',
+              lineHeight: 1.4,
+              cursor: 'pointer',
+            }}
+            onClick={() => openPreview(row)}
+          >
             {row.title_km}
           </div>
           {row.title_en && (
-            <div style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)', marginTop: '2px' }}>
+            <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '2px' }}>
               {row.title_en}
             </div>
           )}
@@ -320,22 +398,22 @@ export const AdminDownloadsPage = () => {
     {
       header: isKhmer ? 'ប្រភេទ' : 'Category',
       render: (row) => {
-        const cat = CATEGORY_OPTIONS.find((c) => c.value === row.category);
+        const cat = getCategoryMeta(row.category);
         return (
           <span
             style={{
               display: 'inline-block',
-              padding: '4px 10px',
+              padding: '3px 10px',
               borderRadius: '9999px',
-              fontSize: '0.75rem',
-              fontWeight: '600',
-              backgroundColor: cat ? `${cat.color}15` : '#f1f5f9',
-              color: cat ? cat.color : '#475569',
-              border: `1px solid ${cat ? `${cat.color}35` : '#cbd5e1'}`,
+              fontSize: '0.76rem',
+              fontWeight: 700,
+              background: cat.bg,
+              color: cat.color,
+              border: `1px solid ${cat.border}`,
               whiteSpace: 'nowrap',
             }}
           >
-            {cat ? (isKhmer ? cat.labelKm : cat.labelEn) : row.category}
+            {isKhmer ? cat.labelKm : cat.labelEn}
           </span>
         );
       },
@@ -344,28 +422,14 @@ export const AdminDownloadsPage = () => {
       header: isKhmer ? 'ឯកសារ & ទម្រង់' : 'File & Format',
       render: (row) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div
-            style={{
-              width: '34px',
-              height: '34px',
-              borderRadius: '8px',
-              backgroundColor: row.file_type === 'pdf' ? '#fee2e2' : row.file_type === 'xlsx' ? '#dcfce7' : '#e0f2fe',
-              color: row.file_type === 'pdf' ? '#ef4444' : row.file_type === 'xlsx' ? '#16a34a' : '#0284c7',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: '800',
-              fontSize: '0.75rem',
-              textTransform: 'uppercase',
-            }}
-          >
+          <div className={`admin-doc-format-box ${getFormatBadgeClass(row.file_type)}`}>
             {row.file_type || 'PDF'}
           </div>
           <div>
-            <div style={{ fontWeight: '600', fontSize: '0.84rem', textTransform: 'uppercase' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.82rem', textTransform: 'uppercase', color: '#07294D' }}>
               {row.file_type || 'PDF'}
             </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)' }}>
+            <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
               {row.file_size || 'N/A'}
             </div>
           </div>
@@ -375,8 +439,8 @@ export const AdminDownloadsPage = () => {
     {
       header: isKhmer ? 'ការទាញយក' : 'Downloads',
       render: (row) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '700', color: '#0f172a' }}>
-          <Download size={15} style={{ color: '#1e73be' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 800, color: '#07294D' }}>
+          <Download size={14} style={{ color: '#1e73be' }} />
           <span>{(Number(row.downloads_count) || 0).toLocaleString()}</span>
         </div>
       ),
@@ -384,63 +448,86 @@ export const AdminDownloadsPage = () => {
     {
       header: isKhmer ? 'ស្ថានភាព' : 'Status',
       render: (row) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button
-            onClick={() => handleToggleActive(row)}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
-              padding: '4px 8px',
-              borderRadius: '6px',
-              fontSize: '0.75rem',
-              fontWeight: '600',
-              backgroundColor: row.is_active ? '#dcfce7' : '#f1f5f9',
-              color: row.is_active ? '#15803d' : '#64748b',
-            }}
-            title={isKhmer ? 'ចុចដើម្បីបិទ/បើកការបង្ហាញជាសាធារណៈ' : 'Click to toggle public status'}
-          >
-            {row.is_active ? <CheckCircle size={14} /> : <XCircle size={14} />}
-            {row.is_active ? (isKhmer ? 'សកម្ម' : 'Active') : (isKhmer ? 'អសកម្ម' : 'Inactive')}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => handleToggleActive(row)}
+          style={{
+            border: 'none',
+            background: row.is_active ? '#f0fdf4' : '#fef2f2',
+            color: row.is_active ? '#166534' : '#dc2626',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '4px 10px',
+            borderRadius: '20px',
+            fontSize: '0.76rem',
+            fontWeight: 700,
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            borderColor: row.is_active ? '#bbf7d0' : '#fecaca',
+            transition: 'all 0.2s ease',
+          }}
+          title={isKhmer ? 'ចុចដើម្បីផ្លាស់ប្តូរស្ថានភាព' : 'Toggle active status'}
+        >
+          {row.is_active ? <CheckCircle2 size={13} /> : <XCircle size={13} />}
+          <span>{row.is_active ? (isKhmer ? 'សកម្ម' : 'Active') : (isKhmer ? 'អសកម្ម' : 'Inactive')}</span>
+        </button>
       ),
     },
     {
-      header: isKhmer ? 'សកម្មភាព' : 'Actions',
+      header: isKhmer ? 'ប្រតិបត្តិការ' : 'Actions',
+      align: 'right',
       render: (row) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
           {/* Toggle Popular */}
           <button
+            type="button"
             onClick={() => handleTogglePopular(row)}
-            className="admin-action-btn"
-            style={{ color: row.is_popular ? '#f59e0b' : '#94a3b8' }}
+            className="admin-btn admin-btn-outline admin-btn-sm"
+            style={{
+              padding: '6px 9px',
+              borderRadius: '8px',
+              color: row.is_popular ? '#d97706' : '#94a3b8',
+              backgroundColor: row.is_popular ? '#fefce8' : '#ffffff',
+              borderColor: row.is_popular ? '#fef08a' : '#e2e8f0',
+            }}
             title={row.is_popular ? (isKhmer ? 'ដកការពេញនិយម' : 'Unmark Popular') : (isKhmer ? 'កំណត់ជាពេញនិយម' : 'Mark as Popular')}
           >
-            <Star size={16} fill={row.is_popular ? '#f59e0b' : 'none'} />
+            <Star size={14} fill={row.is_popular ? '#d97706' : 'none'} />
+          </button>
+
+          {/* Quick Preview */}
+          <button
+            type="button"
+            onClick={() => openPreview(row)}
+            className="admin-btn admin-btn-outline admin-btn-sm"
+            style={{ padding: '6px 9px', borderRadius: '8px', color: '#1e73be', borderColor: '#dbeafe', background: '#eff6ff' }}
+            title={isKhmer ? 'មើលព័ត៌មានលម្អិត' : 'Preview Document'}
+          >
+            <Eye size={14} />
           </button>
 
           {/* Edit */}
           <button
+            type="button"
             onClick={() => openEditModal(row)}
-            className="admin-action-btn"
-            style={{ color: 'var(--admin-primary)' }}
+            className="admin-btn admin-btn-outline admin-btn-sm"
+            style={{ padding: '6px 9px', borderRadius: '8px' }}
             title={isKhmer ? 'កែសម្រួលឯកសារ' : 'Edit Document'}
           >
-            <Edit2 size={16} />
+            <Edit2 size={14} />
           </button>
 
           {/* Delete */}
           <button
-            onClick={() => handleDelete(row)}
-            className="admin-action-btn delete"
-            style={{ color: '#ef4444' }}
+            type="button"
+            onClick={() => openDeleteModal(row)}
+            className="admin-btn admin-btn-danger admin-btn-sm"
+            style={{ padding: '6px 9px', borderRadius: '8px' }}
             title={isKhmer ? 'លុបឯកសារ' : 'Delete Document'}
           >
-            <Trash2 size={16} />
+            <Trash2 size={14} />
           </button>
         </div>
       ),
@@ -448,38 +535,99 @@ export const AdminDownloadsPage = () => {
   ];
 
   return (
-    <div className="admin-page">
-      {/* Page Header */}
-      <div className="admin-page-header" style={{ marginBottom: '24px' }}>
+    <div>
+      {/* 1. Institutional Header Banner */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+          borderRadius: '20px',
+          border: '1px solid #e2e8f0',
+          padding: '24px 28px',
+          marginBottom: '24px',
+          boxShadow: '0 4px 18px rgba(7, 41, 77, 0.03)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '16px',
+        }}
+      >
         <div>
-          <h2 style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--admin-primary)', margin: 0 }}>
-            {isKhmer ? 'ឯកសារផ្លូវការ & មជ្ឈមណ្ឌលទាញយក' : 'Official Documents & Download Center'}
-          </h2>
-          <p style={{ margin: '6px 0 0', color: 'var(--admin-text-muted)', fontSize: '0.9rem' }}>
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 12px',
+              borderRadius: '9999px',
+              background: '#eff6ff',
+              color: '#1e73be',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              marginBottom: '8px',
+              border: '1px solid #dbeafe',
+            }}
+          >
+            <FileDown size={14} />
+            {isKhmer ? 'ការគ្រប់គ្រងឯកសារទាញយក & ទម្រង់បែបបទ' : 'Institutional Downloads & Official Forms'}
+          </div>
+          <h1
+            style={{
+              fontSize: '1.6rem',
+              fontWeight: 800,
+              color: '#07294D',
+              margin: '0 0 6px 0',
+              lineHeight: 1.2,
+            }}
+          >
+            {isKhmer ? 'មជ្ឈមណ្ឌលឯកសារ & ទម្រង់បែបបទ' : 'Documents & Download Center'}
+          </h1>
+          <p style={{ margin: 0, color: '#64748b', fontSize: '0.88rem' }}>
             {isKhmer
-              ? 'គ្រប់គ្រងទម្រង់បែបបទផ្លូវការ ពាក្យសុំចុះឈ្មោះ សៀវភៅណែនាំនិស្សិត និងកាលវិភាគសិក្សាសម្រាប់សាធារណជនទាញយក។'
-              : 'Manage official forms, applications, student handbooks, and academic schedules available for public download.'}
+              ? 'គ្រប់គ្រងទម្រង់បែបបទចុះឈ្មោះ អាហារូបករណ៍ សៀវភៅណែនាំនិស្សិត និងកាលវិភាគសិក្សាផ្លូវការ'
+              : 'Manage official forms, applications, student handbooks, and academic schedules available for public download'}
           </p>
         </div>
-        <button
-          onClick={openAddModal}
-          className="admin-btn-primary"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '10px 20px',
-            borderRadius: '10px',
-            fontWeight: '600',
-            cursor: 'pointer',
-          }}
-        >
-          <Plus size={18} />
-          <span>{isKhmer ? 'បន្ថែមឯកសារថ្មី' : 'Add New Document'}</span>
-        </button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            onClick={fetchData}
+            disabled={loading}
+            className="admin-btn admin-btn-outline"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              borderRadius: '12px',
+              padding: '9px 16px',
+              fontWeight: 600,
+            }}
+          >
+            <RotateCw size={15} className={loading ? 'fa-spin' : ''} />
+            {isKhmer ? 'ធ្វើបច្ចុប្បន្នភាព' : 'Refresh'}
+          </button>
+          <button
+            onClick={openAddModal}
+            className="admin-btn admin-btn-primary"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              borderRadius: '12px',
+              padding: '9px 18px',
+              fontWeight: 600,
+              background: 'linear-gradient(135deg, #07294D 0%, #1e73be 100%)',
+              border: 'none',
+              boxShadow: '0 4px 12px rgba(7, 41, 77, 0.15)',
+            }}
+          >
+            <Plus size={16} />
+            {isKhmer ? 'បន្ថែមឯកសារថ្មី' : 'Add Document'}
+          </button>
+        </div>
       </div>
 
-      {/* Metric Cards */}
+      {/* 2. 4-Card Institutional KPI Metric Strip */}
       <div
         style={{
           display: 'grid',
@@ -488,405 +636,910 @@ export const AdminDownloadsPage = () => {
           marginBottom: '24px',
         }}
       >
-        <div className="admin-card" style={{ padding: '18px 20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              backgroundColor: '#eff6ff',
-              color: '#1e73be',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <FileText size={24} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)', fontWeight: '600' }}>
-              {isKhmer ? 'ឯកសារសរុប' : 'Total Documents'}
-            </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--admin-primary)' }}>
-              {metrics.total}
-            </div>
-          </div>
-        </div>
-
-        <div className="admin-card" style={{ padding: '18px 20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              backgroundColor: '#ecfdf5',
-              color: '#10b981',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Download size={24} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)', fontWeight: '600' }}>
-              {isKhmer ? 'ការទាញយកសរុប' : 'Total Downloads'}
-            </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: '800', color: '#10b981' }}>
-              {metrics.downloads.toLocaleString()}
-            </div>
-          </div>
-        </div>
-
-        <div className="admin-card" style={{ padding: '18px 20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              backgroundColor: '#fef3c7',
-              color: '#f59e0b',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Star size={24} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)', fontWeight: '600' }}>
-              {isKhmer ? 'ឯកសារពេញនិយម' : 'Popular Forms'}
-            </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: '800', color: '#b45309' }}>
-              {metrics.popular}
-            </div>
-          </div>
-        </div>
-
-        <div className="admin-card" style={{ padding: '18px 20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              backgroundColor: '#f5f3ff',
-              color: '#8b5cf6',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <CheckCircle size={24} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)', fontWeight: '600' }}>
-              {isKhmer ? 'ឯកសារសកម្ម' : 'Active Published'}
-            </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: '800', color: '#8b5cf6' }}>
-              {metrics.active}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Category Filter Pills */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
-        <button
-          onClick={() => setSelectedCategory('all')}
+        {/* KPI 1: Total Documents */}
+        <div
           style={{
-            padding: '6px 14px',
-            borderRadius: '9999px',
-            fontSize: '0.82rem',
-            fontWeight: '600',
-            border: '1px solid',
-            cursor: 'pointer',
-            backgroundColor: selectedCategory === 'all' ? '#07294D' : '#ffffff',
-            borderColor: selectedCategory === 'all' ? '#07294D' : '#e2e8f0',
-            color: selectedCategory === 'all' ? '#ffffff' : '#475569',
-            transition: 'all 0.2s ease',
+            background: '#ffffff',
+            borderRadius: '18px',
+            padding: '18px 20px',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
           }}
         >
-          {isKhmer ? 'ឯកសារទាំងអស់' : 'All Documents'} ({documents.length})
-        </button>
-        {CATEGORY_OPTIONS.map((cat) => {
-          const count = documents.filter((d) => d.category === cat.value).length;
-          const isSelected = selectedCategory === cat.value;
-          return (
-            <button
-              key={cat.value}
-              onClick={() => setSelectedCategory(cat.value)}
-              style={{
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                fontSize: '0.82rem',
-                fontWeight: '600',
-                border: '1px solid',
-                cursor: 'pointer',
-                backgroundColor: isSelected ? cat.color : '#ffffff',
-                borderColor: isSelected ? cat.color : '#e2e8f0',
-                color: isSelected ? '#ffffff' : '#475569',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              {isKhmer ? cat.labelKm : cat.labelEn} ({count})
-            </button>
-          );
-        })}
+          <div
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '14px',
+              background: '#eff6ff',
+              color: '#1e73be',
+              border: '1px solid #dbeafe',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <FileText size={22} />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              {isKhmer ? 'ឯកសារសរុប' : 'Total Documents'}
+            </div>
+            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
+              {metrics.total} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#1e73be' }}>{isKhmer ? 'ទម្រង់' : 'Files'}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* KPI 2: Total Downloads */}
+        <div
+          style={{
+            background: '#ffffff',
+            borderRadius: '18px',
+            padding: '18px 20px',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+          }}
+        >
+          <div
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '14px',
+              background: '#f0fdf4',
+              color: '#059669',
+              border: '1px solid #bbf7d0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <Download size={22} />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              {isKhmer ? 'ការទាញយកសរុប' : 'Total Downloads'}
+            </div>
+            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#059669', marginTop: '2px' }}>
+              {metrics.downloads.toLocaleString()}{' '}
+              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#059669' }}>{isKhmer ? 'ដង' : 'times'}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* KPI 3: Popular Forms */}
+        <div
+          style={{
+            background: '#ffffff',
+            borderRadius: '18px',
+            padding: '18px 20px',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+          }}
+        >
+          <div
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '14px',
+              background: '#fefce8',
+              color: '#ca8a04',
+              border: '1px solid #fef08a',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <Star size={22} fill="#ca8a04" />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              {isKhmer ? 'ឯកសារពេញនិយម' : 'Top Popular'}
+            </div>
+            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
+              {metrics.popular} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#ca8a04' }}>{isKhmer ? 'ទម្រង់' : 'Forms'}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* KPI 4: Active Published */}
+        <div
+          style={{
+            background: '#ffffff',
+            borderRadius: '18px',
+            padding: '18px 20px',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+          }}
+        >
+          <div
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '14px',
+              background: '#faf5ff',
+              color: '#7c3aed',
+              border: '1px solid #e9d5ff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <CheckCircle2 size={22} />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              {isKhmer ? 'ស្ថានភាពសកម្ម' : 'Active Published'}
+            </div>
+            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
+              {metrics.active} / {metrics.total}{' '}
+              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#7c3aed' }}>(100%)</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Data Table */}
+      {/* 3. Category Filter Tabs & Live Search */}
+      <div
+        style={{
+          background: '#ffffff',
+          borderRadius: '16px',
+          border: '1px solid #e2e8f0',
+          padding: '14px 18px',
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
+        }}
+      >
+        {/* Dynamic Category Tabs */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={() => setSelectedCategory('all')}
+            style={{
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              border: '1px solid',
+              borderColor: selectedCategory === 'all' ? '#1e73be' : '#e2e8f0',
+              backgroundColor: selectedCategory === 'all' ? '#eff6ff' : '#ffffff',
+              color: selectedCategory === 'all' ? '#1e73be' : '#64748b',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            {isKhmer ? 'ឯកសារទាំងអស់' : 'All Documents'} ({documents.length})
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSelectedCategory('popular')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              border: '1px solid',
+              borderColor: selectedCategory === 'popular' ? '#ca8a04' : '#e2e8f0',
+              backgroundColor: selectedCategory === 'popular' ? '#fefce8' : '#ffffff',
+              color: selectedCategory === 'popular' ? '#ca8a04' : '#64748b',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <Star size={13} fill={selectedCategory === 'popular' ? '#ca8a04' : 'none'} />
+            {isKhmer ? 'ពេញនិយម' : 'Popular'} ({metrics.popular})
+          </button>
+
+          {CATEGORY_OPTIONS.map((cat) => {
+            const count = documents.filter((d) => d.category === cat.value).length;
+            const isSelected = selectedCategory === cat.value;
+            return (
+              <button
+                type="button"
+                key={cat.value}
+                onClick={() => setSelectedCategory(cat.value)}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: '9999px',
+                  fontSize: '0.82rem',
+                  fontWeight: isSelected ? 700 : 600,
+                  border: '1px solid',
+                  borderColor: isSelected ? '#1e73be' : '#e2e8f0',
+                  backgroundColor: isSelected ? '#eff6ff' : '#ffffff',
+                  color: isSelected ? '#1e73be' : '#64748b',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                {isKhmer ? cat.labelKm : cat.labelEn} ({count})
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Live Search */}
+        <div style={{ position: 'relative', minWidth: '260px' }}>
+          <Search
+            size={16}
+            style={{
+              position: 'absolute',
+              left: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: '#94a3b8',
+            }}
+          />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder={isKhmer ? 'ស្វែងរកតាមចំណងជើង ឬកូដ...' : 'Search by title or code...'}
+            style={{
+              width: '100%',
+              padding: '7px 32px 7px 36px',
+              borderRadius: '10px',
+              border: '1px solid #e2e8f0',
+              fontSize: '0.84rem',
+              outline: 'none',
+            }}
+          />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm('')}
+              style={{
+                position: 'absolute',
+                right: '8px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                color: '#94a3b8',
+                cursor: 'pointer',
+                padding: '2px',
+              }}
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* 4. Rich Institutional DataTable */}
       <AdminDataTable
-        title={isKhmer ? 'តារាងបញ្ជីឯកសារផ្លូវការ' : 'Documents Directory'}
-        subtitle={isKhmer ? `បង្ហាញ ${displayedDocuments.length} ឯកសារ` : `Showing ${displayedDocuments.length} documents`}
         columns={columns}
-        data={displayedDocuments}
+        data={filteredDocuments}
         loading={loading}
-        onAdd={openAddModal}
-        addLabel={isKhmer ? 'បន្ថែមឯកសារ' : 'Add Document'}
-        onRefresh={fetchData}
-        searchPlaceholder={isKhmer ? 'ស្វែងរកតាមចំណងជើង លេខកូដ ឬការពណ៌នា...' : 'Search by title, code, or description...'}
+        title={isKhmer ? 'បញ្ជីឯកសារ និងទម្រង់បែបបទផ្លូវការ' : 'Official Documents Directory'}
+        subtitle={
+          isKhmer
+            ? `បង្ហាញ ${filteredDocuments.length} ក្នុងចំណោមឯកសារសរុប ${documents.length}`
+            : `Showing ${filteredDocuments.length} of ${documents.length} forms`
+        }
       />
 
-      {/* Add / Edit Modal */}
+      {/* 5. Interactive Document Preview Lightbox Modal */}
+      {previewDoc && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1060,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(7, 41, 77, 0.75)',
+            backdropFilter: 'blur(8px)',
+            padding: '24px',
+          }}
+          onClick={() => setPreviewDoc(null)}
+        >
+          <div
+            style={{
+              background: '#ffffff',
+              borderRadius: '24px',
+              width: '100%',
+              maxWidth: '720px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 25px 70px rgba(0, 0, 0, 0.3)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                padding: '24px 28px',
+                background: 'linear-gradient(135deg, #07294D 0%, #1e73be 100%)',
+                color: '#ffffff',
+                borderRadius: '24px 24px 0 0',
+                position: 'relative',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                <span
+                  style={{
+                    fontFamily: 'monospace',
+                    fontSize: '0.78rem',
+                    fontWeight: 800,
+                    padding: '3px 10px',
+                    borderRadius: '6px',
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    color: '#ffffff',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                  }}
+                >
+                  {previewDoc.code || 'FORM-DOC'}
+                </span>
+
+                {previewDoc.is_popular && (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '3px 9px',
+                      borderRadius: '9999px',
+                      fontSize: '0.74rem',
+                      fontWeight: 800,
+                      backgroundColor: '#fefce8',
+                      color: '#b45309',
+                    }}
+                  >
+                    <Star size={11} fill="#b45309" />
+                    {isKhmer ? 'ឯកសារពេញនិយម' : 'Top Form'}
+                  </span>
+                )}
+
+                {(() => {
+                  const cat = getCategoryMeta(previewDoc.category);
+                  return (
+                    <span
+                      style={{
+                        padding: '3px 10px',
+                        borderRadius: '9999px',
+                        fontSize: '0.74rem',
+                        fontWeight: 700,
+                        background: 'rgba(255, 255, 255, 0.15)',
+                        color: '#ffffff',
+                        border: '1px solid rgba(255, 255, 255, 0.25)',
+                      }}
+                    >
+                      {isKhmer ? cat.labelKm : cat.labelEn}
+                    </span>
+                  );
+                })()}
+              </div>
+
+              <h3 style={{ margin: '0 0 6px 0', fontSize: '1.25rem', fontWeight: 800, lineHeight: 1.4 }}>
+                {previewDoc.title_km}
+              </h3>
+              {previewDoc.title_en && (
+                <div style={{ fontSize: '0.84rem', opacity: 0.85 }}>
+                  {previewDoc.title_en}
+                </div>
+              )}
+
+              <button
+                onClick={() => setPreviewDoc(null)}
+                style={{
+                  position: 'absolute',
+                  top: '18px',
+                  right: '18px',
+                  background: 'rgba(0, 0, 0, 0.25)',
+                  border: 'none',
+                  color: '#ffffff',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div style={{ padding: '24px 28px' }}>
+              {/* Description */}
+              {previewDoc.description_km && (
+                <div
+                  style={{
+                    background: '#f8fafc',
+                    padding: '14px 18px',
+                    borderRadius: '12px',
+                    border: '1px solid #e2e8f0',
+                    fontSize: '0.9rem',
+                    color: '#334155',
+                    lineHeight: 1.6,
+                    marginBottom: '18px',
+                  }}
+                >
+                  {previewDoc.description_km}
+                </div>
+              )}
+
+              {/* Submission Office */}
+              {previewDoc.submission_office && (
+                <div
+                  style={{
+                    background: '#eff6ff',
+                    padding: '14px 18px',
+                    borderRadius: '12px',
+                    border: '1px solid #bfdbfe',
+                    marginBottom: '18px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                  }}
+                >
+                  <Building2 size={20} color="#1e73be" />
+                  <div>
+                    <div style={{ fontSize: '0.76rem', fontWeight: 700, color: '#1e73be', textTransform: 'uppercase' }}>
+                      {isKhmer ? 'ទីតាំងទទួលពាក្យផ្លូវការ' : 'Official Submission Office'}
+                    </div>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#07294D', marginTop: '2px' }}>
+                      {previewDoc.submission_office}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Required Documents Checklist */}
+              {Array.isArray(previewDoc.required_docs_km) && previewDoc.required_docs_km.length > 0 && (
+                <div style={{ marginBottom: '18px' }}>
+                  <h4 style={{ margin: '0 0 10px 0', fontSize: '0.92rem', fontWeight: 800, color: '#07294D' }}>
+                    {isKhmer ? 'ឯកសារភ្ជាប់ចាំបាច់សម្រាប់ដាក់ពាក្យ ៖' : 'Required Supporting Documents:'}
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {previewDoc.required_docs_km.map((item, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '10px',
+                          background: '#f8fafc',
+                          padding: '10px 14px',
+                          borderRadius: '8px',
+                          border: '1px solid #e2e8f0',
+                          fontSize: '0.84rem',
+                          color: '#334155',
+                        }}
+                      >
+                        <CheckSquare size={16} color="#059669" style={{ marginTop: '2px', flexShrink: 0 }} />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* File Info & Download Box */}
+              <div
+                style={{
+                  padding: '16px 20px',
+                  background: '#f8fafc',
+                  borderRadius: '14px',
+                  border: '1px solid #e2e8f0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '14px',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div className={`admin-doc-format-box ${getFormatBadgeClass(previewDoc.file_type)}`}>
+                    {previewDoc.file_type || 'PDF'}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#07294D' }}>
+                      {previewDoc.file_path ? previewDoc.file_path.split('/').pop() : (isKhmer ? 'ឯកសារគំរូទម្រង់' : 'Template Form')}
+                    </div>
+                    <div style={{ fontSize: '0.76rem', color: '#64748b' }}>
+                      {previewDoc.file_size || 'N/A'} • {(Number(previewDoc.downloads_count) || 0).toLocaleString()} {isKhmer ? 'ដងទាញយក' : 'downloads'}
+                    </div>
+                  </div>
+                </div>
+
+                {previewDoc.file_path && (
+                  <a
+                    href={previewDoc.file_path}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="admin-btn admin-btn-primary"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      borderRadius: '8px',
+                      textDecoration: 'none',
+                      padding: '8px 16px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    <Download size={15} />
+                    {isKhmer ? 'ទាញយកឯកសារ' : 'Download File'}
+                  </a>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div
+              style={{
+                padding: '14px 28px',
+                background: '#f8fafc',
+                borderTop: '1px solid #e2e8f0',
+                borderRadius: '0 0 24px 24px',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '10px',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setPreviewDoc(null)}
+                className="admin-btn admin-btn-outline"
+                style={{ borderRadius: '10px', padding: '8px 18px', fontWeight: 600 }}
+              >
+                {isKhmer ? 'បិទផ្ទាំង' : 'Close'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const d = previewDoc;
+                  setPreviewDoc(null);
+                  openEditModal(d);
+                }}
+                className="admin-btn admin-btn-primary"
+                style={{
+                  borderRadius: '10px',
+                  padding: '8px 20px',
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <Edit2 size={14} />
+                {isKhmer ? 'កែសម្រួល' : 'Edit Document'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 6. Create / Edit Document Modal */}
       <AdminModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         title={editingDoc ? (isKhmer ? 'កែសម្រួលឯកសារផ្លូវការ' : 'Edit Official Document') : (isKhmer ? 'បន្ថែមឯកសារផ្លូវការថ្មី' : 'Add New Official Document')}
         onSubmit={handleSubmit}
-        submitLabel={submitting ? (isKhmer ? 'កំពុងរក្សាទុក...' : 'Saving Document...') : editingDoc ? (isKhmer ? 'កែប្រែឯកសារ' : 'Update Document') : (isKhmer ? 'រក្សាទុកឯកសារ' : 'Save Document')}
-        cancelLabel={isKhmer ? 'បោះបង់' : 'Cancel'}
         isSubmitting={submitting}
         maxWidth="750px"
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {/* File Upload Box */}
-          <div
-            style={{
-              padding: '16px',
-              borderRadius: '12px',
-              border: '2px dashed #bfdbfe',
-              backgroundColor: '#f8fafc',
-              textAlign: 'center',
-            }}
-          >
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-              <UploadCloud size={32} style={{ color: '#1e73be' }} />
-              <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#0f172a' }}>
-                {isKhmer ? 'ផ្ទុកឡើងឯកសារទម្រង់ / លិខិត (PDF, DOCX, XLSX, ZIP)' : 'Upload Form / Document File (PDF, DOCX, XLSX, ZIP)'}
-              </div>
-              <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
-                {isKhmer ? 'គាំទ្រឯកសារទំហំរហូតដល់ 25MB។ ទំហំ និងប្រភេទឯកសារនឹងត្រូវបានរកឃើញដោយស្វ័យប្រវត្តិ។' : 'Supports files up to 25MB. File size and format are automatically detected.'}
-              </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Section 1: File Upload */}
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '0.84rem',
+                fontWeight: 700,
+                color: '#07294D',
+                borderBottom: '1px dashed #e2e8f0',
+                paddingBottom: '6px',
+                marginBottom: '12px',
+              }}
+            >
+              <UploadCloud size={15} color="#1e73be" />
+              {isKhmer ? 'ផ្នែកទី ១៖ ឯកសារសម្រាប់ទាញយក (PDF, Word, Excel, ZIP)' : 'Section 1: Upload Document File'}
+            </div>
 
-              <label
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  backgroundColor: '#1e73be',
-                  color: '#ffffff',
-                  fontSize: '0.82rem',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  marginTop: '6px',
-                }}
-              >
-                <span>
-                  {uploadingFile
-                    ? (isKhmer ? 'កំពុងផ្ទុកឯកសារឡើង...' : 'Uploading File...')
-                    : (isKhmer ? 'ជ្រើសរើសឯកសារដើម្បីផ្ទុកឡើង' : 'Choose File to Upload')}
-                </span>
-                <input
-                  type="file"
-                  onChange={handleFileUpload}
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip"
-                  style={{ display: 'none' }}
-                  disabled={uploadingFile}
-                />
-              </label>
+            <div
+              style={{
+                padding: '18px',
+                borderRadius: '12px',
+                border: '2px dashed #bfdbfe',
+                backgroundColor: '#f8fafc',
+                textAlign: 'center',
+              }}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                <UploadCloud size={30} style={{ color: '#1e73be' }} />
+                <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#07294D' }}>
+                  {isKhmer ? 'ផ្ទុកឡើងឯកសារទម្រង់ / លិខិតផ្លូវការ' : 'Upload Official Document Form'}
+                </div>
+                <div style={{ fontSize: '0.76rem', color: '#64748b' }}>
+                  {isKhmer ? 'គាំទ្រ PDF, Word, Excel, ZIP ទំហំរហូតដល់ 25MB' : 'Supports PDF, Word, Excel, ZIP up to 25MB'}
+                </div>
 
-              {formData.file_path && (
-                <div
+                <label
                   style={{
-                    display: 'flex',
+                    display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '8px',
-                    padding: '6px 12px',
-                    borderRadius: '6px',
-                    backgroundColor: '#dcfce7',
-                    color: '#15803d',
-                    fontSize: '0.8rem',
-                    fontWeight: '600',
-                    marginTop: '8px',
+                    gap: '6px',
+                    padding: '8px 18px',
+                    borderRadius: '8px',
+                    backgroundColor: '#1e73be',
+                    color: '#ffffff',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    marginTop: '6px',
                   }}
                 >
-                  <CheckCircle size={14} />
+                  <UploadCloud size={14} />
                   <span>
-                    {isKhmer ? 'បានភ្ជាប់ឯកសារ៖ ' : 'File attached: '}
-                    {formData.file_path} ({formData.file_size || (isKhmer ? 'រួចរាល់' : 'Ready')})
+                    {uploadingFile
+                      ? (isKhmer ? 'កំពុងផ្ទុកឡើង...' : 'Uploading...')
+                      : (isKhmer ? 'ជ្រើសរើសឯកសារ' : 'Choose File')}
                   </span>
-                </div>
-              )}
+                  <input
+                    type="file"
+                    onChange={handleFileUpload}
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip"
+                    style={{ display: 'none' }}
+                    disabled={uploadingFile}
+                  />
+                </label>
+
+                {formData.file_path && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '6px 14px',
+                      borderRadius: '8px',
+                      backgroundColor: '#dcfce7',
+                      color: '#15803d',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      marginTop: '8px',
+                    }}
+                  >
+                    <CheckCircle2 size={14} />
+                    <span>
+                      {formData.file_path} ({formData.file_size || (isKhmer ? 'រួចរាល់' : 'Ready')})
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Form Code & Category */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <div>
-              <label className="admin-form-label" style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '0.85rem' }}>
-                {isKhmer ? 'លេខកូដទម្រង់' : 'Document Code'}
+          {/* Section 2: Codes, Category & Titles */}
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '0.84rem',
+                fontWeight: 700,
+                color: '#07294D',
+                borderBottom: '1px dashed #e2e8f0',
+                paddingBottom: '6px',
+                marginBottom: '12px',
+              }}
+            >
+              <Layers size={15} color="#ca8a04" />
+              {isKhmer ? 'ផ្នែកទី ២៖ កូដ ប្រភេទ & ចំណងជើង' : 'Section 2: Code, Category & Titles'}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+              <div className="admin-form-group">
+                <label className="admin-form-label">
+                  {isKhmer ? 'លេខកូដទម្រង់ (Document Code)' : 'Document Code'}
+                </label>
+                <input
+                  type="text"
+                  className="admin-form-control"
+                  placeholder="e.g. FORM-RPITSSR-01"
+                  value={formData.code}
+                  onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                />
+              </div>
+
+              <div className="admin-form-group">
+                <label className="admin-form-label">
+                  {isKhmer ? 'ប្រភេទឯកសារ *' : 'Category *'}
+                </label>
+                <select
+                  className="admin-form-control"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  required
+                >
+                  {CATEGORY_OPTIONS.map((cat) => (
+                    <option key={cat.value} value={cat.value}>
+                      {isKhmer ? cat.labelKm : cat.labelEn}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="admin-form-group" style={{ marginBottom: '12px' }}>
+              <label className="admin-form-label">
+                {isKhmer ? 'ចំណងជើងជាភាសាខ្មែរ *' : 'Title in Khmer *'}
               </label>
               <input
                 type="text"
-                className="admin-form-input"
-                placeholder={isKhmer ? 'ឧ. FORM-TVET-01' : 'e.g. FORM-TVET-01'}
-                value={formData.code}
-                onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <label className="admin-form-label" style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '0.85rem' }}>
-                {isKhmer ? 'ប្រភេទឯកសារ *' : 'Category *'}
-              </label>
-              <select
-                className="admin-form-input"
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="admin-form-control"
+                placeholder={isKhmer ? 'ឧ. ពាក្យសុំចុះឈ្មោះវគ្គបណ្តុះបណ្តាលជំនាញវិជ្ជាជីវៈ ១.៥ លាននាក់' : 'e.g. Title in Khmer'}
+                value={formData.title_km}
+                onChange={(e) => setFormData({ ...formData, title_km: e.target.value })}
                 required
-              >
-                {CATEGORY_OPTIONS.map((cat) => (
-                  <option key={cat.value} value={cat.value}>
-                    {isKhmer ? cat.labelKm : cat.labelEn}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Title Khmer & Title English */}
-          <div>
-            <label className="admin-form-label" style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '0.85rem' }}>
-              {isKhmer ? 'ចំណងជើងជាភាសាខ្មែរ *' : 'Title in Khmer *'}
-            </label>
-            <input
-              type="text"
-              className="admin-form-input"
-              placeholder={isKhmer ? 'ឧ. ពាក្យសុំចុះឈ្មោះវគ្គបណ្តុះបណ្តាលជំនាញវិជ្ជាជីវៈ ១.៥ លាននាក់' : 'e.g. Title in Khmer'}
-              value={formData.title_km}
-              onChange={(e) => setFormData({ ...formData, title_km: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <label className="admin-form-label" style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '0.85rem' }}>
-              {isKhmer ? 'ចំណងជើងជាភាសាអង់គ្លេស' : 'Title in English'}
-            </label>
-            <input
-              type="text"
-              className="admin-form-input"
-              placeholder="e.g. TVET 1.5M Vocational Training Scholarship Application Form"
-              value={formData.title_en}
-              onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
-            />
-          </div>
-
-          {/* Format, Size & Office */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 2fr', gap: '12px' }}>
-            <div>
-              <label className="admin-form-label" style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '0.85rem' }}>
-                {isKhmer ? 'ទម្រង់ឯកសារ' : 'Format'}
-              </label>
-              <select
-                className="admin-form-input"
-                value={formData.file_type}
-                onChange={(e) => setFormData({ ...formData, file_type: e.target.value })}
-              >
-                <option value="pdf">PDF</option>
-                <option value="docx">DOCX (Word)</option>
-                <option value="xlsx">XLSX (Excel)</option>
-                <option value="pptx">PPTX</option>
-                <option value="zip">ZIP</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="admin-form-label" style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '0.85rem' }}>
-                {isKhmer ? 'ទំហំឯកសារ' : 'File Size'}
-              </label>
-              <input
-                type="text"
-                className="admin-form-input"
-                placeholder={isKhmer ? 'ឧ. 1.2 MB' : 'e.g. 1.2 MB'}
-                value={formData.file_size}
-                onChange={(e) => setFormData({ ...formData, file_size: e.target.value })}
               />
             </div>
 
-            <div>
-              <label className="admin-form-label" style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '0.85rem' }}>
-                {isKhmer ? 'កន្លែងទទួលពាក្យ' : 'Submission Office'}
+            <div className="admin-form-group">
+              <label className="admin-form-label">
+                {isKhmer ? 'ចំណងជើងជាភាសាអង់គ្លេស' : 'Title in English'}
               </label>
               <input
                 type="text"
-                className="admin-form-input"
-                placeholder={isKhmer ? 'ឧ. ការិយាល័យសិក្សា និងកិច្ចការនិស្សិត (អគារ A)' : 'e.g. Academic and Student Affairs Office (Building A)'}
-                value={formData.submission_office}
-                onChange={(e) => setFormData({ ...formData, submission_office: e.target.value })}
+                className="admin-form-control"
+                placeholder="e.g. TVET 1.5M Vocational Training Scholarship Application Form"
+                value={formData.title_en}
+                onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
               />
             </div>
           </div>
 
-          {/* Descriptions */}
+          {/* Section 3: Format, Size & Submission Office */}
           <div>
-            <label className="admin-form-label" style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '0.85rem' }}>
-              {isKhmer ? 'ការពណ៌នាជាភាសាខ្មែរ' : 'Description in Khmer'}
-            </label>
-            <textarea
-              className="admin-form-input"
-              rows={3}
-              placeholder={isKhmer ? 'ព័ត៌មានសង្ខេបអំពីទម្រង់ពាក្យសុំ និងគោលបំណង...' : 'Brief summary about the application form...'}
-              value={formData.description_km}
-              onChange={(e) => setFormData({ ...formData, description_km: e.target.value })}
-            />
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '0.84rem',
+                fontWeight: 700,
+                color: '#07294D',
+                borderBottom: '1px dashed #e2e8f0',
+                paddingBottom: '6px',
+                marginBottom: '12px',
+              }}
+            >
+              <Building2 size={15} color="#059669" />
+              {isKhmer ? 'ផ្នែកទី ៣៖ ទម្រង់ ទំហំ & ទីតាំងទទួលពាក្យ' : 'Section 3: Format, Size & Submission Office'}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 2fr', gap: '12px' }}>
+              <div className="admin-form-group">
+                <label className="admin-form-label">
+                  {isKhmer ? 'ទម្រង់ឯកសារ' : 'Format'}
+                </label>
+                <select
+                  className="admin-form-control"
+                  value={formData.file_type}
+                  onChange={(e) => setFormData({ ...formData, file_type: e.target.value })}
+                >
+                  <option value="pdf">PDF</option>
+                  <option value="docx">DOCX (Word)</option>
+                  <option value="xlsx">XLSX (Excel)</option>
+                  <option value="pptx">PPTX</option>
+                  <option value="zip">ZIP</option>
+                </select>
+              </div>
+
+              <div className="admin-form-group">
+                <label className="admin-form-label">
+                  {isKhmer ? 'ទំហំឯកសារ' : 'File Size'}
+                </label>
+                <input
+                  type="text"
+                  className="admin-form-control"
+                  placeholder="e.g. 1.2 MB"
+                  value={formData.file_size}
+                  onChange={(e) => setFormData({ ...formData, file_size: e.target.value })}
+                />
+              </div>
+
+              <div className="admin-form-group">
+                <label className="admin-form-label">
+                  {isKhmer ? 'កន្លែងទទួលពាក្យ' : 'Submission Office'}
+                </label>
+                <input
+                  type="text"
+                  className="admin-form-control"
+                  placeholder={isKhmer ? 'ឧ. ការិយាល័យសិក្សា និងកិច្ចការនិស្សិត (អគារ A)' : 'e.g. Academic and Student Affairs Office'}
+                  value={formData.submission_office}
+                  onChange={(e) => setFormData({ ...formData, submission_office: e.target.value })}
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Dynamic Required Documents (Khmer) */}
-          <div style={{ backgroundColor: '#f8fafc', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <label style={{ fontWeight: '700', fontSize: '0.85rem', color: '#0f172a' }}>
-                {isKhmer ? 'ឯកសារភ្ជាប់ចាំបាច់ (ភាសាខ្មែរ)' : 'Required Supporting Documents (Khmer)'}
+          {/* Section 4: Description */}
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '0.84rem',
+                fontWeight: 700,
+                color: '#07294D',
+                borderBottom: '1px dashed #e2e8f0',
+                paddingBottom: '6px',
+                marginBottom: '12px',
+              }}
+            >
+              <FileText size={15} color="#7c3aed" />
+              {isKhmer ? 'ផ្នែកទី ៤៖ ការពិពណ៌នាខ្លឹមសារ' : 'Section 4: Description'}
+            </div>
+
+            <div className="admin-form-group">
+              <label className="admin-form-label">
+                {isKhmer ? 'ការពិពណ៌នាជាភាសាខ្មែរ' : 'Description in Khmer'}
+              </label>
+              <textarea
+                className="admin-form-control"
+                rows={3}
+                placeholder={isKhmer ? 'ព័ត៌មានសង្ខេបអំពីទម្រង់ពាក្យសុំ និងគោលបំណង...' : 'Brief summary about the application form...'}
+                value={formData.description_km}
+                onChange={(e) => setFormData({ ...formData, description_km: e.target.value })}
+              />
+            </div>
+          </div>
+
+          {/* Section 5: Dynamic Required Documents */}
+          <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <label style={{ fontWeight: 800, fontSize: '0.85rem', color: '#07294D' }}>
+                {isKhmer ? 'ឯកសារភ្ជាប់ចាំបាច់សម្រាប់ដាក់ពាក្យ' : 'Required Supporting Documents'}
               </label>
               <button
                 type="button"
                 onClick={() => addReqDocField('km')}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  padding: '3px 8px',
-                  borderRadius: '6px',
-                  backgroundColor: '#e0f2fe',
-                  color: '#0284c7',
-                  border: 'none',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                }}
+                className="admin-btn admin-btn-outline admin-btn-sm"
+                style={{ padding: '4px 10px', borderRadius: '6px', fontSize: '0.76rem', color: '#1e73be', borderColor: '#bfdbfe' }}
               >
                 <Plus size={13} /> {isKhmer ? 'បន្ថែមឯកសារភ្ជាប់' : 'Add Requirement'}
               </button>
             </div>
 
             {formData.required_docs_km.map((doc, idx) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <span style={{ fontSize: '0.8rem', color: '#64748b', minWidth: '18px' }}>{idx + 1}.</span>
                 <input
                   type="text"
-                  className="admin-form-input"
+                  className="admin-form-control"
                   style={{ flex: 1 }}
                   placeholder={isKhmer ? 'ឧ. រូបថត ៤x៦ ចំនួន ៣ សន្លឹក...' : 'e.g. 3 copies of 4x6 photos...'}
                   value={doc}
@@ -911,30 +1564,167 @@ export const AdminDownloadsPage = () => {
             ))}
           </div>
 
-          {/* Settings & Flags */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap', paddingTop: '4px' }}>
-            <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.88rem', fontWeight: '600' }}>
+          {/* Section 6: Settings */}
+          <div
+            style={{
+              backgroundColor: '#f8fafc',
+              border: '1px solid #e2e8f0',
+              borderRadius: '12px',
+              padding: '14px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '16px',
+            }}
+          >
+            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', margin: 0 }}>
               <input
                 type="checkbox"
                 checked={formData.is_popular}
                 onChange={(e) => setFormData({ ...formData, is_popular: e.target.checked })}
-                style={{ width: '16px', height: '16px' }}
+                style={{ width: '16px', height: '16px', accentColor: '#d97706' }}
               />
-              <span>{isKhmer ? 'កំណត់ជាឯកសារពេញនិយម (បង្ហាញលើ Top Downloads)' : 'Mark as Popular Form (Show in Top Downloads)'}</span>
+              <div>
+                <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#07294D' }}>
+                  ⭐ {isKhmer ? 'កំណត់ជាឯកសារពេញនិយម (Top Downloads)' : 'Mark as Popular Form'}
+                </span>
+                <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                  {isKhmer ? 'បង្ហាញក្នុងបញ្ជីឯកសារទាញយកច្រើនបំផុត' : 'Shows in Top Downloads highlight'}
+                </div>
+              </div>
             </label>
 
-            <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.88rem', fontWeight: '600' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', margin: 0 }}>
               <input
                 type="checkbox"
                 checked={formData.is_active}
                 onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                style={{ width: '16px', height: '16px' }}
+                style={{ width: '16px', height: '16px', accentColor: '#1e73be' }}
               />
-              <span>{isKhmer ? 'ស្ថានភាពសកម្ម (បង្ហាញជាសាធារណៈ)' : 'Published Active Status (Publicly Visible)'}</span>
+              <div>
+                <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#07294D' }}>
+                  👁️ {isKhmer ? 'បង្ហាញជាសាធារណៈ (Active)' : 'Publicly Visible (Active)'}
+                </span>
+                <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                  {isKhmer ? 'អនុញ្ញាតឱ្យទាញយកលើគេហទំព័រ' : 'Enables public downloading on website'}
+                </div>
+              </div>
             </label>
           </div>
         </div>
       </AdminModal>
+
+      {/* 7. Delete Confirmation Modal */}
+      {deleteModalOpen && docToDelete && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1060,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(7, 41, 77, 0.45)',
+            backdropFilter: 'blur(5px)',
+            padding: '20px',
+          }}
+          onClick={() => setDeleteModalOpen(false)}
+        >
+          <div
+            style={{
+              background: '#ffffff',
+              borderRadius: '20px',
+              width: '100%',
+              maxWidth: '480px',
+              boxShadow: '0 20px 60px rgba(7, 41, 77, 0.2)',
+              border: '1px solid #fecdd3',
+              overflow: 'hidden',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ padding: '24px 26px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+                <div
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '12px',
+                    background: '#fee2e2',
+                    color: '#dc2626',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <AlertTriangle size={22} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#07294D' }}>
+                    {isKhmer ? 'បញ្ជាក់ការលុបឯកសារ' : 'Delete Document Confirmation'}
+                  </h3>
+                  <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                    {isKhmer ? 'សកម្មភាពនេះមិនអាចត្រឡប់ក្រោយវិញបានទេ' : 'This action cannot be undone'}
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  background: '#f8fafc',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0',
+                  padding: '12px 16px',
+                  marginBottom: '14px',
+                }}
+              >
+                <span className="admin-doc-code-badge" style={{ marginBottom: '6px', display: 'inline-block' }}>
+                  {docToDelete.code || 'FORM-DOC'}
+                </span>
+                <div style={{ fontWeight: 700, fontSize: '0.92rem', color: '#07294D' }}>
+                  {docToDelete.title_km}
+                </div>
+              </div>
+
+              <p style={{ fontSize: '0.88rem', color: '#475569', lineHeight: 1.6, margin: 0 }}>
+                {isKhmer
+                  ? 'តើអ្នកពិតជាចង់លុបឯកសារផ្លូវការនេះចេញពីប្រព័ន្ធមែនទេ?'
+                  : 'Are you sure you want to permanently delete this official document?'}
+              </p>
+            </div>
+
+            <div
+              style={{
+                padding: '14px 26px',
+                background: '#f8fafc',
+                borderTop: '1px solid #e2e8f0',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '10px',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setDeleteModalOpen(false)}
+                className="admin-btn admin-btn-outline"
+                style={{ borderRadius: '10px', padding: '8px 16px', fontWeight: 600 }}
+              >
+                {isKhmer ? 'បោះបង់' : 'Cancel'}
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={deleting}
+                className="admin-btn admin-btn-danger"
+                style={{ borderRadius: '10px', padding: '8px 18px', fontWeight: 600 }}
+              >
+                {deleting ? (isKhmer ? 'កំពុងលុប...' : 'Deleting...') : (isKhmer ? 'យល់ព្រមលុប' : 'Yes, Delete')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
