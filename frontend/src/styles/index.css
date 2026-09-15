@@ -2080,15 +2080,15 @@ i {
 }
 
 /* ===================================================
-   MODERN FOOTER REDESIGN
+   MODERN FOOTER REDESIGN (RPITSSR Institutional Standard)
    =================================================== */
 .modern-footer-area {
-  background: linear-gradient(180deg, #071f3a 0%, #05162a 50%, #020a14 100%);
+  background: linear-gradient(180deg, #07294D 0%, #051e38 50%, #031324 100%);
   color: #e2e8f0;
   position: relative;
   overflow: hidden;
-  font-family: 'Koh Santepheap', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  border-top: 1px solid rgba(56, 189, 248, 0.2);
+  font-family: 'Koh Santepheap', 'Kantumruy Pro', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .modern-footer-area::before {
@@ -2100,11 +2100,11 @@ i {
   width: 100%;
   max-width: 1400px;
   height: 100%;
-  background: radial-gradient(circle at 50% 0%, rgba(30, 115, 190, 0.12) 0%, transparent 70%);
+  background: radial-gradient(circle at 50% 0%, rgba(30, 115, 190, 0.15) 0%, transparent 65%);
   pointer-events: none;
 }
 
-/* Footer Top CTA Banner */
+/* Footer Top CTA Banner - Crisp White Floating Institutional Card */
 .footer-top-cta-banner {
   padding-top: 55px;
   padding-bottom: 25px;
@@ -2113,41 +2113,53 @@ i {
 }
 
 .footer-cta-card {
-  background: linear-gradient(135deg, rgba(30, 115, 190, 0.25) 0%, rgba(7, 41, 77, 0.7) 100%);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 24px;
-  padding: 34px 40px;
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  padding: 38px 44px;
+  box-shadow: 0 16px 40px rgba(7, 41, 77, 0.12), 0 4px 12px rgba(7, 41, 77, 0.05);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.footer-cta-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #07294D 0%, #1e73be 50%, #ffaf00 100%);
 }
 
 .footer-cta-badge {
   display: inline-flex;
   align-items: center;
-  padding: 5px 14px;
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
+  gap: 8px;
+  padding: 6px 16px;
+  background: #eff6ff;
+  color: #1e73be;
   border-radius: 30px;
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 700;
-  margin-bottom: 10px;
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  margin-bottom: 12px;
+  border: 1px solid #dbeafe;
 }
 
 .footer-cta-title {
-  font-size: 1.55rem;
+  font-size: 1.6rem;
   font-weight: 800;
-  color: #ffffff;
-  line-height: 1.35;
+  color: #07294D;
+  line-height: 1.38;
   margin-bottom: 8px;
 }
 
 .footer-cta-desc {
-  font-size: 0.95rem;
-  color: #cbd5e1;
+  font-size: 0.96rem;
+  color: #64748b;
   margin-bottom: 0;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
 .footer-cta-actions {
@@ -2159,44 +2171,48 @@ i {
 }
 
 .footer-btn-primary {
-  background: linear-gradient(135deg, #1e73be 0%, #00d2ff 100%);
-  color: #ffffff !important;
-  padding: 12px 26px;
+  background: linear-gradient(135deg, #ffaf00 0%, #f59e0b 100%);
+  color: #07294D !important;
+  padding: 12px 28px;
   border-radius: 50px;
-  font-weight: 700;
-  font-size: 0.92rem;
+  font-weight: 800;
+  font-size: 0.94rem;
   text-decoration: none;
-  box-shadow: 0 4px 16px rgba(0, 210, 255, 0.35);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
   align-items: center;
+  gap: 8px;
+  border: none;
 }
 
 .footer-btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 210, 255, 0.5);
-  color: #ffffff !important;
+  box-shadow: 0 8px 22px rgba(245, 158, 11, 0.5);
+  color: #07294D !important;
 }
 
 .footer-btn-outline {
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  padding: 12px 24px;
+  background: #ffffff;
+  color: #1e73be !important;
+  border: 1.5px solid #1e73be;
+  padding: 12px 26px;
   border-radius: 50px;
-  font-weight: 600;
-  font-size: 0.92rem;
+  font-weight: 700;
+  font-size: 0.94rem;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
   align-items: center;
+  gap: 8px;
 }
 
 .footer-btn-outline:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: #eff6ff;
+  border-color: #07294D;
+  color: #07294D !important;
   transform: translateY(-2px);
-  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(7, 41, 77, 0.1);
 }
 
 /* Main Footer Widget Area */
@@ -2209,27 +2225,41 @@ i {
 .footer-logo-link {
   display: inline-block;
   margin-bottom: 16px;
+  text-decoration: none;
+}
+
+/* Crisp White Institutional Badge for Logo Legibility */
+.footer-logo-badge {
+  display: inline-flex;
+  align-items: center;
+  background: #ffffff;
+  padding: 10px 20px;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  margin-bottom: 18px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.footer-logo-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
 }
 
 .footer-logo-img {
-  height: 62px;
+  height: 54px;
   width: auto;
   max-width: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
-  transition: transform 0.25s ease;
-}
-
-.footer-logo-link:hover .footer-logo-img {
-  transform: scale(1.03);
+  display: block;
 }
 
 .footer-brand-desc {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   color: #94a3b8;
   line-height: 1.75;
   margin-bottom: 22px;
-  max-width: 340px;
+  max-width: 360px;
 }
 
 /* Social Media */
@@ -2249,17 +2279,17 @@ i {
 }
 
 .footer-social-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
+  font-size: 16px;
   color: #ffffff !important;
   text-decoration: none;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -2293,7 +2323,7 @@ i {
 
 /* Nav Widgets & Headings */
 .footer-widget-heading {
-  font-size: 1.12rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #ffffff;
   margin-bottom: 22px;
@@ -2306,7 +2336,7 @@ i {
 .heading-line {
   width: 36px;
   height: 3px;
-  background: linear-gradient(90deg, #38bdf8 0%, #1e73be 100%);
+  background: linear-gradient(90deg, #ffaf00 0%, #f59e0b 100%);
   border-radius: 3px;
 }
 
@@ -2331,14 +2361,14 @@ i {
 }
 
 .link-arrow {
-  font-size: 10px;
-  color: #38bdf8;
-  opacity: 0.6;
+  color: #ffaf00;
+  opacity: 0.75;
   transition: transform 0.25s ease, opacity 0.25s ease;
+  flex-shrink: 0;
 }
 
 .footer-menu-list li a:hover {
-  color: #38bdf8;
+  color: #ffaf00;
   transform: translateX(5px);
 }
 
@@ -2351,7 +2381,7 @@ i {
 .footer-contact-items {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 .footer-contact-item {
@@ -2361,70 +2391,69 @@ i {
 }
 
 .contact-icon-box {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: rgba(56, 189, 248, 0.1);
-  border: 1px solid rgba(56, 189, 248, 0.22);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(30, 115, 190, 0.16);
+  border: 1px solid rgba(30, 115, 190, 0.32);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #38bdf8;
-  font-size: 15px;
+  color: #60a5fa;
   flex-shrink: 0;
   margin-top: 2px;
 }
 
 .contact-label {
   display: block;
-  font-size: 0.74rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: #94a3b8;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
   margin-bottom: 4px;
 }
 
 .contact-value {
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   color: #e2e8f0;
-  line-height: 1.5;
+  line-height: 1.55;
   margin: 0;
 }
 
 .phone-pills-wrap {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
-  margin-top: 4px;
+  gap: 8px;
+  margin-top: 6px;
 }
 
 .phone-chip {
   display: inline-flex;
   align-items: center;
-  padding: 4px 11px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 5px 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 20px;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #38bdf8 !important;
+  color: #ffffff !important;
   text-decoration: none;
-  transition: all 0.25s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .phone-chip:hover {
-  background: #1e73be;
-  color: #ffffff !important;
-  border-color: #1e73be;
+  background: #ffaf00;
+  color: #07294D !important;
+  border-color: #ffaf00;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(30, 115, 190, 0.4);
+  box-shadow: 0 4px 12px rgba(255, 175, 0, 0.35);
 }
 
 .footer-link-highlight {
   color: #e2e8f0 !important;
   text-decoration: none;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
@@ -2432,15 +2461,16 @@ i {
 }
 
 .footer-link-highlight:hover {
-  color: #38bdf8 !important;
+  color: #ffaf00 !important;
   transform: translateX(3px);
 }
 
 .footer-working-hours-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 175, 0, 0.22);
+  border-left: 3px solid #ffaf00;
+  border-radius: 12px;
+  padding: 14px 16px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -2448,29 +2478,32 @@ i {
 }
 
 .working-hours-icon {
-  font-size: 20px;
-  color: #f59e0b;
+  color: #ffaf00;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .working-title {
   display: block;
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  color: #f59e0b;
+  color: #ffaf00;
   text-transform: uppercase;
+  letter-spacing: 0.4px;
   margin-bottom: 2px;
 }
 
 .working-desc {
   font-size: 0.82rem;
   color: #cbd5e1;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 /* Bottom Bar */
 .footer-bottom-bar {
-  background: #020b14;
+  background: #031324;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding: 22px 0;
   position: relative;
@@ -2508,42 +2541,39 @@ i {
 .footer-bottom-links li a {
   color: #94a3b8;
   text-decoration: none;
-  font-size: 0.85rem;
+  font-size: 0.86rem;
   font-weight: 500;
   transition: color 0.2s ease;
 }
 
 .footer-bottom-links li a:hover {
-  color: #38bdf8;
+  color: #ffaf00;
 }
 
 .footer-scroll-top-btn {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #07294D 0%, #1e73be 100%);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #ffaf00 0%, #f59e0b 100%);
+  color: #07294D;
+  border: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 10px rgba(255, 175, 0, 0.3);
 }
 
 .footer-scroll-top-btn:hover {
-  background: #38bdf8;
-  color: #07294D;
   transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(56, 189, 248, 0.4);
+  box-shadow: 0 6px 16px rgba(255, 175, 0, 0.5);
 }
 
 /* Responsive Footer */
 @media (max-width: 991px) {
   .footer-cta-card {
-    padding: 28px 24px;
+    padding: 30px 24px;
   }
   .footer-cta-title {
     font-size: 1.35rem;

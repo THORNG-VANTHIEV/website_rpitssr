@@ -1,5 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import {
+  GraduationCap,
+  Edit3,
+  MessageCircle,
+  MapPin,
+  Phone,
+  Mail,
+  Globe,
+  Clock,
+  ArrowUp,
+  ChevronRight,
+} from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
 export const Footer = () => {
@@ -13,7 +25,7 @@ export const Footer = () => {
 
   return (
     <footer className="modern-footer-area">
-      {/* Top CTA Banner */}
+      {/* Top CTA Banner - Crisp White Floating Institutional Card */}
       <div className="footer-top-cta-banner">
         <div className="container">
           <div className="footer-cta-card">
@@ -21,8 +33,8 @@ export const Footer = () => {
               <div className="col-lg-8 col-md-7">
                 <div className="footer-cta-content">
                   <span className="footer-cta-badge">
-                    <i className="fas fa-graduation-cap me-2"></i>
-                    {language === 'km' ? 'ចាប់ផ្តើមអនាគតរបស់អ្នក' : 'Shape Your Future'}
+                    <GraduationCap size={16} />
+                    <span>{language === 'km' ? 'ចាប់ផ្តើមអនាគតរបស់អ្នក' : 'Shape Your Future'}</span>
                   </span>
                   <h3 className="footer-cta-title">
                     {language === 'km'
@@ -39,11 +51,11 @@ export const Footer = () => {
               <div className="col-lg-4 col-md-5 text-md-end text-center mt-3 mt-md-0">
                 <div className="footer-cta-actions">
                   <Link to="/register" onClick={scrollToTop} className="footer-btn-primary">
-                    <i className="fas fa-edit me-2"></i>
+                    <Edit3 size={17} />
                     <span>{language === 'km' ? 'ចុះឈ្មោះចូលរៀន' : 'Apply Online'}</span>
                   </Link>
                   <Link to="/contact" onClick={scrollToTop} className="footer-btn-outline">
-                    <i className="fas fa-comment-dots me-2"></i>
+                    <MessageCircle size={17} />
                     <span>{language === 'km' ? 'ទំនាក់ទំនង' : 'Contact Us'}</span>
                   </Link>
                 </div>
@@ -57,16 +69,18 @@ export const Footer = () => {
       <div className="footer-main-widget">
         <div className="container">
           <div className="row g-4">
-            {/* Column 1: School Identity & Brand (Clean, Minimal & Modern) */}
+            {/* Column 1: School Identity & Brand with Crisp White Logo Badge */}
             <div className="col-lg-4 col-md-6 footer-col-brand">
               <div className="footer-brand-wrap">
                 <Link to="/" onClick={scrollToTop} className="footer-logo-link">
-                  <img
-                    src="/images/logo.webp"
-                    alt="RPITSSR Logo"
-                    className="footer-logo-img"
-                    onError={(e) => { e.target.src = '/images/logo.png'; }}
-                  />
+                  <div className="footer-logo-badge">
+                    <img
+                      src="/images/logo.webp"
+                      alt="RPITSSR Logo"
+                      className="footer-logo-img"
+                      onError={(e) => { e.target.src = '/images/logo.png'; }}
+                    />
+                  </div>
                 </Link>
 
                 <p className="footer-brand-desc">
@@ -131,43 +145,43 @@ export const Footer = () => {
                 <ul className="footer-menu-list">
                   <li>
                     <Link to="/about-us" onClick={scrollToTop}>
-                      <i className="fas fa-chevron-right link-arrow"></i>
+                      <ChevronRight size={14} className="link-arrow" />
                       <span>{t('footer.aboutUs') || 'អំពីយើង'}</span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/organization" onClick={scrollToTop}>
-                      <i className="fas fa-chevron-right link-arrow"></i>
+                      <ChevronRight size={14} className="link-arrow" />
                       <span>{t('organization.pageTitle') || 'រចនាសម្ព័ន្ធគ្រប់គ្រង'}</span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/gallery" onClick={scrollToTop}>
-                      <i className="fas fa-chevron-right link-arrow"></i>
+                      <ChevronRight size={14} className="link-arrow" />
                       <span>{t('footer.campusMap') || 'ផែនទីបរិវេណ'}</span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/gallery" onClick={scrollToTop}>
-                      <i className="fas fa-chevron-right link-arrow"></i>
+                      <ChevronRight size={14} className="link-arrow" />
                       <span>{t('footer.view360') || 'ទស្សនាលម្អិត ៣៦០°'}</span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/notice" onClick={scrollToTop}>
-                      <i className="fas fa-chevron-right link-arrow"></i>
+                      <ChevronRight size={14} className="link-arrow" />
                       <span>{t('footer.noticeBoard') || 'ក្តារព័ត៌មានជូនដំណឹង'}</span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/gallery" onClick={scrollToTop}>
-                      <i className="fas fa-chevron-right link-arrow"></i>
+                      <ChevronRight size={14} className="link-arrow" />
                       <span>{language === 'km' ? 'វិចិត្រសាលរូបភាព' : 'Campus Gallery'}</span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/contact" onClick={scrollToTop}>
-                      <i className="fas fa-chevron-right link-arrow"></i>
+                      <ChevronRight size={14} className="link-arrow" />
                       <span>{t('footer.contact') || 'ទំនាក់ទំនង'}</span>
                     </Link>
                   </li>
@@ -179,56 +193,56 @@ export const Footer = () => {
             <div className="col-lg-2 col-md-4 col-sm-6">
               <div className="footer-nav-widget">
                 <h5 className="footer-widget-heading">
-                  <span>{t('footer.information') || 'ព័ត៌មានសិក្សា'}</span>
+                  <span>{t('footer.information') || 'ព័ត៌មាន'}</span>
                   <span className="heading-line"></span>
                 </h5>
                 <ul className="footer-menu-list">
                   <li>
                     <Link to="/our-courses" onClick={scrollToTop}>
-                      <i className="fas fa-chevron-right link-arrow"></i>
+                      <ChevronRight size={14} className="link-arrow" />
                       <span>{t('footer.allCourses') || 'វគ្គសិក្សាទាំងអស់'}</span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/register" onClick={scrollToTop}>
-                      <i className="fas fa-chevron-right link-arrow"></i>
+                      <ChevronRight size={14} className="link-arrow" />
                       <span>{t('footer.admission') || 'ការចូលរៀន'}</span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/about-us" onClick={scrollToTop}>
-                      <i className="fas fa-chevron-right link-arrow"></i>
+                      <ChevronRight size={14} className="link-arrow" />
                       <span>{t('footer.scholarship') || 'អាហារូបករណ៍ ១០០%'}</span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/teachers" onClick={scrollToTop}>
-                      <i className="fas fa-chevron-right link-arrow"></i>
+                      <ChevronRight size={14} className="link-arrow" />
                       <span>{t('footer.ourTeachers') || 'គ្រូបង្រៀនរបស់យើង'}</span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/events" onClick={scrollToTop}>
-                      <i className="fas fa-chevron-right link-arrow"></i>
+                      <ChevronRight size={14} className="link-arrow" />
                       <span>{t('footer.ourEvents') || 'ព្រឹត្តិការណ៍របស់យើង'}</span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/blog" onClick={scrollToTop}>
-                      <i className="fas fa-chevron-right link-arrow"></i>
+                      <ChevronRight size={14} className="link-arrow" />
                       <span>{t('footer.blogPost') || 'ប្រកាសប្លុក'}</span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/faq" onClick={scrollToTop}>
-                      <i className="fas fa-chevron-right link-arrow"></i>
+                      <ChevronRight size={14} className="link-arrow" />
                       <span>{t('footer.faqs') || 'សំណួរញឹកញាប់'}</span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/downloads" onClick={scrollToTop}>
-                      <i className="fas fa-chevron-right link-arrow"></i>
-                      <span>{t('downloads.pageTitle') || 'ទាញយកឯកសារ'}</span>
+                      <ChevronRight size={14} className="link-arrow" />
+                      <span>{t('downloads.pageTitle') || 'មជ្ឈមណ្ឌលទាញយកឯកសារ'}</span>
                     </Link>
                   </li>
                 </ul>
@@ -236,7 +250,7 @@ export const Footer = () => {
             </div>
 
             {/* Column 4: Contact & Working Hours */}
-            <div className="col-lg-4 col-md-4 col-sm-12">
+            <div className="col-lg-4 col-md-6 col-sm-12">
               <div className="footer-nav-widget footer-contact-widget">
                 <h5 className="footer-widget-heading">
                   <span>{t('footer.contactInfo') || 'ព័ត៌មានទំនាក់ទំនង'}</span>
@@ -247,7 +261,7 @@ export const Footer = () => {
                   {/* Address */}
                   <div className="footer-contact-item address-item">
                     <div className="contact-icon-box">
-                      <i className="fas fa-map-marker-alt"></i>
+                      <MapPin size={18} />
                     </div>
                     <div className="contact-text-box">
                       <span className="contact-label">
@@ -262,7 +276,7 @@ export const Footer = () => {
                   {/* Phone Numbers Grid */}
                   <div className="footer-contact-item phone-item">
                     <div className="contact-icon-box">
-                      <i className="fas fa-phone-alt"></i>
+                      <Phone size={18} />
                     </div>
                     <div className="contact-text-box">
                       <span className="contact-label">
@@ -270,16 +284,16 @@ export const Footer = () => {
                       </span>
                       <div className="phone-pills-wrap">
                         <a href="tel:0966660306" className="phone-chip">
-                          <i className="fas fa-phone-volume me-1"></i> 096 666 0306
+                          <Phone size={12} className="me-1" /> 096 666 0306
                         </a>
                         <a href="tel:089483623" className="phone-chip">
-                          <i className="fas fa-phone-volume me-1"></i> 089 483 623
+                          <Phone size={12} className="me-1" /> 089 483 623
                         </a>
                         <a href="tel:086924448" className="phone-chip">
-                          <i className="fas fa-phone-volume me-1"></i> 086 924 448
+                          <Phone size={12} className="me-1" /> 086 924 448
                         </a>
                         <a href="tel:0887585693" className="phone-chip">
-                          <i className="fas fa-phone-volume me-1"></i> 088 7585 693
+                          <Phone size={12} className="me-1" /> 088 7585 693
                         </a>
                       </div>
                     </div>
@@ -288,15 +302,15 @@ export const Footer = () => {
                   {/* Email & Website */}
                   <div className="footer-contact-item email-item">
                     <div className="contact-icon-box">
-                      <i className="fas fa-envelope-open-text"></i>
+                      <Mail size={18} />
                     </div>
                     <div className="contact-text-box">
                       <span className="contact-label">
                         {language === 'km' ? 'អ៊ីមែល និងគេហទំព័រផ្លូវការ' : 'Email & Website'}
                       </span>
-                      <div className="d-flex flex-column gap-1 mt-1">
+                      <div className="d-flex flex-column gap-2 mt-1">
                         <a href="mailto:info@rpitssr.edu.kh" className="footer-link-highlight">
-                          <i className="fas fa-paper-plane me-2 text-primary"></i> info@rpitssr.edu.kh
+                          <Mail size={14} className="me-2" style={{ color: '#ffaf00' }} /> info@rpitssr.edu.kh
                         </a>
                         <a
                           href="https://www.rpitssr.edu.kh"
@@ -304,7 +318,7 @@ export const Footer = () => {
                           rel="noreferrer"
                           className="footer-link-highlight"
                         >
-                          <i className="fas fa-globe me-2 text-info"></i> www.rpitssr.edu.kh
+                          <Globe size={14} className="me-2" style={{ color: '#60a5fa' }} /> www.rpitssr.edu.kh
                         </a>
                       </div>
                     </div>
@@ -313,7 +327,7 @@ export const Footer = () => {
                   {/* Working Hours Card */}
                   <div className="footer-working-hours-card">
                     <div className="working-hours-icon">
-                      <i className="far fa-clock"></i>
+                      <Clock size={20} />
                     </div>
                     <div className="working-hours-text">
                       <span className="working-title">
@@ -378,7 +392,7 @@ export const Footer = () => {
                     className="footer-scroll-top-btn"
                     title={language === 'km' ? 'ឡើងទៅលើ' : 'Scroll to top'}
                   >
-                    <i className="fas fa-arrow-up"></i>
+                    <ArrowUp size={16} />
                   </button>
                 </li>
               </ul>
