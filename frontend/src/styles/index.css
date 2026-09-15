@@ -4647,17 +4647,27 @@ i {
   margin: 0 auto;
 }
 
+.courses-hero-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
 .courses-breadcrumb {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   font-size: 0.88rem;
   color: #94a3b8;
-  margin-bottom: 18px;
-  padding: 5px 16px;
+  margin-bottom: 0;
+  padding: 6px 16px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 30px;
   border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
 }
 
 .courses-breadcrumb a {
@@ -4694,7 +4704,8 @@ i {
   color: #38bdf8;
   font-size: 0.85rem;
   font-weight: 700;
-  margin-bottom: 16px;
+  margin-bottom: 0;
+  backdrop-filter: blur(8px);
 }
 
 .courses-hero-title {

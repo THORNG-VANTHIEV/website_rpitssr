@@ -155,24 +155,27 @@ export const CoursesPage = () => {
       <section className="courses-page-hero">
         <div className="container">
           <div className="courses-hero-content">
-            {/* Breadcrumb Navigation */}
-            <div className="courses-breadcrumb">
-              <Link to="/" onClick={scrollToTop}>
-                <Home size={14} />
-                <span>{isKhmer ? 'ទំព័រដើម' : 'Home'}</span>
-              </Link>
-              <span className="crumb-sep">
-                <ChevronRight size={13} />
-              </span>
-              <span className="active-crumb">
-                {isKhmer ? 'វគ្គសិក្សា & ជំនាញ' : 'Courses & Programs'}
-              </span>
-            </div>
+            {/* Breadcrumb & Institutional Badge Row */}
+            <div className="courses-hero-meta-row">
+              {/* Breadcrumb Navigation */}
+              <div className="courses-breadcrumb">
+                <Link to="/" onClick={scrollToTop}>
+                  <Home size={14} />
+                  <span>{isKhmer ? 'ទំព័រដើម' : 'Home'}</span>
+                </Link>
+                <span className="crumb-sep">
+                  <ChevronRight size={13} />
+                </span>
+                <span className="active-crumb">
+                  {isKhmer ? 'វគ្គសិក្សា & ជំនាញ' : 'Courses & Programs'}
+                </span>
+              </div>
 
-            {/* Badge & Title */}
-            <div className="courses-hero-badge">
-              <Sparkles size={15} />
-              <span>{isKhmer ? 'កម្មវិធីបណ្តុះបណ្តាល TVET & បរិញ្ញាបត្រ' : 'TVET & Higher Education Programs'}</span>
+              {/* Badge */}
+              <div className="courses-hero-badge">
+                <Sparkles size={15} />
+                <span>{isKhmer ? 'កម្មវិធីបណ្តុះបណ្តាល TVET & បរិញ្ញាបត្រ' : 'TVET & Higher Education Programs'}</span>
+              </div>
             </div>
 
             <h1 className="courses-hero-title">
