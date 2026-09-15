@@ -126,10 +126,15 @@ class AdminCategoryController extends Controller
         return response()->json(['message' => 'Blog category deleted successfully']);
     }
 
-    // Event Categories
     public function getEventCategories(): JsonResponse
     {
-        $categories = EventCategory::withCount('events')->orderBy('name', 'asc')->get();
+        $categories = EventCategory::withCount('events')
+            ->with(['events' => function ($query) {
+                $query->select('id', 'title', 'date', 'time', 'place', 'fee', 'imageUrl', 'category_id');
+            }])
+            ->orderBy('order', 'asc')
+            ->orderBy('name', 'asc')
+            ->get();
         return response()->json($categories);
     }
 
@@ -138,9 +143,24 @@ class AdminCategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'slug' => 'nullable|string|max:255',
+            'imageUrl' => 'nullable|string',
+            'status' => 'nullable|string|in:active,inactive',
+            'order' => 'nullable|integer',
         ]);
 
+        if (empty($validated['slug']) && !empty($validated['name'])) {
+            $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
+        }
+        if (empty($validated['status'])) {
+            $validated['status'] = 'active';
+        }
+
         $category = EventCategory::create($validated);
+        $category->loadCount('events');
+        $category->load(['events' => function ($query) {
+            $query->select('id', 'title', 'date', 'time', 'place', 'fee', 'imageUrl', 'category_id');
+        }]);
         return response()->json($category, 201);
     }
 
@@ -150,15 +170,34 @@ class AdminCategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'slug' => 'nullable|string|max:255',
+            'imageUrl' => 'nullable|string',
+            'status' => 'nullable|string|in:active,inactive',
+            'order' => 'nullable|integer',
         ]);
 
+        if (empty($validated['slug']) && !empty($validated['name'])) {
+            $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
+        }
+
         $category->update($validated);
+        $category->loadCount('events');
+        $category->load(['events' => function ($query) {
+            $query->select('id', 'title', 'date', 'time', 'place', 'fee', 'imageUrl', 'category_id');
+        }]);
         return response()->json($category);
     }
 
     public function destroyEventCategory($id): JsonResponse
     {
         $category = EventCategory::findOrFail($id);
+
+        if ($category->events()->count() > 0) {
+            return response()->json([
+                'message' => 'មិនអាចលុបប្រភេទនេះបានទេ ពីព្រោះមានព្រឹត្តិការណ៍កំពុងភ្ជាប់ជាមួយ។ សូមផ្លាស់ប្តូរប្រភេទព្រឹត្តិការណ៍ជាមុនសិន។ / Cannot delete category with associated events. Please reassign events first.'
+            ], 422);
+        }
+
         $category->delete();
         return response()->json(['message' => 'Event category deleted successfully']);
     }
