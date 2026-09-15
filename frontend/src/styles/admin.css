@@ -1839,6 +1839,92 @@
   transform: scale(1.1);
 }
 
+/* Promotional Video Management Grid & Cards */
+.admin-video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 22px;
+  margin-bottom: 24px;
+}
+
+.admin-video-card {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(7, 41, 77, 0.04);
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-video-card:hover {
+  transform: translateY(-4px);
+  border-color: #cbd5e1;
+  box-shadow: 0 14px 32px rgba(7, 41, 77, 0.09);
+}
+
+.admin-video-card-thumb-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #0f172a;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.admin-video-card-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.admin-video-card:hover .admin-video-card-thumb-img {
+  transform: scale(1.04);
+}
+
+.admin-video-play-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 41, 77, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+}
+
+.admin-video-card:hover .admin-video-play-overlay {
+  background: rgba(7, 41, 77, 0.2);
+}
+
+.admin-video-play-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.admin-video-card:hover .admin-video-play-btn {
+  transform: scale(1.12);
+  background: #ffffff;
+}
+
+.admin-video-card-body {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: space-between;
+}
+
+
 
 
 
