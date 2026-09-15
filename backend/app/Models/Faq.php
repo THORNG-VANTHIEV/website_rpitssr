@@ -9,6 +9,7 @@ class Faq extends BaseModel
     protected $fillable = [
         'question',
         'answer',
+        'category',
         'order',
     ];
 }

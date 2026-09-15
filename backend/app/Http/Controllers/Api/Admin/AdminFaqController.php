@@ -33,6 +33,7 @@ class AdminFaqController extends Controller
         $validated = $request->validate([
             'question' => 'required|string',
             'answer' => 'required|string',
+            'category' => 'nullable|string|max:50',
             'order' => 'nullable|integer',
         ]);
 
@@ -52,6 +53,7 @@ class AdminFaqController extends Controller
         $validated = $request->validate([
             'question' => 'sometimes|required|string',
             'answer' => 'sometimes|required|string',
+            'category' => 'nullable|string|max:50',
             'order' => 'nullable|integer',
         ]);
 
