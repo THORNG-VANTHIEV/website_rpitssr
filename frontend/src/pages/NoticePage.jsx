@@ -128,7 +128,8 @@ const SAMPLE_FALLBACK_NOTICES = [
 ];
 
 export const NoticePage = () => {
-  const { isKhmer } = useLanguage();
+  const { currentLanguage, language, t } = useLanguage();
+  const isKhmer = (currentLanguage || language) === 'km';
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('all');

@@ -59,7 +59,8 @@ const formatExamDate = (dateString, isKhmer) => {
 };
 
 export const ExamResultsPage = () => {
-  const { t, isKhmer } = useLanguage();
+  const { t, currentLanguage, language } = useLanguage();
+  const isKhmer = (currentLanguage || language) === 'km';
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState([]);
   const [examResults, setExamResults] = useState([]);

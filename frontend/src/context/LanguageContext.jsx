@@ -98,6 +98,7 @@ export const LanguageProvider = ({ children }) => {
       value={{
         currentLanguage,
         language: currentLanguage,
+        isKhmer: currentLanguage === 'km',
         languages,
         translations,
         isLoading,

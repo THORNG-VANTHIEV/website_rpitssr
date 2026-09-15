@@ -34,7 +34,8 @@ export const LoginPage = () => {
 
   const navigate = useNavigate();
   const { login, logout, user, isAuthenticated } = useAuth();
-  const { t, isKhmer } = useLanguage();
+  const { t, currentLanguage, language } = useLanguage();
+  const isKhmer = (currentLanguage || language) === 'km';
 
   useEffect(() => {
     const token = localStorage.getItem('token');

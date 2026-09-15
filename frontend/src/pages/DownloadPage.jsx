@@ -316,7 +316,8 @@ const OFFICIAL_DOCUMENTS = [
 ];
 
 export const DownloadPage = () => {
-  const { t, isKhmer } = useLanguage();
+  const { t, currentLanguage, language } = useLanguage();
+  const isKhmer = (currentLanguage || language) === 'km';
   const [documents, setDocuments] = useState(OFFICIAL_DOCUMENTS);
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedFormat, setSelectedFormat] = useState('all');
