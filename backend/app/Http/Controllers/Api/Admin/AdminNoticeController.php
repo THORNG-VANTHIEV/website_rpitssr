@@ -11,8 +11,26 @@ class AdminNoticeController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $limit = (int) $request->input('limit', 20);
-        $notices = Notice::orderBy('date', 'desc')->paginate($limit);
+        $query = Notice::query();
+
+        if ($request->filled('category') && $request->category !== 'all') {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%");
+            });
+        }
+
+        $limit = (int) $request->input('limit', 100);
+        $notices = $query->orderBy('isPinned', 'desc')
+            ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
+            ->paginate($limit);
 
         return response()->json($notices->items(), 200);
     }
@@ -33,11 +51,18 @@ class AdminNoticeController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'category' => 'nullable|string|max:100',
+            'fileUrl' => 'nullable|string|max:500',
+            'isPinned' => 'nullable|boolean',
             'date' => 'nullable|date',
         ]);
 
         if (empty($validated['date'])) {
             $validated['date'] = now()->toDateString();
+        }
+
+        if (empty($validated['category'])) {
+            $validated['category'] = 'general';
         }
 
         $notice = Notice::create($validated);
@@ -56,6 +81,9 @@ class AdminNoticeController extends Controller
         $validated = $request->validate([
             'title' => 'sometimes|required|string|max:255',
             'content' => 'sometimes|required|string',
+            'category' => 'nullable|string|max:100',
+            'fileUrl' => 'nullable|string|max:500',
+            'isPinned' => 'nullable|boolean',
             'date' => 'nullable|date',
         ]);
 
