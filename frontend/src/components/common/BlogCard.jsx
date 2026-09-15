@@ -3,14 +3,58 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { getCleanExcerpt } from '../../utils/textUtils';
 
+// Helper for authentic Cambodian date formatting
+const formatKhmerDate = (dateStr, isKhmer) => {
+  if (!dateStr) return isKhmer ? 'មិនមានកាលបរិច្ឆេទ' : 'N/A';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return isKhmer ? 'មិនមានកាលបរិច្ឆេទ' : 'N/A';
+
+  if (!isKhmer) {
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  const khmerMonths = [
+    'មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា',
+    'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'
+  ];
+  const toKhmerNumber = (num) => {
+    const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+    return num.toString().split('').map(char => khmerDigits[char] || char).join('');
+  };
+
+  const day = toKhmerNumber(d.getDate());
+  const month = khmerMonths[d.getMonth()];
+  const year = toKhmerNumber(d.getFullYear());
+  return `${day} ${month} ${year}`;
+};
+
+// Category styling resolver following AGENTS.md pastel palette
+const getCategoryStyle = (catName) => {
+  const c = (catName || '').toLowerCase();
+  if (c.includes('scholar') || c.includes('អាហារូបករណ៍') || c.includes('promotion')) {
+    return { background: '#fffbeb', color: '#b45309', border: '1px solid #fde68a' };
+  }
+  if (c.includes('event') || c.includes('ព្រឹត្តិការណ៍') || c.includes('workshop')) {
+    return { background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' };
+  }
+  if (c.includes('achieve') || c.includes('iso') || c.includes('សមិទ្ធផល') || c.includes('award')) {
+    return { background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' };
+  }
+  if (c.includes('partner') || c.includes('ដៃគូ') || c.includes('mou')) {
+    return { background: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa' };
+  }
+  return { background: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' };
+};
+
 export const BlogCard = ({ post, featured = false }) => {
   if (!post) return null;
 
-  const { t } = useLanguage();
+  const { t, language, currentLanguage } = useLanguage();
+  const isKhmer = (currentLanguage || language) === 'km';
   const imageUrl = post.imageUrl || post.image_url || '/images/blog-placeholder.jpg';
-  
-  // Category resolution matching chunk 605
-  let categoryName = 'Education';
+
+  // Category resolution
+  let categoryName = isKhmer ? 'ព័ត៌មានទូទៅ' : 'Campus News';
   if (post.category) {
     if (typeof post.category === 'object' && post.category.name) categoryName = post.category.name;
     else if (typeof post.category === 'string') categoryName = post.category;
@@ -32,18 +76,30 @@ export const BlogCard = ({ post, featured = false }) => {
     }
   } else if (post.title) {
     const titleLower = post.title.toLowerCase();
-    if (titleLower.includes('course') || titleLower.includes('class') || titleLower.includes('education')) categoryName = 'Education';
-    else if (titleLower.includes('event') || titleLower.includes('ceremony') || titleLower.includes('graduation')) categoryName = 'Events';
-    else if (titleLower.includes('news') || titleLower.includes('announcement') || titleLower.includes('notice')) categoryName = 'News';
-    else if (titleLower.includes('student') || titleLower.includes('achievement') || titleLower.includes('award')) categoryName = 'Student Life';
+    if (titleLower.includes('scholar') || titleLower.includes('អាហារូបករណ៍') || titleLower.includes('១០០%')) {
+      categoryName = isKhmer ? 'អាហារូបករណ៍' : 'Scholarships';
+    } else if (titleLower.includes('event') || titleLower.includes('ពិធី') || titleLower.includes('បវេសនកាល')) {
+      categoryName = isKhmer ? 'ព្រឹត្តិការណ៍' : 'Events';
+    } else if (titleLower.includes('partner') || titleLower.includes('jica') || titleLower.includes('adb') || titleLower.includes('ដៃគូ')) {
+      categoryName = isKhmer ? 'កិច្ចសហប្រតិបត្តិការ' : 'Partnership';
+    } else if (titleLower.includes('iso') || titleLower.includes('គុណភាព') || titleLower.includes('ជ័យលាភី')) {
+      categoryName = isKhmer ? 'សមិទ្ធផល' : 'Achievement';
+    }
+  }
+
+  // Automatic translation for standard categories
+  if (isKhmer) {
+    const catLower = (categoryName || '').toLowerCase();
+    if (catLower === 'promotion' || catLower.includes('scholar')) categoryName = 'អាហារូបករណ៍';
+    else if (catLower === 'news' || catLower.includes('campus')) categoryName = 'ព័ត៌មានទូទៅ';
+    else if (catLower === 'events' || catLower.includes('event')) categoryName = 'ព្រឹត្តិការណ៍';
+    else if (catLower === 'partnership' || catLower.includes('partner')) categoryName = 'កិច្ចសហប្រតិបត្តិការ';
+    else if (catLower === 'achievement' || catLower.includes('achieve')) categoryName = 'សមិទ្ធផល & គុណភាព';
+    else if (catLower === 'education') categoryName = 'ការអប់រំបណ្តុះបណ្តាល';
   }
 
   const dateStr = post.publishedAt || post.createdAt || post.created_at;
-  const formattedDate = (() => {
-    if (!dateStr) return 'N/A';
-    const d = new Date(dateStr);
-    return isNaN(d.getTime()) ? 'N/A' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  })();
+  const formattedDate = formatKhmerDate(dateStr, isKhmer);
 
   const isRecent = (() => {
     if (post.is_new || post.isNew) return true;
@@ -61,52 +117,69 @@ export const BlogCard = ({ post, featured = false }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const catStyle = getCategoryStyle(categoryName);
+
   return (
-    <div className={`modern-blog-card ${featured ? 'featured' : ''}`}>
-      <div className="blog-image-wrapper">
-        <Link to={linkTarget} onClick={handleScrollTop}>
+    <div className={`inst-blog-card modern-blog-card ${featured ? 'featured' : ''}`}>
+      <div className="inst-blog-media">
+        <Link to={linkTarget} onClick={handleScrollTop} className="d-block w-100 h-100">
           <img
             src={imageUrl}
             alt={post.title || 'Blog post'}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            onError={(e) => { e.target.src = '/images/blog-placeholder.jpg'; }}
+            onError={(e) => { e.target.src = '/images/blog.webp'; }}
           />
         </Link>
-        <div className="blog-category">
-          <span>{categoryName}</span>
+        <div className="inst-blog-cat-badge" style={catStyle}>
+          {categoryName}
         </div>
         {isRecent && (
-          <span className="blog-new-badge">
-            <span className="pulse-dot"></span> ថ្មី
+          <span
+            className="badge position-absolute top-0 end-0 m-3 px-2.5 py-1 rounded-pill shadow-sm"
+            style={{ backgroundColor: '#ffaf00', color: '#07294D', fontWeight: '800', fontSize: '0.72rem', zIndex: 2 }}
+          >
+            <i className="fas fa-sparkles me-1"></i>
+            {isKhmer ? 'ថ្មី' : 'NEW'}
           </span>
         )}
       </div>
-      <div className="blog-content-wrapper">
-        <div className="blog-meta">
-          <div className="meta-item">
-            <i className="fas fa-calendar"></i>
-            <span>{formattedDate}</span>
-          </div>
-          <div className="meta-item">
-            <i className="fas fa-user"></i>
-            <span>{post.author || 'Admin'}</span>
-          </div>
+
+      <div className="inst-blog-body">
+        <div className="inst-blog-meta">
+          <span>
+            <i className="far fa-calendar-alt text-primary"></i>
+            {formattedDate}
+          </span>
+          <span>
+            <i className="far fa-user text-primary"></i>
+            {post.author || 'RPITSSR News'}
+          </span>
         </div>
-        <h4 className="blog-title">
+
+        <h4 className="inst-blog-title">
           <Link to={linkTarget} onClick={handleScrollTop}>
             {post.title}
           </Link>
         </h4>
-        <p className="blog-excerpt">
+
+        <p className="inst-blog-excerpt">
           {getCleanExcerpt(post, 120)}
         </p>
-        <div className="blog-footer">
-          <Link to={linkTarget} className="read-more-btn" onClick={handleScrollTop}>
-            {t('home.readMore')} <i className="fas fa-arrow-right"></i>
+
+        <div className="inst-blog-footer">
+          <Link to={linkTarget} className="inst-blog-btn" onClick={handleScrollTop}>
+            <span>{t('blog.readMore') || 'អានបន្ថែម'}</span>
+            <i className="fas fa-arrow-right"></i>
           </Link>
-          <div className="blog-engagement">
-            <span className="comments-count">
-              <i className="fas fa-comments"></i>{commentsCount}
+          <div className="d-flex align-items-center gap-2 text-muted small">
+            {post.viewCount !== undefined && post.viewCount > 0 && (
+              <span title="Views" className="d-inline-flex align-items-center gap-1">
+                <i className="far fa-eye text-secondary"></i>
+                <span>{post.viewCount}</span>
+              </span>
+            )}
+            <span title="Comments" className="d-inline-flex align-items-center gap-1">
+              <i className="far fa-comments text-secondary"></i>
+              <span>{commentsCount}</span>
             </span>
           </div>
         </div>
