@@ -14,7 +14,12 @@ class AdminCategoryController extends Controller
     // Course Categories
     public function getCourseCategories(): JsonResponse
     {
-        $categories = CourseCategory::withCount('courses')->orderBy('name', 'asc')->get();
+        $categories = CourseCategory::withCount('courses')
+            ->with(['courses' => function ($query) {
+                $query->select('id', 'title', 'categoryId', 'fee', 'duration', 'credit', 'semester', 'imageUrl');
+            }])
+            ->orderBy('name', 'asc')
+            ->get();
         return response()->json($categories);
     }
 
@@ -23,11 +28,24 @@ class AdminCategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'icon' => 'nullable|string',
-            'color' => 'nullable|string',
+            'slug' => 'nullable|string|max:255',
+            'imageUrl' => 'nullable|string',
+            'status' => 'nullable|string|in:active,inactive',
+            'order' => 'nullable|integer',
         ]);
 
+        if (empty($validated['slug']) && !empty($validated['name'])) {
+            $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
+        }
+        if (empty($validated['status'])) {
+            $validated['status'] = 'active';
+        }
+
         $category = CourseCategory::create($validated);
+        $category->loadCount('courses');
+        $category->load(['courses' => function ($query) {
+            $query->select('id', 'title', 'categoryId', 'fee', 'duration', 'credit', 'semester', 'imageUrl');
+        }]);
         return response()->json($category, 201);
     }
 
@@ -37,17 +55,34 @@ class AdminCategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'icon' => 'nullable|string',
-            'color' => 'nullable|string',
+            'slug' => 'nullable|string|max:255',
+            'imageUrl' => 'nullable|string',
+            'status' => 'nullable|string|in:active,inactive',
+            'order' => 'nullable|integer',
         ]);
 
+        if (empty($validated['slug']) && !empty($validated['name'])) {
+            $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
+        }
+
         $category->update($validated);
+        $category->loadCount('courses');
+        $category->load(['courses' => function ($query) {
+            $query->select('id', 'title', 'categoryId', 'fee', 'duration', 'credit', 'semester', 'imageUrl');
+        }]);
         return response()->json($category);
     }
 
     public function destroyCourseCategory($id): JsonResponse
     {
         $category = CourseCategory::findOrFail($id);
+        
+        if ($category->courses()->count() > 0) {
+            return response()->json([
+                'message' => 'មិនអាចលុបប្រភេទនេះបានទេ ពីព្រោះមានវគ្គសិក្សាកំពុងភ្ជាប់ជាមួយ។ សូមផ្លាស់ប្តូរប្រភេទវគ្គសិក្សាជាមុនសិន។ / Cannot delete category with associated courses. Please reassign courses first.'
+            ], 422);
+        }
+
         $category->delete();
         return response()->json(['message' => 'Course category deleted successfully']);
     }

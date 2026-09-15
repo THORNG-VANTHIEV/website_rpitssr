@@ -1670,6 +1670,73 @@
   color: #475569;
 }
 
+/* Course Categories Modern Styling */
+.admin-cat-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.admin-cat-slug-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.admin-cat-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.admin-cat-count-badge.has-courses {
+  background: #eff6ff;
+  color: #1e73be;
+  border: 1px solid #dbeafe;
+}
+
+.admin-cat-count-badge.empty-courses {
+  background: #f8fafc;
+  color: #94a3b8;
+  border: 1px solid #e2e8f0;
+}
+
+.admin-cat-course-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.admin-cat-course-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(7, 41, 77, 0.04);
+  transform: translateY(-2px);
+}
+
+
 
 
 
