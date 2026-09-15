@@ -1519,4 +1519,90 @@
   color: #07294D;
 }
 
+/* =========================================================
+   Teacher & Faculty Standards (Daylight Institutional)
+   ========================================================= */
+.admin-teacher-avatar-wrapper {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  flex-shrink: 0;
+}
+
+.admin-teacher-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.admin-teacher-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.88rem;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  color: #1e73be;
+}
+
+.admin-teacher-photo-uploader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #f8fafc;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 12px;
+  transition: border-color 0.2s ease;
+}
+
+.admin-teacher-photo-uploader:hover {
+  border-color: #1e73be;
+}
+
+.admin-teacher-photo-preview {
+  width: 68px;
+  height: 68px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(7, 41, 77, 0.1);
+  background: #ffffff;
+  flex-shrink: 0;
+}
+
+.admin-teacher-photo-empty {
+  width: 68px;
+  height: 68px;
+  border-radius: 12px;
+  border: 2px dashed #cbd5e1;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.admin-dept-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+
 
