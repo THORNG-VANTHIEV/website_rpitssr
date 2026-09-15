@@ -1,8 +1,37 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { PageBanner } from '../components/common/PageBanner';
 import { useLanguage } from '../context/LanguageContext';
-import api from '../api/client';
+import {
+  FileText,
+  Download,
+  Eye,
+  Search,
+  CheckCircle2,
+  Clock,
+  HardDrive,
+  ShieldCheck,
+  Award,
+  ChevronRight,
+  X,
+  Printer,
+  Phone,
+  Mail,
+  Building,
+  ClipboardCheck,
+  AlertCircle,
+  FileSpreadsheet,
+  FileCode,
+  FolderOpen,
+  Calendar,
+  BookOpen,
+  UserPlus
+} from 'lucide-react';
+
+// Khmer numeral conversion helper
+const toKhmerNumber = (num) => {
+  const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+  return String(num).replace(/[0-9]/g, (digit) => khmerDigits[parseInt(digit, 10)]);
+};
 
 // Official Documents Database for RPITSSR Download Center
 const OFFICIAL_DOCUMENTS = [
@@ -99,102 +128,85 @@ const OFFICIAL_DOCUMENTS = [
     requiredDocsKm: [
       'ពាក្យស្នើសុំស្នាក់នៅដែលមានហត្ថលេខាអាណាព្យាបាល',
       'លិខិតបញ្ជាក់ទីលំនៅពីអាជ្ញាធរឃុំ/សង្កាត់',
-      'កិច្ចសន្យាគោរពបទបញ្ជាផ្ទៃក្នុងអន្តេវាសិកដ្ឋាន'
+      'ច្បាប់ចម្លងប័ណ្ណក្រីក្រ (បើមានអាទិភាព)'
     ],
     requiredDocsEn: [
-      'Dormitory request form endorsed by parent or legal guardian',
-      'Commune residency verification certificate',
-      'Signed agreement adhering to campus dormitory code of conduct'
+      'Application signed by parent or legal guardian',
+      'Residency verification certificate from Commune/Sangkat administration',
+      'Copy of IDPoor card (for priority accommodation queue)'
     ]
   },
 
-  // 2. ACADEMIC CALENDARS & SCHEDULES
+  // 2. ACADEMIC CALENDARS & TIMETABLES
   {
     id: 'doc-cal-2026-2027',
-    code: 'CAL-ACAD-26',
+    code: 'CAL-AY-2026',
     category: 'calendars',
     fileType: 'pdf',
     fileSize: '2.4 MB',
-    updatedAt: '2026-09-01',
-    downloadsCount: 4890,
+    updatedAt: '2026-08-01',
+    downloadsCount: 6890,
     isPopular: true,
-    titleKm: 'ប្រតិទិនសិក្សា និងថ្ងៃឈប់សម្រាកផ្លូវការប្រចាំឆ្នាំ ២០២៦-២០២៧',
-    titleEn: 'Official Academic Calendar & Holiday Schedule 2026-2027',
-    descriptionKm: 'ប្រតិទិនលម្អិតអំពីកាលបរិច្ឆេទបើកបវេសនកាល ការចុះឈ្មោះមុខវិជ្ជា ការប្រឡងពាក់កណ្តាលឆមាស ការប្រឡងបញ្ចប់ឆមាស និងថ្ងៃឈប់សម្រាកបុណ្យជាតិ។',
-    descriptionEn: 'Comprehensive schedule of semester terms, course add/drop deadlines, midterm & final exam periods, and official public holidays.',
-    submissionOffice: 'ការិយាល័យសិក្សា និងកិច្ចការនិស្សិត (អគារ A)',
-    requiredDocsKm: ['ឯកសារយោង និងព័ត៌មានទូទៅសម្រាប់និស្សិតគ្រប់ដេប៉ាតឺម៉ង់'],
-    requiredDocsEn: ['Official reference schedule for all registered students and faculty']
+    titleKm: 'ប្រតិទិនសិក្សាផ្លូវការប្រចាំឆ្នាំ ២០២៦-២០២៧ (Official Academic Calendar)',
+    titleEn: 'RPITSSR Official Academic Calendar 2026-2027',
+    descriptionKm: 'ប្រតិទិនសិក្សាផ្លូវការបង្ហាញកាលបរិច្ឆេទបើកបវេសនកាល ឆមាសទី១ ឆមាសទី២ ការប្រឡងពាក់កណ្តាលឆមាស និងថ្ងៃឈប់សម្រាកបុណ្យជាតិ។',
+    descriptionEn: 'Comprehensive institutional calendar covering Semester I & II start dates, exam weeks, TVET practicums, and official holidays.',
+    submissionOffice: 'ផ្សព្វផ្សាយដោយការិយាល័យកិច្ចការសិក្សា និងស្រាវជ្រាវ',
+    requiredDocsKm: null,
+    requiredDocsEn: null
   },
   {
-    id: 'doc-exam-schedule-s1',
-    code: 'SCHED-EXAM-S1',
+    id: 'doc-exam-rules',
+    code: 'REG-EXAM-01',
     category: 'calendars',
     fileType: 'pdf',
-    fileSize: '820 KB',
-    updatedAt: '2026-08-28',
-    downloadsCount: 3670,
-    isPopular: true,
-    titleKm: 'តារាងកាលវិភាគប្រឡងឆមាសទី ១ ឆ្នាំសិក្សា ២០២៦-២០២៧ (Semester 1 Exam Schedule)',
-    titleEn: 'Semester 1 Examination Timetable & Room Allocations 2026-2027',
-    descriptionKm: 'តារាងកាលបរិច្ឆេទ ម៉ោងប្រឡង បន្ទប់ប្រឡង និងសមាសភាពអនុរក្ស សម្រាប់និស្សិតគ្រប់កម្រិត (TVET C1-C3, សញ្ញាបត្រជាន់ខ្ពស់ និងបរិញ្ញាបត្រ)។',
-    descriptionEn: 'Exam dates, session times, room allocations, and exam invigilator assignments for all degree and vocational cohorts.',
-    submissionOffice: 'គណៈកម្មការរៀបចំការប្រឡងវិទ្យាស្ថាន',
-    requiredDocsKm: ['និស្សិតត្រូវកាន់កាតសិស្ស (Student ID Card) ចូលបន្ទប់ប្រឡងជាចាំបាច់'],
-    requiredDocsEn: ['Mandatory presentation of valid Student ID Card upon entering exam hall']
-  },
-  {
-    id: 'doc-internship-schedule',
-    code: 'SCHED-INTERN-26',
-    category: 'calendars',
-    fileType: 'xlsx',
-    fileSize: '450 KB',
-    updatedAt: '2026-08-18',
-    downloadsCount: 1640,
+    fileSize: '780 KB',
+    updatedAt: '2026-07-20',
+    downloadsCount: 2150,
     isPopular: false,
-    titleKm: 'កាលវិភាគ និងបញ្ជីសហគ្រាសទទួលសិស្សចុះកម្មសិក្សាការងារ (Internship Placement List)',
-    titleEn: 'Enterprise Internship Timeline & Partner Placement Directory',
-    descriptionKm: 'កាលវិភាគលម្អិតនៃការចុះហាត់ការនៅសហគ្រាសដៃគូ សណ្ឋាគារ រោងចក្រ និងក្រុមហ៊ុនបច្ចេកវិទ្យាក្នុងខេត្តសៀមរាប និងរាជធានីភ្នំពេញ។',
-    descriptionEn: 'Industry practicum timeline and directory of enterprise partners offering student placements across hospitality, auto, and IT.',
-    submissionOffice: 'ការិយាល័យទំនាក់ទំនងសហគ្រាស និងការងារ (អគារ B, បន្ទប់ ១០១)',
-    requiredDocsKm: ['ទម្រង់វាយតម្លៃការងារ និងសៀវភៅតាមដានកម្មសិក្សា'],
-    requiredDocsEn: ['Supervisor performance assessment form and weekly logbook']
+    titleKm: 'បទបញ្ជាផ្ទៃក្នុងស្តីពីការប្រឡង និងការវាយតម្លៃលទ្ធផលសិក្សា',
+    titleEn: 'Examination Regulations & Academic Assessment Guidelines',
+    descriptionKm: 'គោលការណ៍ណែនាំស្តីពីវិន័យក្នុងការប្រឡង បទបញ្ជាបន្ទប់ប្រឡង លក្ខខណ្ឌសុំប្រឡងសង និងប្រព័ន្ធគណនា GPA និងនិទ្ទេស។',
+    descriptionEn: 'Institutional rules governing examination attendance, integrity violations, re-examination procedures, and the national grading scale.',
+    submissionOffice: 'ការិយាល័យកិច្ចការសិក្សា និងស្រាវជ្រាវ',
+    requiredDocsKm: null,
+    requiredDocsEn: null
   },
 
-  // 3. STUDENT HANDBOOKS & REGULATIONS
+  // 3. STUDENT HANDBOOKS & CURRICULUM
   {
-    id: 'doc-handbook-student',
+    id: 'doc-student-handbook',
     code: 'HB-STU-2026',
     category: 'handbooks',
     fileType: 'pdf',
-    fileSize: '3.8 MB',
-    updatedAt: '2026-07-25',
-    downloadsCount: 2980,
+    fileSize: '4.8 MB',
+    updatedAt: '2026-08-12',
+    downloadsCount: 4320,
     isPopular: true,
-    titleKm: 'សៀវភៅណែនាំនិស្សិត និងបទបញ្ជាផ្ទៃក្នុងវិទ្យាស្ថាន RPITSSR (Student Handbook)',
-    titleEn: 'Student Handbook & Institutional Code of Conduct',
-    descriptionKm: 'សៀវភៅណែនាំពេញលេញស្តីពីបទបញ្ជាផ្ទៃក្នុង ការស្លៀកពាក់ វិន័យ សិទ្ធិ និងកាតព្វកិច្ចរបស់និស្សិត ព្រមទាំងប្រព័ន្ធពិន្ទុ និងការផ្តល់រង្វាន់លើកទឹកចិត្ត។',
-    descriptionEn: 'Comprehensive guide detailing campus regulations, uniform policy, code of student discipline, academic integrity, and graduation criteria.',
-    submissionOffice: 'ការិយាល័យសិក្សា និងកិច្ចការនិស្សិត (អគារ A)',
-    requiredDocsKm: ['និស្សិតគ្រប់រូបត្រូវអាន និងយល់ដឹងឱ្យបានច្បាស់លាស់ពីបទបញ្ជាផ្ទៃក្នុង'],
-    requiredDocsEn: ['All enrolled students are required to read and comply with the student handbook']
+    titleKm: 'សៀវភៅណែនាំនិស្សិត RPITSSR (Student Handbook 2026-2027)',
+    titleEn: 'RPITSSR Comprehensive Student Handbook 2026-2027',
+    descriptionKm: 'សៀវភៅណែនាំពេញលេញស្តីពីសិទ្ធិ កាតព្វកិច្ច សេវាកម្មគាំទ្រនិស្សិត បណ្ណាល័យ រោងជាង និងសកម្មភាពសង្គមក្នុងបរិវេណវិទ្យាស្ថាន។',
+    descriptionEn: 'Essential institutional guide detailing campus facilities, laboratory protocols, digital library access, and student code of conduct.',
+    submissionOffice: 'ការិយាល័យសិក្សា និងកិច្ចការនិស្សិត',
+    requiredDocsKm: null,
+    requiredDocsEn: null
   },
   {
-    id: 'doc-safety-manual',
-    code: 'HB-SAFE-01',
+    id: 'doc-it-curriculum',
+    code: 'CURR-IT-2026',
     category: 'handbooks',
     fileType: 'pdf',
-    fileSize: '2.1 MB',
-    updatedAt: '2026-08-02',
-    downloadsCount: 2150,
+    fileSize: '3.1 MB',
+    updatedAt: '2026-07-15',
+    downloadsCount: 3870,
     isPopular: false,
-    titleKm: 'ស្តង់ដារសុវត្ថិភាព និងការប្រើប្រាស់រោងជាងបច្ចេកទេស (Workshop Safety Manual - OSH)',
-    titleEn: 'Occupational Safety and Health (OSH) Workshop Safety Manual',
-    descriptionKm: 'សៀវភៅណែនាំស្តង់ដារសុវត្ថិភាពការងារក្នុងរោងជាងយានយន្ត អគ្គិសនី មេកានិច និងការដ្ឋានសំណង់ ស្របតាមបទដ្ឋានសុវត្ថិភាពការងារជាតិ។',
-    descriptionEn: 'Workshop safety rules, personal protective equipment (PPE) compliance, and emergency protocols for engineering laboratories.',
-    submissionOffice: 'ដេប៉ាតឺម៉ង់បច្ចេកទេស និងការិយាល័យរដ្ឋបាល',
-    requiredDocsKm: ['តម្រូវឱ្យពាក់ឧបករណ៍ការពារខ្លួន (PPE) គ្រប់ពេលអនុវត្តការងារ'],
-    requiredDocsEn: ['Mandatory PPE wear during all workshop practical sessions']
+    titleKm: 'កម្មវិធីសិក្សា និងសៀវភៅគោលជំនាញបច្ចេកវិទ្យាព័ត៌មាន (IT Curriculum Guide)',
+    titleEn: 'Information Technology Curriculum & Course Syllabus',
+    descriptionKm: 'ព័ត៌មានលម្អិតមុខវិជ្ជា រយៈពេលសិក្សា និងក្រេឌីតសម្រាប់កម្រិត C1, C2, C3, បរិញ្ញាបត្ររង និងបរិញ្ញាបត្របច្ចេកវិទ្យា។',
+    descriptionEn: 'Complete syllabus and course modular mapping for software development, network engineering, and cybersecurity programs.',
+    submissionOffice: 'ដេប៉ាតឺម៉ង់បច្ចេកវិទ្យាព័ត៌មាន (អគារ C, បន្ទប់ ២០១)',
+    requiredDocsKm: null,
+    requiredDocsEn: null
   },
   {
     id: 'doc-internship-guide',
@@ -202,434 +214,407 @@ const OFFICIAL_DOCUMENTS = [
     category: 'handbooks',
     fileType: 'pdf',
     fileSize: '1.6 MB',
-    updatedAt: '2026-07-30',
-    downloadsCount: 1720,
+    updatedAt: '2026-06-25',
+    downloadsCount: 2980,
     isPopular: false,
-    titleKm: 'សៀវភៅណែនាំការចុះកម្មសិក្សា និងការសរសេររបាយការណ៍បញ្ចប់ការសិក្សា (Internship Guide)',
-    titleEn: 'Internship Practicum & Capstone Project Report Writing Guidelines',
-    descriptionKm: 'ការណែនាំអំពីរបៀបរៀបចំខ្លួនចុះហាត់ការនៅក្រុមហ៊ុន និងទម្រង់ស្តង់ដារនៃការសរសេររបាយការណ៍គម្រោងបញ្ចប់ការសិក្សា (Project Report)។',
-    descriptionEn: 'Standard guidelines on internship conduct, company evaluation criteria, and capstone technical project report formatting.',
+    titleKm: 'សៀវភៅណែនាំការចុះកម្មសិក្សាការងារ (Internship Logbook & Guidelines)',
+    titleEn: 'Industrial Internship Guidelines & Practical Logbook Template',
+    descriptionKm: 'សៀវភៅតាមដានការចុះអនុវត្តការងារផ្ទាល់នៅតាមសហគ្រាស និងរោងចក្រដៃគូ របៀបសរសេររបាយការណ៍កម្មសិក្សា និងការវាយតម្លៃពីអ្នកគ្រប់គ្រង។',
+    descriptionEn: 'Step-by-step guidance, weekly log sheets, and enterprise evaluation rubric for mandatory 3-month industrial workplace internships.',
     submissionOffice: 'ការិយាល័យទំនាក់ទំនងសហគ្រាស និងការងារ',
-    requiredDocsKm: ['លិខិតឧទ្ទេសនាមពីវិទ្យាស្ថាន និងកិច្ចសន្យាហាត់ការ'],
-    requiredDocsEn: ['Institutional introduction letter and tripartite internship agreement']
+    requiredDocsKm: null,
+    requiredDocsEn: null
   },
 
-  // 4. ADMINISTRATIVE & STUDENT SERVICE FORMS
+  // 4. ADMINISTRATIVE & STUDENT REQUEST FORMS
+  {
+    id: 'doc-student-cert',
+    code: 'FORM-ADM-04',
+    category: 'adminForms',
+    fileType: 'docx',
+    fileSize: '420 KB',
+    updatedAt: '2026-08-18',
+    downloadsCount: 4610,
+    isPopular: true,
+    titleKm: 'ពាក្យស្នើសុំលិខិតបញ្ជាក់ការសិក្សា (Certificate of Study Request)',
+    titleEn: 'Certificate of Enrollment / Study Verification Request Form',
+    descriptionKm: 'ទម្រង់ស្នើសុំលិខិតបញ្ជាក់ការសិក្សាផ្លូវការ ដើម្បីប្រើប្រាស់ក្នុងការពន្យារប័ណ្ណបើកបរ សុំទិដ្ឋាការ សុំការងារ ឬដាក់ពាក្យអាហារូបករណ៍ក្រៅប្រទេស។',
+    descriptionEn: 'Formal application to obtain an official verification certificate of enrollment and student status for visa or employment purposes.',
+    submissionOffice: 'ការិយាល័យសិក្សា និងកិច្ចការនិស្សិត (អគារ A, បន្ទប់ ១០៤)',
+    requiredDocsKm: [
+      'កាតសម្គាល់ខ្លួនសិស្ស-និស្សិត RPITSSR (ច្បាប់ដើម ឬច្បាប់ថតចម្លង)',
+      'បង្កាន់ដៃបង់សេវារដ្ឋបាល (បើមានកំណត់)'
+    ],
+    requiredDocsEn: [
+      'Valid RPITSSR Student ID card',
+      'Administrative receipt from Finance Office (if applicable)'
+    ]
+  },
   {
     id: 'doc-transcript-req',
-    code: 'FORM-ADM-CERT',
+    code: 'FORM-ADM-05',
     category: 'adminForms',
     fileType: 'docx',
     fileSize: '480 KB',
-    updatedAt: '2026-08-25',
-    downloadsCount: 3890,
-    isPopular: true,
-    titleKm: 'ពាក្យស្នើសុំលិខិតបញ្ជាក់ការសិក្សា ឬព្រឹត្តិបត្រពិន្ទុផ្លូវការ (Transcript Request Form)',
-    titleEn: 'Official Academic Transcript & Student Status Request Form',
-    descriptionKm: 'ទម្រង់បែបបទស្នើសុំព្រឹត្តិបត្រពិន្ទុជាភាសាខ្មែរ/អង់គ្លេស ឬលិខិតបញ្ជាក់កំពុងសិក្សា សម្រាប់យកទៅប្រើប្រាស់ដាក់ពាក្យការងារ ឬសុំអាហារូបករណ៍។',
-    descriptionEn: 'Official request form for bilingual academic transcripts or proof-of-enrollment certificates for employment or scholarship applications.',
+    updatedAt: '2026-08-08',
+    downloadsCount: 3420,
+    isPopular: false,
+    titleKm: 'ពាក្យស្នើសុំព្រឹត្តិបត្រពិន្ទុផ្លូវការ (Official Academic Transcript Request)',
+    titleEn: 'Official Academic Transcript & Grade Sheet Request Form',
+    descriptionKm: 'ទម្រង់ស្នើសុំព្រឹត្តិបត្រពិន្ទុគ្រប់ឆមាស ឬព្រឹត្តិបត្រពិន្ទុបញ្ចប់ការសិក្សាជាភាសាខ្មែរ ឬអង់គ្លេស។',
+    descriptionEn: 'Request form for certified semester-by-semester grade transcripts issued by the Registrar Office.',
     submissionOffice: 'ការិយាល័យសិក្សា និងកិច្ចការនិស្សិត (អគារ A, បន្ទប់ ១០៤)',
     requiredDocsKm: [
-      'ច្បាប់ចម្លងកាតសិស្ស ឬបង្កាន់ដៃបង់ថ្លៃសិក្សា (បើមាន)',
-      'រយៈពេលរង់ចាំដំណើរការឯកសារ៖ ៣ ទៅ ៥ ថ្ងៃនៃថ្ងៃធ្វើការ'
+      'កាតនិស្សិត ឬអត្តសញ្ញាណប័ណ្ណសញ្ជាតិខ្មែរ',
+      'ពាក្យស្នើសុំបំពេញរួចរាល់'
     ],
     requiredDocsEn: [
-      'Copy of Student ID card or registration receipt',
-      'Standard processing turnaround time: 3-5 working days'
+      'Student ID card or National Cambodian ID',
+      'Fully filled request form'
     ]
   },
   {
     id: 'doc-leave-request',
-    code: 'FORM-STU-LEAVE',
+    code: 'FORM-ADM-06',
     category: 'adminForms',
     fileType: 'docx',
-    fileSize: '420 KB',
-    updatedAt: '2026-08-12',
-    downloadsCount: 2210,
+    fileSize: '390 KB',
+    updatedAt: '2026-07-28',
+    downloadsCount: 1650,
     isPopular: false,
-    titleKm: 'ពាក្យសុំច្បាប់ឈប់សម្រាកបណ្តោះអាសន្ន ឬផ្អាកការសិក្សា (Leave of Absence Form)',
-    titleEn: 'Temporary Leave of Absence & Study Deferral Request Form',
-    descriptionKm: 'ទម្រង់សុំច្បាប់សម្រាកព្យាបាលជំងឺ ឬផ្អាកការសិក្សាមួយឆមាសដោយមានហេតុផលចាំបាច់ ដោយរក្សាទុកកំណត់ត្រាសិក្សា។',
-    descriptionEn: 'Form for medical leave of absence or temporary semester deferral with academic standing preservation.',
-    submissionOffice: 'ការិយាល័យសិក្សា និងកិច្ចការនិស្សិត (អគារ A, បន្ទប់ ១០៤)',
+    titleKm: 'ពាក្យសុំច្បាប់ឈប់សម្រាកសិក្សាបណ្តោះអាសន្ន (Leave of Absence Request)',
+    titleEn: 'Temporary Leave of Absence / Postponement Application',
+    descriptionKm: 'ទម្រង់សុំព្យួរការសិក្សា ឬសុំច្បាប់ឈប់សម្រាករយៈពេលខ្លី ដោយសារបញ្ហាសុខភាព ឬធុរៈចាំបាច់ក្នុងគ្រួសារ។',
+    descriptionEn: 'Application for official semester deferral, health-related leave, or approved absence from technical coursework.',
+    submissionOffice: 'ការិយាល័យសិក្សា និងកិច្ចការនិស្សិត',
     requiredDocsKm: [
-      'វេជ្ជបញ្ជា ឬលិខិតបញ្ជាក់ពីមន្ទីរពេទ្យ (ករណីឈឺ)',
-      'ហត្ថលេខាឯកភាពពីប្រធានដេប៉ាតឺម៉ង់ និងអាណាព្យាបាល'
+      'វេជ្ជបញ្ជា ឬលិខិតបញ្ជាក់សុខភាពពីមន្ទីរពេទ្យ (ករណីឈឺ)',
+      'ការយល់ព្រមពីអាណាព្យាបាល'
     ],
     requiredDocsEn: [
-      'Medical certificate or hospital letter (for health leaves)',
-      'Department head endorsement and parental consent'
+      'Official medical certificate (for health-related leaves)',
+      'Parent or guardian written concurrence'
     ]
   },
   {
-    id: 'doc-transfer-major',
-    code: 'FORM-STU-TRANS',
+    id: 'doc-internship-eval',
+    code: 'FORM-EVAL-01',
     category: 'adminForms',
-    fileType: 'docx',
-    fileSize: '460 KB',
-    updatedAt: '2026-08-08',
-    downloadsCount: 1430,
+    fileType: 'xlsx',
+    fileSize: '540 KB',
+    updatedAt: '2026-08-02',
+    downloadsCount: 2780,
     isPopular: false,
-    titleKm: 'ពាក្យស្នើសុំប្តូរវេនសិក្សា ឬប្តូរជំនាញ (Major / Shift Change Request Form)',
-    titleEn: 'Course Major / Study Shift Transfer Application Form',
-    descriptionKm: 'ទម្រង់ស្នើសុំប្តូរវេនសិក្សា (វេនព្រឹក វេនរសៀល ឬវេនយប់/ចុងសប្តាហ៍) ឬប្តូរជំនាញក្នុងអំឡុងពេល ២ សប្តាហ៍ដំបូងនៃដើមឆមាស។',
-    descriptionEn: 'Application form to switch study shifts (Morning, Afternoon, Weekend) or transfer technical majors during the first 2 weeks of the semester.',
-    submissionOffice: 'ការិយាល័យសិក្សា និងកិច្ចការនិស្សិត (អគារ A, បន្ទប់ ១០៤)',
-    requiredDocsKm: [
-      'លិខិតបញ្ជាក់ការងារ (ករណីសុំប្តូរវេនយប់/ចុងសប្តាហ៍)',
-      'ការយល់ព្រមពីប្រធានដេប៉ាតឺម៉ង់ទាំងសងខាង'
-    ],
-    requiredDocsEn: [
-      'Employer work letter (if requesting transfer to weekend/evening shift)',
-      'Mutual approval from both releasing and receiving department heads'
-    ]
+    titleKm: 'តារាងវាយតម្លៃការអនុវត្តកម្មសិក្សាដោយសហគ្រាស (Internship Assessment Template)',
+    titleEn: 'Enterprise Supervisor Internship Assessment Spreadsheet Template',
+    descriptionKm: 'តារាង Excel សម្រាប់អ្នកគ្រប់គ្រងនៅក្រុមហ៊ុន ឬរោងចក្រវាយតម្លៃលើវិន័យ សីលធម៌ និងសមត្ថភាពបច្ចេកទេសរបស់និស្សិតចុះកម្មសិក្សា។',
+    descriptionEn: 'Interactive Excel grading sheet for enterprise mentors to score student competency, punctuality, and technical execution.',
+    submissionOffice: 'ការិយាល័យទំនាក់ទំនងសហគ្រាស និងការងារ',
+    requiredDocsKm: null,
+    requiredDocsEn: null
   }
 ];
 
 export const DownloadPage = () => {
-  const { t, language } = useLanguage();
-  const isKhmer = language === 'km';
-
+  const { t, isKhmer } = useLanguage();
   const [documents, setDocuments] = useState(OFFICIAL_DOCUMENTS);
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedFormat, setSelectedFormat] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [downloadSuccessToast, setDownloadSuccessToast] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
-  // Fetch dynamic documents from Laravel backend API
-  useEffect(() => {
-    const fetchDocuments = async () => {
-      try {
-        const res = await api.get('/documents');
-        if (res.data?.success && Array.isArray(res.data?.data) && res.data.data.length > 0) {
-          const mapped = res.data.data.map((d) => ({
-            id: d.id,
-            code: d.code || 'FORM-DOC',
-            category: d.category || 'admissions',
-            fileType: (d.file_type || 'pdf').toLowerCase(),
-            fileSize: d.file_size || '1.0 MB',
-            filePath: d.file_path || '',
-            updatedAt: d.updated_at ? d.updated_at.split('T')[0] : '2026-08-20',
-            downloadsCount: Number(d.downloads_count) || 0,
-            isPopular: !!d.is_popular,
-            titleKm: d.title_km,
-            titleEn: d.title_en || d.title_km,
-            descriptionKm: d.description_km || '',
-            descriptionEn: d.description_en || '',
-            submissionOffice: d.submission_office || 'ការិយាល័យសិក្សា និងកិច្ចការនិស្សិត (អគារ A, បន្ទប់ ១០៤)',
-            requiredDocsKm: Array.isArray(d.required_docs_km) ? d.required_docs_km : [],
-            requiredDocsEn: Array.isArray(d.required_docs_en) ? d.required_docs_en : [],
-          }));
-          setDocuments(mapped);
-        }
-      } catch (err) {
-        console.warn('Could not fetch documents from API, using fallback:', err);
+  // Filter categories with labels and icons
+  const categories = [
+    { id: 'all', labelKh: 'ទាំងអស់', labelEn: 'All Forms', icon: FolderOpen },
+    { id: 'admissions', labelKh: 'ការចុះឈ្មោះ & អាហារូបករណ៍', labelEn: 'Admissions & TVET', icon: UserPlus },
+    { id: 'calendars', labelKh: 'កាលវិភាគ & ប្រតិទិន', labelEn: 'Calendars & Schedules', icon: Calendar },
+    { id: 'handbooks', labelKh: 'សៀវភៅណែនាំ & បទបញ្ជា', labelEn: 'Handbooks & Syllabus', icon: BookOpen },
+    { id: 'adminForms', labelKh: 'ទម្រង់រដ្ឋបាល & លិខិតបញ្ជាក់', labelEn: 'Administrative Forms', icon: FileText }
+  ];
+
+  // Dynamic counts for each category
+  const categoryCounts = useMemo(() => {
+    const counts = { all: documents.length };
+    categories.forEach(cat => {
+      if (cat.id !== 'all') {
+        counts[cat.id] = documents.filter(d => d.category === cat.id).length;
       }
-    };
-    fetchDocuments();
-  }, []);
+    });
+    return counts;
+  }, [documents]);
 
-  // Close modal on ESC
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') setSelectedDoc(null);
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  // Prevent background scroll when modal is open
-  useEffect(() => {
-    if (selectedDoc) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => { document.body.style.overflow = 'unset'; };
-  }, [selectedDoc]);
+  // Total downloads aggregate
+  const totalDownloads = useMemo(() => {
+    return documents.reduce((acc, curr) => acc + (curr.downloadsCount || 0), 0);
+  }, [documents]);
 
   // Filtered documents
   const filteredDocs = useMemo(() => {
-    return documents.filter(doc => {
-      const matchCat = activeCategory === 'all' || doc.category === activeCategory;
-      const matchFormat = selectedFormat === 'all' || doc.fileType === selectedFormat;
-      if (!matchCat || !matchFormat) return false;
+    return documents.filter((doc) => {
+      // Category match
+      const matchesCategory = activeCategory === 'all' || doc.category === activeCategory;
 
-      if (!searchQuery.trim()) return true;
-      const q = searchQuery.toLowerCase();
-      const title = `${doc.titleKm} ${doc.titleEn} ${doc.code}`.toLowerCase();
-      const desc = `${doc.descriptionKm} ${doc.descriptionEn}`.toLowerCase();
-      return title.includes(q) || desc.includes(q);
+      // Format match
+      const matchesFormat = selectedFormat === 'all' || doc.fileType === selectedFormat;
+
+      // Search match
+      const query = searchQuery.trim().toLowerCase();
+      const matchesSearch =
+        !query ||
+        doc.titleKm.toLowerCase().includes(query) ||
+        doc.titleEn.toLowerCase().includes(query) ||
+        doc.code.toLowerCase().includes(query) ||
+        doc.descriptionKm.toLowerCase().includes(query) ||
+        doc.descriptionEn.toLowerCase().includes(query);
+
+      return matchesCategory && matchesFormat && matchesSearch;
     });
   }, [documents, activeCategory, selectedFormat, searchQuery]);
 
-  // Dynamic total downloads count
-  const totalDownloadsText = useMemo(() => {
-    const total = documents.reduce((sum, d) => sum + (d.downloadsCount || 0), 0);
-    if (total >= 1000) {
-      return `${(total / 1000).toFixed(1)}K+`;
-    }
-    return `${total}+`;
-  }, [documents]);
+  // Pagination calculation
+  const totalPages = Math.ceil(filteredDocs.length / itemsPerPage) || 1;
+  const paginatedDocs = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredDocs.slice(start, start + itemsPerPage);
+  }, [filteredDocs, currentPage, itemsPerPage]);
 
-  // Trigger actual file download simulation (generates downloadable file blob with real institutional header)
-  const handleDownload = (doc) => {
-    const fileExtension = doc.fileType;
-    const fileName = `${doc.code}_${doc.titleEn.replace(/[^a-zA-Z0-9]/g, '_')}.${fileExtension}`;
-    
-    // Create text representation of official document
-    const fileContent = `================================================================================
-ព្រះរាជាណាចក្រកម្ពុជា
-ជាតិ សាសនា ព្រះមហាក្សត្រ
-ក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ (MLVT)
-វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប (RPITSSR)
-================================================================================
-ឯកសារផ្លូវការ៖ ${doc.titleKm}
-Official Document: ${doc.titleEn}
-លេខកូដសម្គាល់ (Document Code): ${doc.code}
-កាលបរិច្ឆេទធ្វើបច្ចុប្បន្នភាព (Updated Date): ${doc.updatedAt}
-ទំហំឯកសារ (Size): ${doc.fileSize}
-ការិយាល័យទទួលឯកសារ (Submission Office): ${doc.submissionOffice}
-
-សេចក្តីពិពណ៌នា / DESCRIPTION:
-${doc.descriptionKm}
-${doc.descriptionEn}
-
-ឯកសារភ្ជាប់ចាំបាច់ / REQUIRED ATTACHMENTS:
-${(doc.requiredDocsKm || []).map((d, i) => `[${i + 1}] ${d}`).join('\n')}
-
-================================================================================
-ទំនាក់ទំនងការិយាល័យសិក្សា និងកិច្ចការនិស្សិត RPITSSR:
-អ៊ីមែល៖ info@rpitssr.edu.kh | student.affairs@rpitssr.edu.kh
-ទូរស័ព្ទ៖ (+855) 63 963 888 | (+855) 63 963 801
-អាសយដ្ឋាន៖ ភូមិបន្ទាយចាស់ សង្កាត់ស្លក្រាម ក្រុងសៀមរាប ខេត្តសៀមរាប
-គេហទំព័រផ្លូវការ៖ https://rpitssr.edu.kh
-================================================================================`;
-
-    const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-    // Increment download count in backend and locally
-    if (doc.id && typeof doc.id === 'number') {
-      api.post(`/documents/${doc.id}/download`).catch(() => {});
-      setDocuments(prev => prev.map(d => d.id === doc.id ? { ...d, downloadsCount: (d.downloadsCount || 0) + 1 } : d));
-    }
-
-    // Show toast feedback
-    setDownloadSuccessToast(isKhmer ? `បានទាញយកឯកសារ ${doc.code} ដោយជោគជ័យ!` : `Downloaded ${doc.code} successfully!`);
-    setTimeout(() => {
-      setDownloadSuccessToast(null);
-    }, 4000);
+  const handleCategoryChange = (catId) => {
+    setActiveCategory(catId);
+    setCurrentPage(1);
   };
 
-  // Helper for file type styles
-  const getFileTypeBadge = (type) => {
-    switch (type) {
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setActiveCategory('all');
+    setSelectedFormat('all');
+    setCurrentPage(1);
+  };
+
+  // Simulate Instant Download with counter update
+  const handleDownload = (doc) => {
+    setDocuments((prevDocs) =>
+      prevDocs.map((d) => (d.id === doc.id ? { ...d, downloadsCount: (d.downloadsCount || 0) + 1 } : d))
+    );
+
+    const docName = isKhmer ? doc.titleKm : doc.titleEn;
+    setDownloadSuccessToast(
+      isKhmer
+        ? `ឯកសារ «${doc.code}» កំពុងទាញយកដោយជោគជ័យ!`
+        : `Form "${doc.code}" download started successfully!`
+    );
+
+    // Create virtual download file for demo
+    const element = document.createElement('a');
+    const fileContent = `RPITSSR OFFICIAL DOCUMENT\nCode: ${doc.code}\nTitle: ${doc.titleKm}\n${doc.titleEn}\nCategory: ${doc.category}\nOffice: ${doc.submissionOffice}\nGenerated: ${new Date().toISOString()}`;
+    const file = new Blob([fileContent], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = `${doc.code}_RPITSSR.${doc.fileType === 'pdf' ? 'txt' : doc.fileType}`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+
+    setTimeout(() => {
+      setDownloadSuccessToast(null);
+    }, 4500);
+  };
+
+  // File type badge styling
+  const getFileTypeBadge = (fileType) => {
+    switch (fileType) {
       case 'pdf':
-        return { bg: '#fee2e2', color: '#dc2626', icon: 'fa-file-pdf', label: 'PDF' };
+        return { bg: '#fef2f2', color: '#dc2626', border: '#fecaca', label: 'PDF', icon: FileText };
       case 'docx':
-        return { bg: '#dbeafe', color: '#1d4ed8', icon: 'fa-file-word', label: 'WORD' };
+        return { bg: '#eff6ff', color: '#1e73be', border: '#bfdbfe', label: 'WORD', icon: FileText };
       case 'xlsx':
-        return { bg: '#dcfce7', color: '#15803d', icon: 'fa-file-excel', label: 'EXCEL' };
+        return { bg: '#f0fdf4', color: '#15803d', border: '#bbf7d0', label: 'EXCEL', icon: FileSpreadsheet };
       default:
-        return { bg: '#f1f5f9', color: '#475569', icon: 'fa-file-alt', label: 'FILE' };
+        return { bg: '#f8fafc', color: '#475569', border: '#e2e8f0', label: 'FILE', icon: FileText };
     }
   };
 
   return (
-    <div className="download-page-wrapper">
-      {/* 1. Official Page Banner */}
-      <PageBanner
-        title={t('downloads.pageTitle') || 'មជ្ឈមណ្ឌលទាញយកឯកសារផ្លូវការ'}
-        image="/images/notice.webp"
-      />
+    <div className="download-page-root" style={{ background: '#ffffff', minHeight: '100vh' }}>
+      {/* =========================================================================
+          1. DAYLIGHT INSTITUTIONAL HERO (Strictly AGENTS.md Standard)
+          ========================================================================= */}
+      <section className="download-page-hero">
+        <div className="container">
+          <div className="row justify-content-center text-center">
+            <div className="col-lg-10">
+              {/* Breadcrumb */}
+              <div className="download-breadcrumb">
+                <Link to="/">{isKhmer ? 'ទំព័រដើម' : 'Home'}</Link>
+                <ChevronRight size={14} />
+                <span>{isKhmer ? 'មជ្ឈមណ្ឌលទាញយកឯកសារផ្លូវការ' : 'Downloads & Forms'}</span>
+              </div>
 
-      <div className="download-main-section" style={{ backgroundColor: '#f8fafc', paddingTop: '60px', paddingBottom: '100px', paddingLeft: '16px', paddingRight: '16px' }}>
+              {/* Institutional Hero Badge */}
+              <div>
+                <span className="download-hero-badge">
+                  <ShieldCheck size={16} />
+                  {isKhmer
+                    ? 'វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប • RPITSSR'
+                    : 'Regional Polytechnic Institute Techo Sen Siem Reap'}
+                </span>
+              </div>
+
+              {/* Title */}
+              <h1 className="download-hero-title">
+                {isKhmer ? 'មជ្ឈមណ្ឌលទាញយកឯកសារ & ទម្រង់បែបបទផ្លូវការ' : 'Official Document & Forms Download Center'}
+              </h1>
+
+              {/* Subtitle */}
+              <p className="download-hero-subtitle">
+                {isKhmer
+                  ? 'បណ្ណាល័យឯកសារផ្លូវការ ២៤/៧ ផ្តល់ជូនទម្រង់ពាក្យសុំចុះឈ្មោះចូលរៀន អាហារូបករណ៍ TVET 1.5M កាលវិភាគសិក្សា សៀវភៅណែនាំនិស្សិត និងទម្រង់បែបបទរដ្ឋបាលផ្សេងៗ។'
+                  : 'Authenticated 24/7 institutional forms repository offering admissions paperwork, TVET 1.5M scholarship applications, academic syllabi, handbooks, and administrative requests.'}
+              </p>
+
+              {/* Trust Badges */}
+              <div className="download-trust-badges">
+                <span className="download-trust-pill">
+                  <CheckCircle2 size={14} color="#059669" />
+                  {isKhmer ? 'ទម្រង់ស្តង់ដារជាតិ ១០០%' : '100% National Standard Forms'}
+                </span>
+                <span className="download-trust-pill">
+                  <Award size={14} color="#d97706" />
+                  {isKhmer ? 'អាហារូបករណ៍ TVET 1.5M' : 'TVET 1.5M Scholarship Forms'}
+                </span>
+                <span className="download-trust-pill">
+                  <Download size={14} color="#1e73be" />
+                  {isKhmer ? 'ទាញយកឥតគិតថ្លៃ ២៤/៧' : 'Free Public Access 24/7'}
+                </span>
+                <span className="download-trust-pill">
+                  <Building size={14} color="#7c3aed" />
+                  {isKhmer ? 'ការិយាល័យសិក្សា អគារ A បន្ទប់ ១០៤' : 'Building A, Room 104'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          2. MAIN CONTENT AREA (Metrics, Search, Filter Toolbar, Cards, Steps)
+          ========================================================================= */}
+      <section className="download-main-area pt-10 pb-80" style={{ backgroundColor: '#f8fafc' }}>
         <div className="container" style={{ maxWidth: '1280px' }}>
-
-          {/* Institutional Introduction & Search Hero Card */}
-          <div className="download-hero-card mb-4 text-center">
-            <div className="download-forms-badge">
-              <i className="fas fa-file-download text-success"></i>
-              <span>{isKhmer ? 'បណ្ណាល័យឯកសារសាធារណៈ ២៤/៧ (Official Forms Hub)' : 'Public Self-Service Forms Hub 24/7'}</span>
-            </div>
-
-            <h2 className="fw-bold mb-3" style={{ color: '#07294D', fontSize: '2.1rem', letterSpacing: '-0.3px', lineHeight: 1.4 }}>
-              {t('downloads.pageTitle')}
-            </h2>
-            <p className="text-muted mx-auto mb-4" style={{ maxWidth: '820px', fontSize: '1.05rem', lineHeight: '1.85' }}>
-              {t('downloads.subtitle')}
-            </p>
-
-            {/* Quick Metrics Strip - 4 Interactive Institutional Cards */}
-            <div className="row g-3 justify-content-center mb-4 pt-4 border-top">
-              <div className="col-6 col-md-3">
-                <div className="download-stat-card">
-                  <div
-                    className="download-stat-icon-wrap"
-                    style={{ backgroundColor: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}
-                  >
-                    <i className="fas fa-file-contract"></i>
-                  </div>
-                  <div className="fw-bold" style={{ fontSize: '2rem', color: '#07294D', lineHeight: 1.1 }}>{documents.length}+</div>
-                  <div className="fw-semibold text-dark small mt-1">{isKhmer ? 'ឯកសារផ្លូវការ' : 'Official Forms'}</div>
-                  <span
-                    className="badge rounded-pill mt-2 px-2.5 py-1"
-                    style={{ backgroundColor: '#eff6ff', color: '#1e73be', fontSize: '0.72rem', fontWeight: '600', border: '1px solid #dbeafe' }}
-                  >
-                    {isKhmer ? 'ទម្រង់ស្តង់ដារ' : 'Standard Forms'}
-                  </span>
-                </div>
+          {/* 4-Card Metrics Strip */}
+          <div className="download-metrics-grid">
+            <div className="download-metric-card">
+              <div className="download-metric-icon" style={{ background: '#eff6ff', color: '#1e73be' }}>
+                <FileText size={24} />
               </div>
-
-              <div className="col-6 col-md-3">
-                <div className="download-stat-card">
-                  <div
-                    className="download-stat-icon-wrap"
-                    style={{ backgroundColor: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}
-                  >
-                    <i className="fas fa-check-double"></i>
-                  </div>
-                  <div className="fw-bold" style={{ fontSize: '2rem', color: '#07294D', lineHeight: 1.1 }}>100%</div>
-                  <div className="fw-semibold text-dark small mt-1">{isKhmer ? 'ទាញយកឥតគិតថ្លៃ' : 'Free Download'}</div>
-                  <span
-                    className="badge rounded-pill mt-2 px-2.5 py-1"
-                    style={{ backgroundColor: '#f0fdf4', color: '#059669', fontSize: '0.72rem', fontWeight: '600', border: '1px solid #bbf7d0' }}
-                  >
-                    {isKhmer ? 'សេវាឥតគិតថ្លៃ' : '100% Free'}
-                  </span>
+              <div>
+                <div className="download-metric-num">
+                  {isKhmer ? `${toKhmerNumber(documents.length)}+` : `${documents.length}+`}
                 </div>
-              </div>
-
-              <div className="col-6 col-md-3">
-                <div className="download-stat-card">
-                  <div
-                    className="download-stat-icon-wrap"
-                    style={{ backgroundColor: '#fffbeb', color: '#d97706', border: '1px solid #fde68a' }}
-                  >
-                    <i className="fas fa-cloud-download-alt"></i>
-                  </div>
-                  <div className="fw-bold" style={{ fontSize: '2rem', color: '#07294D', lineHeight: 1.1 }}>{totalDownloadsText}</div>
-                  <div className="fw-semibold text-dark small mt-1">{isKhmer ? 'ចំនួនទាញយកសរុប' : 'Total Downloads'}</div>
-                  <span
-                    className="badge rounded-pill mt-2 px-2.5 py-1"
-                    style={{ backgroundColor: '#fffbeb', color: '#d97706', fontSize: '0.72rem', fontWeight: '600', border: '1px solid #fde68a' }}
-                  >
-                    {isKhmer ? 'ការទាញយក' : 'Downloads'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="col-6 col-md-3">
-                <div className="download-stat-card">
-                  <div
-                    className="download-stat-icon-wrap"
-                    style={{ backgroundColor: '#f5f3ff', color: '#7c3aed', border: '1px solid #ddd6fe' }}
-                  >
-                    <i className="fas fa-graduation-cap"></i>
-                  </div>
-                  <div className="fw-bold" style={{ fontSize: '1.75rem', color: '#07294D', lineHeight: 1.1 }}>TVET 1.5M</div>
-                  <div className="fw-semibold text-dark small mt-1">{isKhmer ? 'អាហារូបករណ៍រដ្ឋ' : 'National Scholarship'}</div>
-                  <span
-                    className="badge rounded-pill mt-2 px-2.5 py-1"
-                    style={{ backgroundColor: '#f5f3ff', color: '#7c3aed', fontSize: '0.72rem', fontWeight: '600', border: '1px solid #ddd6fe' }}
-                  >
-                    {isKhmer ? 'កម្មវិធីរដ្ឋាភិបាល' : 'National TVET'}
-                  </span>
+                <div className="download-metric-label">
+                  {isKhmer ? 'ឯកសារ & ទម្រង់ផ្លូវការ' : 'Official Forms & Docs'}
                 </div>
               </div>
             </div>
 
-            {/* Search Input Bar */}
-            <div className="download-search-wrapper mx-auto position-relative">
-              <i className="fas fa-search position-absolute" style={{ left: '20px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: '16px' }}></i>
-              <input
-                type="text"
-                className="form-control download-search-input"
-                placeholder={t('downloads.searchPlaceholder') || 'ស្វែងរកឈ្មោះឯកសារ ពាក្យគន្លឹះ ឬលេខកូដ...'}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  className="btn btn-link position-absolute p-0"
-                  style={{ right: '18px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', textDecoration: 'none' }}
-                  onClick={() => setSearchQuery('')}
-                  aria-label="Clear search"
-                >
-                  <i className="fas fa-times-circle fs-5"></i>
-                </button>
-              )}
+            <div className="download-metric-card">
+              <div className="download-metric-icon" style={{ background: '#f0fdf4', color: '#059669' }}>
+                <CheckCircle2 size={24} />
+              </div>
+              <div>
+                <div className="download-metric-num">
+                  {isKhmer ? '១០០%' : '100%'}
+                </div>
+                <div className="download-metric-label">
+                  {isKhmer ? 'សេវាឥតគិតថ្លៃសាធារណៈ' : 'Free Public Access'}
+                </div>
+              </div>
+            </div>
+
+            <div className="download-metric-card">
+              <div className="download-metric-icon" style={{ background: '#fffbeb', color: '#d97706' }}>
+                <Download size={24} />
+              </div>
+              <div>
+                <div className="download-metric-num">
+                  {isKhmer ? `${toKhmerNumber(Math.round(totalDownloads / 1000))}K+` : `${Math.round(totalDownloads / 1000)}K+`}
+                </div>
+                <div className="download-metric-label">
+                  {isKhmer ? 'ចំនួនទាញយកសរុប' : 'Total Downloads'}
+                </div>
+              </div>
+            </div>
+
+            <div className="download-metric-card">
+              <div className="download-metric-icon" style={{ background: '#f5f3ff', color: '#7c3aed' }}>
+                <Award size={24} />
+              </div>
+              <div>
+                <div className="download-metric-num" style={{ fontSize: '1.45rem' }}>
+                  TVET 1.5M
+                </div>
+                <div className="download-metric-label">
+                  {isKhmer ? 'អាហារូបករណ៍រដ្ឋាភិបាល' : 'National TVET Forms'}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Filter Toolbar: Categories & Formats */}
+          {/* Search & Filter Toolbar */}
           <div className="download-toolbar d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-            {/* Category Pills with explicit gaps */}
+            {/* Category Pills */}
             <div className="download-filter-group">
-              <button
-                type="button"
-                className={`download-filter-chip ${activeCategory === 'all' ? 'active' : ''}`}
-                onClick={() => setActiveCategory('all')}
-              >
-                <span>{t('downloads.all')} ({documents.length})</span>
-              </button>
-              <button
-                type="button"
-                className={`download-filter-chip ${activeCategory === 'admissions' ? 'active' : ''}`}
-                onClick={() => setActiveCategory('admissions')}
-              >
-                <i className="fas fa-user-plus"></i>
-                <span>{t('downloads.admissions')}</span>
-              </button>
-              <button
-                type="button"
-                className={`download-filter-chip ${activeCategory === 'calendars' ? 'active' : ''}`}
-                onClick={() => setActiveCategory('calendars')}
-              >
-                <i className="fas fa-calendar-alt"></i>
-                <span>{t('downloads.calendars')}</span>
-              </button>
-              <button
-                type="button"
-                className={`download-filter-chip ${activeCategory === 'handbooks' ? 'active' : ''}`}
-                onClick={() => setActiveCategory('handbooks')}
-              >
-                <i className="fas fa-book-reader"></i>
-                <span>{t('downloads.handbooks')}</span>
-              </button>
-              <button
-                type="button"
-                className={`download-filter-chip ${activeCategory === 'adminForms' ? 'active' : ''}`}
-                onClick={() => setActiveCategory('adminForms')}
-              >
-                <i className="fas fa-file-signature"></i>
-                <span>{t('downloads.adminForms')}</span>
-              </button>
+              {categories.map((cat) => {
+                const IconComponent = cat.icon;
+                const count = categoryCounts[cat.id] || 0;
+                const isActive = activeCategory === cat.id;
+
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    className={`download-filter-chip ${isActive ? 'active' : ''}`}
+                    onClick={() => handleCategoryChange(cat.id)}
+                  >
+                    <IconComponent size={14} />
+                    <span>{isKhmer ? cat.labelKh : cat.labelEn}</span>
+                    <span
+                      style={{
+                        padding: '1px 6px',
+                        borderRadius: '10px',
+                        background: isActive ? 'rgba(255,255,255,0.25)' : '#e2e8f0',
+                        color: isActive ? '#ffffff' : '#475569',
+                        fontSize: '0.72rem',
+                        fontWeight: 700
+                      }}
+                    >
+                      {isKhmer ? toKhmerNumber(count) : count}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* File Format Filter - Unified Horizontal Pill */}
+            {/* File Format Selector */}
             <div className="download-format-pill-wrap">
               <span className="download-format-label">
-                <i className="fas fa-filter text-primary"></i>
-                <span>{isKhmer ? 'ទម្រង់' : 'Format'}:</span>
+                <span>{isKhmer ? 'ទម្រង់ឯកសារ' : 'Format'}:</span>
               </span>
               <select
                 className="form-select download-format-select"
                 value={selectedFormat}
-                onChange={(e) => setSelectedFormat(e.target.value)}
-                aria-label={isKhmer ? 'ជ្រើសរើសទម្រង់ឯកសារ' : 'Select document format'}
+                onChange={(e) => {
+                  setSelectedFormat(e.target.value);
+                  setCurrentPage(1);
+                }}
               >
-                <option value="all">{isKhmer ? 'គ្រប់ Format' : 'All Formats'}</option>
+                <option value="all">{isKhmer ? 'គ្រប់ Format ទាំងអស់' : 'All Formats'}</option>
                 <option value="pdf">PDF (.pdf)</option>
                 <option value="docx">Word (.docx)</option>
                 <option value="xlsx">Excel (.xlsx)</option>
@@ -637,102 +622,200 @@ ${(doc.requiredDocsKm || []).map((d, i) => `[${i + 1}] ${d}`).join('\n')}
             </div>
           </div>
 
+          {/* Live Search Bar inside Main section */}
+          <div className="mb-4">
+            <div className="download-search-wrapper mx-auto position-relative" style={{ maxWidth: '100%' }}>
+              <Search
+                size={18}
+                className="position-absolute"
+                style={{ left: '20px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}
+              />
+              <input
+                type="text"
+                className="form-control download-search-input"
+                placeholder={
+                  isKhmer
+                    ? 'ស្វែងរកឈ្មោះឯកសារ ពាក្យគន្លឹះ ឬលេខកូដ (ឧ. TVET, FORM-ADM, អាហារូបករណ៍)...'
+                    : 'Search forms by title, keyword or code (e.g. TVET, FORM-ADM, Scholarship)...'
+                }
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  className="btn btn-link position-absolute p-0"
+                  style={{ right: '18px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', textDecoration: 'none' }}
+                  onClick={() => {
+                    setSearchQuery('');
+                    setCurrentPage(1);
+                  }}
+                  aria-label="Clear search"
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+
+            <div className="d-flex justify-content-between align-items-center mt-2 px-2" style={{ fontSize: '0.86rem', color: '#64748b' }}>
+              <span>
+                {isKhmer ? 'បង្ហាញលទ្ធផល ៖ ' : 'Showing: '}
+                <strong style={{ color: '#07294D' }}>
+                  {isKhmer ? toKhmerNumber(filteredDocs.length) : filteredDocs.length}
+                </strong>{' '}
+                {isKhmer ? 'ឯកសារ' : 'documents'}
+              </span>
+
+              {(searchQuery || activeCategory !== 'all' || selectedFormat !== 'all') && (
+                <button
+                  type="button"
+                  className="btn btn-link btn-sm text-primary p-0"
+                  onClick={handleClearFilters}
+                  style={{ textDecoration: 'none', fontSize: '0.84rem', fontWeight: 600 }}
+                >
+                  {isKhmer ? 'សម្អាតការស្វែងរកទាំងអស់' : 'Reset All Filters'}
+                </button>
+              )}
+            </div>
+          </div>
+
           {/* Documents Grid */}
-          {filteredDocs.length === 0 ? (
-            <div className="text-center py-5 bg-white rounded-4 border shadow-sm">
-              <i className="fas fa-file-search fs-1 text-muted mb-3"></i>
-              <h5>{isKhmer ? 'រកមិនឃើញឯកសារដែលត្រូវគ្នានឹងការស្វែងរកទេ' : 'No documents match your search criteria'}</h5>
-              <p className="text-muted small mb-3">{isKhmer ? 'សូមសាកល្បងពាក្យគន្លឹះថ្មី ឬកំណត់ការច្រោះឡើងវិញ' : 'Try different keywords or clear current filters'}</p>
+          {paginatedDocs.length === 0 ? (
+            <div className="text-center py-5 bg-white rounded-4 border shadow-sm p-4">
+              <div
+                style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '50%',
+                  background: '#f8fafc',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 16px',
+                  color: '#94a3b8'
+                }}
+              >
+                <AlertCircle size={32} />
+              </div>
+              <h5 style={{ color: '#07294D', fontWeight: 700 }}>
+                {isKhmer ? 'រកមិនឃើញឯកសារដែលត្រូវគ្នានឹងការស្វែងរកឡើយ' : 'No documents match your search criteria'}
+              </h5>
+              <p className="text-muted small mb-3">
+                {isKhmer
+                  ? 'សូមសាកល្បងពាក្យគន្លឹះថ្មី ឬកំណត់ជម្រើសនៃការច្រោះឡើងវិញ។'
+                  : 'Try different keywords or clear current category and format filters.'}
+              </p>
               <button
                 className="btn btn-primary btn-sm rounded-pill px-4"
-                onClick={() => { setSearchQuery(''); setActiveCategory('all'); setSelectedFormat('all'); }}
+                onClick={handleClearFilters}
+                style={{ background: '#07294D', borderColor: '#07294D' }}
               >
-                {isKhmer ? 'កំណត់ឡើងវិញ' : 'Reset All Filters'}
+                {isKhmer ? 'កំណត់ការច្រោះឡើងវិញ' : 'Reset All Filters'}
               </button>
             </div>
           ) : (
             <div className="row g-4">
-              {filteredDocs.map((doc) => {
+              {paginatedDocs.map((doc) => {
                 const badge = getFileTypeBadge(doc.fileType);
+                const BadgeIcon = badge.icon;
+
                 return (
                   <div className="col-12 col-md-6 col-lg-4" key={doc.id}>
-                    <div
-                      className="download-doc-card bg-white p-4 rounded-4 border shadow-sm h-100 d-flex flex-column justify-content-between position-relative"
-                      style={{ transition: 'all 0.3s ease' }}
-                    >
+                    <div className="download-doc-card bg-white p-4 rounded-4 border shadow-sm h-100 d-flex flex-column justify-content-between position-relative">
                       {/* Top Badges */}
                       <div>
                         <div className="d-flex align-items-center justify-content-between mb-3">
                           <span
                             className="badge d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill"
-                            style={{ backgroundColor: badge.bg, color: badge.color, fontWeight: '700', fontSize: '0.78rem' }}
+                            style={{ backgroundColor: badge.bg, color: badge.color, border: `1px solid ${badge.border}`, fontWeight: '700', fontSize: '0.78rem' }}
                           >
-                            <i className={`fas ${badge.icon}`}></i>
+                            <BadgeIcon size={12} />
                             <span>{badge.label}</span>
                           </span>
 
                           <div className="d-flex align-items-center gap-1">
                             {doc.isPopular && (
-                              <span className="badge bg-warning text-dark rounded-pill px-2 py-1" style={{ fontSize: '0.72rem', fontWeight: '700' }}>
+                              <span className="badge bg-warning text-dark rounded-pill px-2.5 py-1" style={{ fontSize: '0.72rem', fontWeight: '700' }}>
                                 🔥 {isKhmer ? 'ពេញនិយម' : 'POPULAR'}
                               </span>
                             )}
-                            <span className="badge bg-light text-secondary rounded-pill" style={{ fontSize: '0.72rem' }}>
+                            <span className="badge bg-light text-secondary rounded-pill px-2 py-1" style={{ fontSize: '0.72rem', fontFamily: 'monospace' }}>
                               {doc.code}
                             </span>
                           </div>
                         </div>
 
                         {/* Title */}
-                        <h5 className="fw-bold mb-2 doc-title-text" style={{ color: '#07294D', fontSize: '1.08rem', lineHeight: '1.6' }}>
+                        <h4
+                          className="doc-title-text fw-bold mb-2"
+                          style={{ color: '#07294D', fontSize: '1.05rem', lineHeight: '1.45', cursor: 'pointer' }}
+                          onClick={() => setSelectedDoc(doc)}
+                        >
                           {isKhmer ? doc.titleKm : doc.titleEn}
-                        </h5>
+                        </h4>
 
-                        {/* Description */}
-                        <p className="text-muted small mb-3" style={{ lineHeight: '1.7', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {/* Subtitle in other language */}
+                        <div className="text-muted small mb-3" style={{ fontSize: '0.8rem', fontStyle: 'italic' }}>
+                          {isKhmer ? doc.titleEn : doc.titleKm}
+                        </div>
+
+                        {/* Excerpt */}
+                        <p className="text-muted small mb-3" style={{ lineHeight: '1.65', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                           {isKhmer ? doc.descriptionKm : doc.descriptionEn}
                         </p>
+
+                        {/* Checklist Preview if applicable */}
+                        {doc.requiredDocsKm && (
+                          <div className="p-2 px-3 rounded-3 mb-3" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', fontSize: '0.76rem' }}>
+                            <div className="fw-bold text-dark mb-1 d-flex align-items-center gap-1">
+                              <ClipboardCheck size={12} color="#059669" />
+                              <span>{isKhmer ? 'ឯកសារភ្ជាប់តម្រូវ ៖' : 'Required:'}</span>
+                            </div>
+                            <div className="text-muted" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {isKhmer ? doc.requiredDocsKm[0] : doc.requiredDocsEn[0]}
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* Card Bottom Meta & Actions */}
-                      <div>
-                        {/* Meta info row */}
-                        <div className="d-flex align-items-center justify-content-between text-muted small py-2 mb-3 border-top border-bottom" style={{ fontSize: '0.8rem' }}>
-                          <div>
-                            <i className="fas fa-hdd me-1 text-secondary"></i>
-                            <span>{doc.fileSize}</span>
-                          </div>
-                          <div>
-                            <i className="fas fa-cloud-download-alt me-1 text-primary"></i>
-                            <span>{doc.downloadsCount.toLocaleString()} {t('downloads.downloadsCount')}</span>
-                          </div>
-                          <div>
-                            <i className="far fa-calendar-alt me-1 text-secondary"></i>
-                            <span>{doc.updatedAt}</span>
-                          </div>
+                      <div className="pt-3 border-top mt-auto">
+                        <div className="d-flex align-items-center justify-content-between text-muted small mb-3" style={{ fontSize: '0.76rem' }}>
+                          <span className="d-inline-flex align-items-center gap-1">
+                            <HardDrive size={12} />
+                            {doc.fileSize}
+                          </span>
+                          <span className="d-inline-flex align-items-center gap-1">
+                            <Clock size={12} />
+                            {doc.updatedAt}
+                          </span>
+                          <span className="d-inline-flex align-items-center gap-1 text-primary fw-semibold">
+                            <Download size={12} />
+                            {isKhmer ? toKhmerNumber(doc.downloadsCount || 0) : doc.downloadsCount}
+                          </span>
                         </div>
 
-                        {/* Action Buttons: Preview & Download */}
                         <div className="d-flex gap-2">
                           <button
                             type="button"
-                            className="btn download-btn-outline flex-grow-1"
-                            onClick={() => setSelectedDoc(doc)}
-                          >
-                            <i className="fas fa-eye text-primary"></i>
-                            <span>{t('downloads.previewBtn')}</span>
-                          </button>
-                          <button
-                            type="button"
-                            className="btn download-btn-primary flex-grow-1"
+                            className="download-btn-primary flex-fill"
                             onClick={() => handleDownload(doc)}
                           >
-                            <i className="fas fa-download"></i>
-                            <span>{t('downloads.downloadBtn')}</span>
+                            <Download size={14} />
+                            <span>{isKhmer ? 'ទាញយក' : 'Download'}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            className="download-btn-outline"
+                            onClick={() => setSelectedDoc(doc)}
+                            title={isKhmer ? 'មើលគំរូទម្រង់' : 'Preview Document'}
+                          >
+                            <Eye size={14} />
+                            <span>{isKhmer ? 'គំរូ' : 'Preview'}</span>
                           </button>
                         </div>
                       </div>
-
                     </div>
                   </div>
                 );
@@ -740,18 +823,69 @@ ${(doc.requiredDocsKm || []).map((d, i) => `[${i + 1}] ${d}`).join('\n')}
             </div>
           )}
 
-          {/* 3-Step Submission Instructions Banner */}
+          {/* Institutional Pagination */}
+          {totalPages > 1 && (
+            <div className="d-flex justify-content-center align-items-center gap-2 mt-40">
+              <button
+                className="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                disabled={currentPage === 1}
+                onClick={() => {
+                  setCurrentPage((prev) => Math.max(prev - 1, 1));
+                  window.scrollTo({ top: 380, behavior: 'smooth' });
+                }}
+                style={{ height: '38px', minWidth: '40px' }}
+              >
+                {isKhmer ? '« មុន' : '« Prev'}
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                <button
+                  key={pageNum}
+                  className={`btn btn-sm rounded-circle ${currentPage === pageNum ? 'btn-primary' : 'btn-outline-secondary'}`}
+                  style={{
+                    width: '38px',
+                    height: '38px',
+                    padding: 0,
+                    fontWeight: 700,
+                    backgroundColor: currentPage === pageNum ? '#07294D' : 'transparent',
+                    borderColor: currentPage === pageNum ? '#07294D' : '#cbd5e1',
+                    color: currentPage === pageNum ? '#ffffff' : '#334155'
+                  }}
+                  onClick={() => {
+                    setCurrentPage(pageNum);
+                    window.scrollTo({ top: 380, behavior: 'smooth' });
+                  }}
+                >
+                  {isKhmer ? toKhmerNumber(pageNum) : pageNum}
+                </button>
+              ))}
+
+              <button
+                className="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                disabled={currentPage === totalPages}
+                onClick={() => {
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+                  window.scrollTo({ top: 380, behavior: 'smooth' });
+                }}
+                style={{ height: '38px', minWidth: '40px' }}
+              >
+                {isKhmer ? 'បន្ទាប់ »' : 'Next »'}
+              </button>
+            </div>
+          )}
+
+          {/* =======================================================================
+              3. 3-STEP HOW-TO-SUBMIT APPLICATION GUIDE
+              ======================================================================= */}
           <div className="download-steps-card">
             <div className="text-center mb-4">
-              <div className="d-inline-flex align-items-center gap-2 px-3 py-1 mb-2 rounded-pill" style={{ backgroundColor: '#eff6ff', color: '#1e73be', fontSize: '0.84rem', fontWeight: '700' }}>
-                <i className="fas fa-stream text-primary"></i>
-                <span>{isKhmer ? 'ដំណើរការស្នើសុំ ៣ ជំហានងាយៗ' : 'Simple 3-Step Process'}</span>
-              </div>
               <h3 className="fw-bold mb-2" style={{ color: '#07294D', fontSize: '1.65rem' }}>
                 {isKhmer ? 'របៀបស្នើសុំ និងបំពេញបែបបទឯកសារ' : 'How to Fill Out & Submit Official Forms'}
               </h3>
               <p className="text-muted small mx-auto mb-0" style={{ maxWidth: '640px' }}>
-                {isKhmer ? 'សូមអនុវត្តតាមដំណាក់កាលងាយៗខាងក្រោម ដើម្បីទទួលបានឯកសារ និងដាក់ពាក្យបានត្រឹមត្រូវទាន់ពេលវេលា' : 'Follow these straightforward steps to prepare and lodge your institutional applications on time.'}
+                {isKhmer
+                  ? 'សូមអនុវត្តតាមដំណាក់កាលងាយៗខាងក្រោម ដើម្បីទទួលបានឯកសារ និងដាក់ពាក្យបានត្រឹមត្រូវទាន់ពេលវេលា'
+                  : 'Follow these straightforward steps to prepare and lodge your institutional applications on time.'}
               </p>
             </div>
 
@@ -759,8 +893,11 @@ ${(doc.requiredDocsKm || []).map((d, i) => `[${i + 1}] ${d}`).join('\n')}
               {/* Step 1 */}
               <div className="col-12 col-md-4">
                 <div className="download-step-box">
-                  <div className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style={{ width: '56px', height: '56px', fontSize: '20px', fontWeight: '700' }}>
-                    1
+                  <div
+                    className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm"
+                    style={{ width: '56px', height: '56px', fontSize: '20px', fontWeight: '800', background: '#eff6ff', color: '#1e73be', border: '1px solid #bfdbfe' }}
+                  >
+                    {isKhmer ? '១' : '1'}
                   </div>
                   <h6 className="fw-bold mb-2" style={{ color: '#07294D' }}>
                     {isKhmer ? 'ទាញយកទម្រង់ឯកសារ' : 'Download Document'}
@@ -776,8 +913,11 @@ ${(doc.requiredDocsKm || []).map((d, i) => `[${i + 1}] ${d}`).join('\n')}
               {/* Step 2 */}
               <div className="col-12 col-md-4">
                 <div className="download-step-box">
-                  <div className="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style={{ width: '56px', height: '56px', fontSize: '20px', fontWeight: '700' }}>
-                    2
+                  <div
+                    className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm"
+                    style={{ width: '56px', height: '56px', fontSize: '20px', fontWeight: '800', background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a' }}
+                  >
+                    {isKhmer ? '២' : '2'}
                   </div>
                   <h6 className="fw-bold mb-2" style={{ color: '#07294D' }}>
                     {isKhmer ? 'បំពេញព័ត៌មាន & ភ្ជាប់ឯកសារ' : 'Fill In & Attach Documents'}
@@ -793,8 +933,11 @@ ${(doc.requiredDocsKm || []).map((d, i) => `[${i + 1}] ${d}`).join('\n')}
               {/* Step 3 */}
               <div className="col-12 col-md-4">
                 <div className="download-step-box">
-                  <div className="rounded-circle bg-success text-white d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style={{ width: '56px', height: '56px', fontSize: '20px', fontWeight: '700' }}>
-                    3
+                  <div
+                    className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm"
+                    style={{ width: '56px', height: '56px', fontSize: '20px', fontWeight: '800', background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}
+                  >
+                    {isKhmer ? '៣' : '3'}
                   </div>
                   <h6 className="fw-bold mb-2" style={{ color: '#07294D' }}>
                     {isKhmer ? 'ដាក់ពាក្យនៅការិយាល័យ' : 'Submit to Campus Office'}
@@ -808,34 +951,41 @@ ${(doc.requiredDocsKm || []).map((d, i) => `[${i + 1}] ${d}`).join('\n')}
               </div>
             </div>
 
-            {/* Need Help Box */}
+            {/* Need Help Support Banner */}
             <div className="download-help-banner">
               <div className="d-flex align-items-center gap-3">
                 <div className="download-help-icon-wrap">
-                  <i className="fas fa-question"></i>
+                  <Phone size={22} />
                 </div>
                 <div>
-                  <div className="download-help-title">{t('downloads.needHelp')}</div>
-                  <div className="download-help-desc">{t('downloads.helpDesc')}</div>
+                  <div className="download-help-title">
+                    {isKhmer ? 'ត្រូវការជំនួយ ឬព័ត៌មានបន្ថែម?' : 'Need Assistance or Form Guidelines?'}
+                  </div>
+                  <div className="download-help-desc">
+                    {isKhmer
+                      ? 'ក្រុមការងារការិយាល័យសិក្សារង់ចាំជួយសម្របសម្រួល និងឆ្លើយតបរាល់ចម្ងល់របស់លោកអ្នកក្នុងម៉ោងរដ្ឋបាល។'
+                      : 'Our Academic Affairs team is on standby to assist with verification and form filing inquiries.'}
+                  </div>
                 </div>
               </div>
               <div className="download-help-btn-group">
                 <a href="tel:+85563963888" className="download-help-phone-btn">
-                  <i className="fas fa-phone"></i>
+                  <Phone size={14} />
                   <span>(+855) 63 963 888</span>
                 </a>
                 <Link to="/contact" className="download-help-contact-btn">
-                  <i className="fas fa-envelope"></i>
+                  <Mail size={14} />
                   <span>{isKhmer ? 'ទាក់ទងមកយើង' : 'Contact Us'}</span>
                 </Link>
               </div>
             </div>
           </div>
-
         </div>
-      </div>
+      </section>
 
-      {/* DOCUMENT PREVIEW MODAL */}
+      {/* =========================================================================
+          4. OFFICIAL DOCUMENT PREVIEW LIGHTBOX MODAL
+          ========================================================================= */}
       {selectedDoc && (
         <div
           className="download-modal-backdrop position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3"
@@ -844,21 +994,23 @@ ${(doc.requiredDocsKm || []).map((d, i) => `[${i + 1}] ${d}`).join('\n')}
         >
           <div
             className="download-preview-modal bg-white rounded-4 shadow-lg overflow-hidden"
-            style={{ maxWidth: '720px', width: '100%', maxHeight: '92vh', display: 'flex', flexDirection: 'column', animation: 'fadeInUp 0.25s ease-out' }}
+            style={{ maxWidth: '740px', width: '100%', maxHeight: '92vh', display: 'flex', flexDirection: 'column' }}
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
           >
             {/* Modal Header */}
             <div className="p-4 text-white d-flex justify-content-between align-items-start" style={{ background: 'linear-gradient(135deg, #07294D 0%, #1e73be 100%)' }}>
               <div className="d-flex align-items-center gap-3">
-                <div className="rounded-3 bg-white d-flex align-items-center justify-content-center" style={{ width: '48px', height: '48px' }}>
-                  <i className={`fas ${getFileTypeBadge(selectedDoc.fileType).icon} fs-4`} style={{ color: getFileTypeBadge(selectedDoc.fileType).color }}></i>
+                <div className="rounded-3 bg-white d-flex align-items-center justify-content-center" style={{ width: '48px', height: '48px', color: '#07294D' }}>
+                  <FileText size={24} />
                 </div>
                 <div>
-                  <span className="badge bg-warning text-dark rounded-pill px-2 py-1 mb-1" style={{ fontSize: '0.72rem', fontWeight: '700' }}>
+                  <span className="badge bg-warning text-dark rounded-pill px-2.5 py-1 mb-1" style={{ fontSize: '0.72rem', fontWeight: '700' }}>
                     {selectedDoc.code}
                   </span>
                   <h5 className="fw-bold mb-0 text-white" style={{ fontSize: '1.15rem' }}>
-                    {t('downloads.previewTitle')}
+                    {isKhmer ? 'គំរូទម្រង់ឯកសារផ្លូវការ' : 'Official Document Template Preview'}
                   </h5>
                 </div>
               </div>
@@ -869,14 +1021,14 @@ ${(doc.requiredDocsKm || []).map((d, i) => `[${i + 1}] ${d}`).join('\n')}
                 style={{ fontSize: '1.4rem', opacity: 0.85 }}
                 aria-label="Close"
               >
-                <i className="fas fa-times"></i>
+                <X size={20} />
               </button>
             </div>
 
             {/* Modal Body: Document Preview Sheet */}
             <div className="p-4 overflow-auto" style={{ flex: 1 }}>
               <div className="p-4 rounded-3 border bg-light position-relative overflow-hidden mb-4" style={{ borderStyle: 'dashed' }}>
-                {/* Simulated Watermark */}
+                {/* Watermark */}
                 <div
                   className="position-absolute top-50 start-50 translate-middle text-uppercase fw-bold text-center"
                   style={{ color: 'rgba(7, 41, 77, 0.04)', fontSize: '5rem', pointerEvents: 'none', transform: 'translate(-50%, -50%) rotate(-25deg)', whiteSpace: 'nowrap' }}
@@ -886,8 +1038,12 @@ ${(doc.requiredDocsKm || []).map((d, i) => `[${i + 1}] ${d}`).join('\n')}
 
                 {/* Institutional Header */}
                 <div className="text-center mb-3 pb-3 border-bottom">
-                  <div className="small fw-bold text-muted text-uppercase mb-1">ព្រះរាជាណាចក្រកម្ពុជា | ជាតិ សាសនា ព្រះមហាក្សត្រ</div>
-                  <div className="text-primary fw-bold small">ក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ</div>
+                  <div className="small fw-bold text-muted text-uppercase mb-1">
+                    ព្រះរាជាណាចក្រកម្ពុជា | ជាតិ សាសនា ព្រះមហាក្សត្រ
+                  </div>
+                  <div className="text-primary fw-bold small">
+                    ក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ
+                  </div>
                   <h6 className="fw-bold mt-2" style={{ color: '#07294D' }}>
                     វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប
                   </h6>
@@ -906,30 +1062,32 @@ ${(doc.requiredDocsKm || []).map((d, i) => `[${i + 1}] ${d}`).join('\n')}
 
                 {/* Details Paragraph */}
                 <div className="p-3 bg-white rounded-3 border mb-3 small">
-                  <div className="text-muted fw-semibold mb-1">{isKhmer ? 'សេចក្តីពិពណ៌នា និងគោលបំណង៖' : 'Description & Scope:'}</div>
-                  <div style={{ lineHeight: '1.8' }}>
+                  <div className="text-muted fw-semibold mb-1">
+                    {isKhmer ? 'សេចក្តីពិពណ៌នា និងគោលបំណង ៖' : 'Description & Scope:'}
+                  </div>
+                  <div style={{ lineHeight: '1.8', color: '#334155' }}>
                     {isKhmer ? selectedDoc.descriptionKm : selectedDoc.descriptionEn}
                   </div>
                 </div>
 
                 {/* Submission Target Office */}
                 <div className="d-flex align-items-center gap-2 p-2 px-3 bg-white rounded-3 border mb-3 small">
-                  <i className="fas fa-building text-primary"></i>
-                  <span className="text-muted">{isKhmer ? 'ការិយាល័យទទួលពាក្យ៖' : 'Submission Location:'}</span>
+                  <Building size={16} color="#1e73be" />
+                  <span className="text-muted">{isKhmer ? 'ការិយាល័យទទួលពាក្យ ៖' : 'Submission Location:'}</span>
                   <span className="fw-bold text-dark">{selectedDoc.submissionOffice}</span>
                 </div>
 
                 {/* Required Documents / Checklist */}
                 {selectedDoc.requiredDocsKm && (
                   <div className="p-3 bg-white rounded-3 border small">
-                    <div className="fw-bold text-dark mb-2">
-                      <i className="fas fa-clipboard-check me-2 text-success"></i>
-                      {isKhmer ? 'ឯកសារភ្ជាប់ចាំបាច់សម្រាប់បំពេញបែបបទ៖' : 'Required Supporting Documents:'}
+                    <div className="fw-bold text-dark mb-2 d-flex align-items-center gap-2">
+                      <ClipboardCheck size={16} color="#059669" />
+                      <span>{isKhmer ? 'ឯកសារភ្ជាប់ចាំបាច់សម្រាប់បំពេញបែបបទ ៖' : 'Required Supporting Documents:'}</span>
                     </div>
                     <ul className="list-unstyled mb-0 d-flex flex-column gap-2">
                       {(isKhmer ? selectedDoc.requiredDocsKm : selectedDoc.requiredDocsEn).map((item, idx) => (
                         <li key={idx} className="d-flex align-items-start gap-2 text-muted">
-                          <i className="fas fa-check-circle text-primary mt-1 flex-shrink-0"></i>
+                          <CheckCircle2 size={14} color="#1e73be" className="mt-1 flex-shrink-0" />
                           <span>{item}</span>
                         </li>
                       ))}
@@ -947,21 +1105,23 @@ ${(doc.requiredDocsKm || []).map((d, i) => `[${i + 1}] ${d}`).join('\n')}
               <div className="d-flex gap-2">
                 <button
                   type="button"
-                  className="btn btn-secondary rounded-pill px-4 btn-sm"
-                  onClick={() => setSelectedDoc(null)}
+                  className="btn btn-outline-secondary rounded-pill px-3 btn-sm d-inline-flex align-items-center gap-1"
+                  onClick={() => window.print()}
                 >
-                  {t('downloads.close')}
+                  <Printer size={14} />
+                  <span>{isKhmer ? 'បោះពុម្ព' : 'Print'}</span>
                 </button>
                 <button
                   type="button"
-                  className="btn btn-primary rounded-pill px-4 btn-sm"
+                  className="btn btn-primary rounded-pill px-4 btn-sm d-inline-flex align-items-center gap-1"
+                  style={{ background: '#07294D', borderColor: '#07294D' }}
                   onClick={() => {
                     handleDownload(selectedDoc);
                     setSelectedDoc(null);
                   }}
                 >
-                  <i className="fas fa-download me-1"></i>
-                  {t('downloads.downloadBtn')}
+                  <Download size={14} />
+                  <span>{isKhmer ? 'ទាញយកទម្រង់' : 'Download'}</span>
                 </button>
               </div>
             </div>
@@ -976,7 +1136,7 @@ ${(doc.requiredDocsKm || []).map((d, i) => `[${i + 1}] ${d}`).join('\n')}
           style={{ zIndex: 10000, animation: 'fadeInUp 0.3s ease-out' }}
         >
           <div className="d-flex align-items-center gap-3 p-3 px-4 bg-dark text-white rounded-pill shadow-lg">
-            <i className="fas fa-check-circle text-success fs-5"></i>
+            <CheckCircle2 size={20} color="#10b981" />
             <span className="small fw-semibold">{downloadSuccessToast}</span>
           </div>
         </div>
