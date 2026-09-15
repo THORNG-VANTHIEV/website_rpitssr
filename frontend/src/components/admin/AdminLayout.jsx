@@ -17,6 +17,7 @@ import {
   Video,
   Bell,
   Sliders,
+  Megaphone,
   Tag,
   Library,
   BookmarkCheck,
@@ -92,7 +93,7 @@ export const AdminLayout = () => {
         { path: '/admin-panel/notices', label: isKhmer ? 'សេចក្តីជូនដំណឹង' : 'Notices', icon: Bell },
         { path: '/admin-panel/downloads', label: isKhmer ? 'ឯកសារទាញយក / ទម្រង់បែបបទ' : 'Downloads / Forms', icon: FileDown },
         { path: '/admin-panel/scrolling-banners', label: isKhmer ? 'បដាអក្សររត់' : 'Scrolling Banners', icon: Sliders },
-        { path: '/admin-panel/promotions', label: isKhmer ? 'ការផ្សព្វផ្សាយពិសេស' : 'Promotions', icon: Tag },
+        { path: '/admin-panel/promotions', label: isKhmer ? 'ការផ្សព្វផ្សាយពិសេស' : 'Special Broadcasts', icon: Megaphone },
       ]
     },
     {

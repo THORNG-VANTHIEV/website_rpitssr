@@ -2211,6 +2211,120 @@
   transform: translateY(-1px);
 }
 
+/* =========================================================
+   Special Broadcasts & Promotions Standards (Daylight Institutional)
+   ========================================================= */
+.admin-broadcast-sim-container {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(7, 41, 77, 0.05);
+  margin-bottom: 24px;
+}
+
+.admin-broadcast-sim-header {
+  padding: 14px 20px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.admin-broadcast-sim-body {
+  padding: 24px;
+  background: radial-gradient(circle at center, #f8fafc 0%, #f1f5f9 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 220px;
+}
+
+.admin-broadcast-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.admin-broadcast-type-popup {
+  background: #eff6ff;
+  color: #1e73be;
+  border: 1px solid #dbeafe;
+}
+
+.admin-broadcast-type-banner {
+  background: #fff7ed;
+  color: #ea580c;
+  border: 1px solid #fed7aa;
+}
+
+.admin-broadcast-type-notification {
+  background: #f0fdf4;
+  color: #059669;
+  border: 1px solid #bbf7d0;
+}
+
+.admin-broadcast-priority-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  background: #fefce8;
+  color: #ca8a04;
+  border: 1px solid #fef08a;
+}
+
+.admin-broadcast-popup-mockup {
+  max-width: 480px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 20px 40px -10px rgba(7, 41, 77, 0.22);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  animation: fadeInModal 0.25s ease-out;
+}
+
+.admin-broadcast-banner-mockup {
+  width: 100%;
+  max-width: 860px;
+  background: #07294D;
+  border-radius: 12px;
+  color: #ffffff;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 10px 25px rgba(7, 41, 77, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.admin-broadcast-toast-mockup {
+  max-width: 380px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 12px 32px rgba(7, 41, 77, 0.18);
+  border-left: 5px solid #059669;
+  border-top: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
 
 
 

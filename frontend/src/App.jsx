@@ -149,6 +149,7 @@ function App() {
               <Route path="downloads" element={<AdminDownloadsPage />} />
               <Route path="scrolling-banners" element={<AdminBannersPage />} />
               <Route path="promotions" element={<AdminPromotionsPage />} />
+              <Route path="special-broadcasts" element={<AdminPromotionsPage />} />
               <Route path="library" element={<AdminLibraryPage />} />
               <Route path="library-categories" element={<AdminLibraryPage />} />
               <Route path="borrowings" element={<AdminLibraryPage />} />

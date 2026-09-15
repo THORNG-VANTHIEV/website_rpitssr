@@ -83,7 +83,7 @@ class AdminToolController extends Controller
     // ==========================================
     public function getPromotions(): JsonResponse
     {
-        $promotions = Promotion::orderBy('id', 'desc')->get();
+        $promotions = Promotion::orderBy('priority', 'desc')->orderBy('id', 'desc')->get();
         return response()->json($promotions);
     }
 
@@ -95,9 +95,17 @@ class AdminToolController extends Controller
             'description' => 'nullable|string',
             'message' => 'nullable|string',
             'image_url' => 'nullable|string',
+            'background_image' => 'nullable|string',
+            'background_color' => 'nullable|string',
             'button_text' => 'nullable|string',
             'button_link' => 'nullable|string',
-            'is_active' => 'boolean',
+            'position' => 'nullable|string',
+            'delay' => 'nullable|integer',
+            'show_once' => 'nullable|boolean',
+            'is_active' => 'nullable|boolean',
+            'priority' => 'nullable|integer',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
         ]);
 
         $promo = Promotion::create($validated);
@@ -113,13 +121,35 @@ class AdminToolController extends Controller
             'description' => 'nullable|string',
             'message' => 'nullable|string',
             'image_url' => 'nullable|string',
+            'background_image' => 'nullable|string',
+            'background_color' => 'nullable|string',
             'button_text' => 'nullable|string',
             'button_link' => 'nullable|string',
-            'is_active' => 'boolean',
+            'position' => 'nullable|string',
+            'delay' => 'nullable|integer',
+            'show_once' => 'nullable|boolean',
+            'is_active' => 'nullable|boolean',
+            'priority' => 'nullable|integer',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
         ]);
 
         $promo->update($validated);
         return response()->json($promo);
+    }
+
+    public function togglePromotion($id): JsonResponse
+    {
+        $promo = Promotion::findOrFail($id);
+        $promo->is_active = !$promo->is_active;
+        $promo->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Promotion status toggled successfully',
+            'is_active' => $promo->is_active,
+            'promotion' => $promo,
+        ]);
     }
 
     public function deletePromotion($id): JsonResponse

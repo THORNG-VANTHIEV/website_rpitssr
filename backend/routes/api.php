@@ -272,6 +272,7 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::post('/promotions', [AdminToolController::class, 'storePromotion']);
     Route::put('/promotions/{id}', [AdminToolController::class, 'updatePromotion']);
     Route::delete('/promotions/{id}', [AdminToolController::class, 'deletePromotion']);
+    Route::post('/promotions/{id}/toggle', [AdminToolController::class, 'togglePromotion']);
 
     // Comments CRUD
     Route::get('/comments', [AdminToolController::class, 'getComments']);
