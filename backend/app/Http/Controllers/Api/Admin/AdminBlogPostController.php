@@ -31,10 +31,11 @@ class AdminBlogPostController extends Controller
         }
 
         $page = (int) $request->input('page', 1);
-        $limit = (int) $request->input('limit', 10);
+        $limit = (int) $request->input('limit', 100);
         $total = $query->count();
 
-        $posts = $query->orderBy('createdAt', 'desc')
+        $posts = $query->orderBy('featured', 'desc')
+            ->orderBy('createdAt', 'desc')
             ->skip(($page - 1) * $limit)
             ->take($limit)
             ->get();
@@ -57,6 +58,38 @@ class AdminBlogPostController extends Controller
         }
 
         return response()->json($post, 200);
+    }
+
+    public function toggleStatus($id): JsonResponse
+    {
+        $post = BlogPost::find($id);
+        if (!$post) {
+            return response()->json(['error' => 'Blog post not found'], 404);
+        }
+        $newStatus = ($post->status === 'published') ? 'draft' : 'published';
+        $post->update([
+            'status' => $newStatus,
+            'publishedAt' => ($newStatus === 'published' && !$post->publishedAt) ? now() : $post->publishedAt,
+        ]);
+        return response()->json([
+            'message' => 'Status updated successfully',
+            'post' => $post,
+            'status' => $post->status,
+        ], 200);
+    }
+
+    public function toggleFeatured($id): JsonResponse
+    {
+        $post = BlogPost::find($id);
+        if (!$post) {
+            return response()->json(['error' => 'Blog post not found'], 404);
+        }
+        $post->update(['featured' => !$post->featured]);
+        return response()->json([
+            'message' => 'Featured status updated successfully',
+            'post' => $post,
+            'featured' => $post->featured,
+        ], 200);
     }
 
     public function store(Request $request): JsonResponse

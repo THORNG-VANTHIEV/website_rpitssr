@@ -2436,6 +2436,117 @@
   position: relative;
 }
 
+/* Institutional Blog Posts Modernization Styling */
+.admin-blog-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(7, 41, 77, 0.04);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.admin-blog-card:hover {
+  transform: translateY(-4px);
+  border-color: #cbd5e1;
+  box-shadow: 0 16px 36px rgba(7, 41, 77, 0.09);
+}
+
+.admin-blog-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #07294D, #1e73be, #ffaf00);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 2;
+}
+
+.admin-blog-card:hover::before {
+  opacity: 1;
+}
+
+.admin-blog-featured-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 6px;
+  color: #b45309;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.admin-blog-views-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 6px;
+  color: #1e73be;
+  font-size: 0.73rem;
+  font-weight: 600;
+}
+
+.admin-blog-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.admin-blog-slug-pill {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.72rem;
+  background: #f8fafc;
+  color: #64748b;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px dashed #cbd5e1;
+}
+
+.admin-blog-reader-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.admin-blog-reader-content {
+  color: #334155;
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+.admin-blog-reader-content p {
+  margin-bottom: 1rem;
+}
+
+.admin-blog-reader-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 12px 0;
+}
+
+
 
 
 

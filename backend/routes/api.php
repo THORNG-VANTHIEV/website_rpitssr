@@ -175,6 +175,8 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::post('/blog-posts', [AdminBlogPostController::class, 'store']);
     Route::put('/blog-posts/{id}', [AdminBlogPostController::class, 'update']);
     Route::delete('/blog-posts/{id}', [AdminBlogPostController::class, 'destroy']);
+    Route::post('/blog-posts/{id}/toggle-status', [AdminBlogPostController::class, 'toggleStatus']);
+    Route::post('/blog-posts/{id}/toggle-featured', [AdminBlogPostController::class, 'toggleFeatured']);
 
     // Teachers CRUD
     Route::get('/teachers', [AdminTeacherController::class, 'index']);
