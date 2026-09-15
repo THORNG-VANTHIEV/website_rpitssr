@@ -17,8 +17,17 @@ class AdminGalleryController extends Controller
             $query->where('category', $request->category);
         }
 
-        $limit = (int) $request->input('limit', 50);
-        $images = $query->orderBy('order', 'asc')->paginate($limit);
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%");
+            });
+        }
+
+        $limit = (int) $request->input('limit', 100);
+        $images = $query->orderBy('order', 'asc')->orderBy('id', 'desc')->paginate($limit);
 
         return response()->json($images->items(), 200);
     }
