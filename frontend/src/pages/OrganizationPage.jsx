@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { PageBanner } from '../components/common/PageBanner';
 import { useLanguage } from '../context/LanguageContext';
 
 // Official Organizational Structure Data of RPITSSR
@@ -383,18 +382,18 @@ const OrgLeaderAvatar = ({ image, name, size = 80, isTopLeader = false, icon = '
         <img
           src={image}
           alt={name}
-          className={`rounded-circle border ${isTopLeader ? 'border-3 border-white shadow' : 'border-2 border-primary shadow-sm'}`}
+          className={`rounded-circle border ${isTopLeader ? 'border-3 border-warning shadow' : 'border-2 border-primary shadow-sm'}`}
           style={{ width: `${size}px`, height: `${size}px`, objectFit: 'cover', display: 'block' }}
           onError={() => setHasError(true)}
         />
       ) : (
         <div
-          className={`rounded-circle border ${isTopLeader ? 'border-3 border-white shadow' : 'border-2 border-primary shadow-sm'} d-flex align-items-center justify-content-center text-white mx-auto`}
+          className={`rounded-circle ${isTopLeader ? 'border-3 border-warning shadow' : 'border-2 border-primary shadow-sm'} d-flex align-items-center justify-content-center text-white mx-auto`}
           style={{
             width: `${size}px`,
             height: `${size}px`,
             background: isTopLeader
-              ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+              ? 'linear-gradient(135deg, #07294D 0%, #1e73be 100%)'
               : 'linear-gradient(135deg, #1e73be 0%, #07294D 100%)',
             fontSize: `${Math.round(size * 0.42)}px`
           }}
@@ -404,10 +403,11 @@ const OrgLeaderAvatar = ({ image, name, size = 80, isTopLeader = false, icon = '
       )}
       {isTopLeader && (
         <span
-          className="badge bg-warning text-dark position-absolute bottom-0 start-50 translate-middle-x rounded-pill px-2 py-1 shadow-sm"
-          style={{ fontSize: '0.75rem', fontWeight: '700' }}
+          className="badge bg-warning text-dark position-absolute bottom-0 start-50 translate-middle-x rounded-pill px-2.5 py-1 shadow-sm d-inline-flex align-items-center gap-1"
+          style={{ fontSize: '0.72rem', fontWeight: '800', letterSpacing: '0.3px', border: '1px solid #fde68a' }}
         >
-          TOP LEADER
+          <i className="fas fa-crown text-dark" style={{ fontSize: '0.68rem' }}></i>
+          <span>DIRECTOR</span>
         </span>
       )}
     </div>
@@ -493,106 +493,134 @@ export const OrganizationPage = () => {
 
   return (
     <div className="organization-page-wrapper">
-      {/* 1. Official Page Banner */}
-      <PageBanner
-        title={t('organization.pageTitle') || 'រចនាសម្ព័ន្ធគ្រប់គ្រង និងថ្នាក់ដឹកនាំ'}
-        image="/images/about-us.webp"
-      />
+      {/* 1. Official Institutional Hero Banner */}
+      <section className="org-page-hero">
+        <div className="container">
+          <div className="org-hero-content">
+            {/* Meta Row with Breadcrumb & TVET Governance Badge (14px gap) */}
+            <div className="org-hero-meta-row">
+              <nav className="org-breadcrumb" aria-label="breadcrumb">
+                <Link to="/">
+                  <i className="fas fa-home"></i>
+                  <span>{isKhmer ? 'ទំព័រដើម' : 'Home'}</span>
+                </Link>
+                <span className="separator">›</span>
+                <span className="current">{t('organization.pageTitle')}</span>
+              </nav>
 
-      <div className="org-main-section" style={{ backgroundColor: '#f8fafc', paddingTop: '60px', paddingBottom: '100px', paddingLeft: '16px', paddingRight: '16px' }}>
-        <div className="container px-2 px-md-3" style={{ maxWidth: '1280px' }}>
-          
-          {/* Institutional Governance Sub-Header */}
-          <div className="org-intro-card mb-4 text-center">
-            <div className="org-ministry-badge d-inline-flex align-items-center gap-2 mb-3 rounded-pill">
-              <i className="fas fa-landmark"></i>
-              <span>ក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ (MLVT)</span>
+              <span className="org-hero-badge">
+                <i className="fas fa-landmark"></i>
+                <span>{t('organization.badge_governance')}</span>
+              </span>
             </div>
-            
-            <h2 className="org-main-heading mb-3" style={{ color: '#07294D', fontWeight: '800', fontSize: '2.1rem', letterSpacing: '-0.3px', lineHeight: 1.4 }}>
+
+            {/* Official Title */}
+            <h1 className="org-hero-title">
               {t('organization.pageTitle')}
-            </h2>
-            
-            <p className="org-main-subtext mx-auto text-muted mb-4" style={{ maxWidth: '850px', fontSize: '1.05rem', lineHeight: '1.85' }}>
-              {t('organization.governanceDesc')}
+            </h1>
+
+            {/* Subtitle */}
+            <p className="org-hero-subtitle">
+              {t('organization.subtitle')}
             </p>
 
-            {/* Quick Stats Strip - 4 Interactive Executive Metric Cards */}
-            <div className="row g-3 justify-content-center pt-4 border-top">
-              <div className="col-6 col-lg-3">
-                <div className="org-stat-card">
-                  <div
-                    className="org-stat-icon-wrap"
-                    style={{ backgroundColor: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}
-                  >
-                    <i className="fas fa-user-tie"></i>
-                  </div>
-                  <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>1</div>
-                  <div className="fw-semibold text-dark small mt-1">{isKhmer ? 'នាយិកាវិទ្យាស្ថាន' : 'Director'}</div>
-                  <span
-                    className="badge rounded-pill mt-2 px-2.5 py-1"
-                    style={{ backgroundColor: '#eff6ff', color: '#1e73be', fontSize: '0.72rem', fontWeight: '600', border: '1px solid #dbeafe' }}
-                  >
-                    {isKhmer ? 'ថ្នាក់ដឹកនាំស្ថាប័ន' : 'Executive Head'}
-                  </span>
-                </div>
-              </div>
+            {/* Institutional Trust Badges */}
+            <div className="org-trust-pills">
+              <span className="org-trust-pill">
+                <i className="fas fa-scroll"></i>
+                <span>{t('organization.trust_subdecree')}</span>
+              </span>
+              <span className="org-trust-pill">
+                <i className="fas fa-award"></i>
+                <span>{t('organization.trust_ministry')}</span>
+              </span>
+              <span className="org-trust-pill">
+                <i className="fas fa-sitemap"></i>
+                <span>{t('organization.trust_structure')}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
 
-              <div className="col-6 col-lg-3">
-                <div className="org-stat-card">
-                  <div
-                    className="org-stat-icon-wrap"
-                    style={{ backgroundColor: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}
-                  >
-                    <i className="fas fa-users-cog"></i>
-                  </div>
-                  <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>3</div>
-                  <div className="fw-semibold text-dark small mt-1">{isKhmer ? 'នាយករងទទួលបន្ទុក' : 'Deputy Directors'}</div>
-                  <span
-                    className="badge rounded-pill mt-2 px-2.5 py-1"
-                    style={{ backgroundColor: '#f0fdf4', color: '#059669', fontSize: '0.72rem', fontWeight: '600', border: '1px solid #bbf7d0' }}
-                  >
-                    {isKhmer ? 'កិច្ចការជំនាញ' : 'Deputy Heads'}
-                  </span>
-                </div>
-              </div>
+      <div className="org-main-section" style={{ backgroundColor: '#f8fafc', paddingTop: '50px', paddingBottom: '100px', paddingLeft: '16px', paddingRight: '16px' }}>
+        <div className="container px-2 px-md-3" style={{ maxWidth: '1280px' }}>
 
-              <div className="col-6 col-lg-3">
-                <div className="org-stat-card">
-                  <div
-                    className="org-stat-icon-wrap"
-                    style={{ backgroundColor: '#f5f3ff', color: '#7c3aed', border: '1px solid #ddd6fe' }}
-                  >
-                    <i className="fas fa-laptop-code"></i>
-                  </div>
-                  <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>5</div>
-                  <div className="fw-semibold text-dark small mt-1">{isKhmer ? 'ដេប៉ាតឺម៉ង់បច្ចេកទេស' : 'Technical Depts'}</div>
-                  <span
-                    className="badge rounded-pill mt-2 px-2.5 py-1"
-                    style={{ backgroundColor: '#f5f3ff', color: '#7c3aed', fontSize: '0.72rem', fontWeight: '600', border: '1px solid #ddd6fe' }}
-                  >
-                    {isKhmer ? 'បណ្តុះបណ្តាល TVET' : 'Engineering & IT'}
-                  </span>
+          {/* Quick Stats Strip - 4 Interactive Executive Metric Cards */}
+          <div className="row g-3 justify-content-center mb-4 pb-2">
+            <div className="col-6 col-lg-3">
+              <div className="org-stat-card">
+                <div
+                  className="org-stat-icon-wrap"
+                  style={{ backgroundColor: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}
+                >
+                  <i className="fas fa-user-tie"></i>
                 </div>
+                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>1</div>
+                <div className="fw-semibold text-dark small mt-1">{t('organization.stat_director')}</div>
+                <span
+                  className="badge rounded-pill mt-2 px-2.5 py-1"
+                  style={{ backgroundColor: '#eff6ff', color: '#1e73be', fontSize: '0.72rem', fontWeight: '600', border: '1px solid #dbeafe' }}
+                >
+                  {t('organization.stat_director_badge')}
+                </span>
               </div>
+            </div>
 
-              <div className="col-6 col-lg-3">
-                <div className="org-stat-card">
-                  <div
-                    className="org-stat-icon-wrap"
-                    style={{ backgroundColor: '#fffbeb', color: '#d97706', border: '1px solid #fde68a' }}
-                  >
-                    <i className="fas fa-building"></i>
-                  </div>
-                  <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>3</div>
-                  <div className="fw-semibold text-dark small mt-1">{isKhmer ? 'ការិយាល័យជំនាញ' : 'Admin Offices'}</div>
-                  <span
-                    className="badge rounded-pill mt-2 px-2.5 py-1"
-                    style={{ backgroundColor: '#fffbeb', color: '#d97706', fontSize: '0.72rem', fontWeight: '600', border: '1px solid #fde68a' }}
-                  >
-                    {isKhmer ? 'រដ្ឋបាល & គាំទ្រ' : 'Admin & Support'}
-                  </span>
+            <div className="col-6 col-lg-3">
+              <div className="org-stat-card">
+                <div
+                  className="org-stat-icon-wrap"
+                  style={{ backgroundColor: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}
+                >
+                  <i className="fas fa-users-cog"></i>
                 </div>
+                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>3</div>
+                <div className="fw-semibold text-dark small mt-1">{t('organization.stat_deputies')}</div>
+                <span
+                  className="badge rounded-pill mt-2 px-2.5 py-1"
+                  style={{ backgroundColor: '#f0fdf4', color: '#059669', fontSize: '0.72rem', fontWeight: '600', border: '1px solid #bbf7d0' }}
+                >
+                  {t('organization.stat_deputies_badge')}
+                </span>
+              </div>
+            </div>
+
+            <div className="col-6 col-lg-3">
+              <div className="org-stat-card">
+                <div
+                  className="org-stat-icon-wrap"
+                  style={{ backgroundColor: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}
+                >
+                  <i className="fas fa-laptop-code"></i>
+                </div>
+                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>5</div>
+                <div className="fw-semibold text-dark small mt-1">{t('organization.stat_departments')}</div>
+                <span
+                  className="badge rounded-pill mt-2 px-2.5 py-1"
+                  style={{ backgroundColor: '#faf5ff', color: '#7c3aed', fontSize: '0.72rem', fontWeight: '600', border: '1px solid #e9d5ff' }}
+                >
+                  {t('organization.stat_departments_badge')}
+                </span>
+              </div>
+            </div>
+
+            <div className="col-6 col-lg-3">
+              <div className="org-stat-card">
+                <div
+                  className="org-stat-icon-wrap"
+                  style={{ backgroundColor: '#fffbeb', color: '#d97706', border: '1px solid #fde68a' }}
+                >
+                  <i className="fas fa-building"></i>
+                </div>
+                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>3</div>
+                <div className="fw-semibold text-dark small mt-1">{t('organization.stat_offices')}</div>
+                <span
+                  className="badge rounded-pill mt-2 px-2.5 py-1"
+                  style={{ backgroundColor: '#fffbeb', color: '#d97706', fontSize: '0.72rem', fontWeight: '600', border: '1px solid #fde68a' }}
+                >
+                  {t('organization.stat_offices_badge')}
+                </span>
               </div>
             </div>
           </div>
@@ -626,7 +654,7 @@ export const OrganizationPage = () => {
                 style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.84rem' }}
               >
                 <i className="fas fa-mouse-pointer text-primary"></i>
-                <span>{isKhmer ? 'ចុចលើកាតថ្នាក់ដឹកនាំ ឬដេប៉ាតឺម៉ង់ ដើម្បីមើលប្រវត្តិរូប និងភារកិច្ច' : 'Click any unit or leader card to view profile details'}</span>
+                <span>{t('organization.tree_hint')}</span>
               </div>
             )}
 
@@ -638,7 +666,7 @@ export const OrganizationPage = () => {
                   <input
                     type="text"
                     className="form-control org-search-input-pill"
-                    placeholder={isKhmer ? 'ស្វែងរកឈ្មោះ ឬផ្នែក...' : 'Search name or title...'}
+                    placeholder={t('organization.searchPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -692,42 +720,40 @@ export const OrganizationPage = () => {
             <div className="org-tree-container p-4 p-md-5 bg-white rounded-4 border shadow-sm">
               <div className="text-center mb-4 text-muted small">
                 <i className="fas fa-info-circle me-1 text-primary"></i>
-                {isKhmer ? 'ចុចលើកាតថ្នាក់ដឹកនាំ ឬដេប៉ាតឺម៉ង់ ដើម្បីពិនិត្យមើលប្រវត្តិរូប និងភារកិច្ចលម្អិត' : 'Click any leadership card or department to preview full profile and responsibilities'}
+                {t('organization.tree_hint')}
               </div>
 
-              {/* TREE LEVEL 1: DIRECTOR (TOP) */}
+              {/* TREE LEVEL 1: DIRECTOR (TOP) - CRISP WHITE DAYLIGHT CARD */}
               <div className="org-tree-level d-flex justify-content-center mb-4">
                 <div
-                  className="org-tree-card org-director-card text-center p-4 rounded-4 shadow-sm border"
+                  className="org-tree-card org-director-card-daylight text-center"
                   onClick={() => setSelectedLeader(LEADERSHIP_DATA.director)}
                   role="button"
                   tabIndex={0}
-                  style={{
-                    maxWidth: '420px',
-                    width: '100%',
-                    background: 'linear-gradient(145deg, #07294D 0%, #1e73be 100%)',
-                    color: '#ffffff',
-                    cursor: 'pointer'
-                  }}
                 >
+                  <div className="org-director-ribbon">
+                    <i className="fas fa-crown"></i>
+                    <span>{isKhmer ? 'គណៈនាយិកាវិទ្យាស្ថាន' : 'Institute Directorate'}</span>
+                  </div>
+
                   <OrgLeaderAvatar
                     image={LEADERSHIP_DATA.director.image}
                     name={isKhmer ? LEADERSHIP_DATA.director.nameKm : LEADERSHIP_DATA.director.nameEn}
                     size={96}
                     isTopLeader={true}
                   />
-                  <h4 className="fw-bold mb-1 text-white" style={{ fontSize: '1.25rem' }}>
+                  <h4 className="fw-bold mb-1" style={{ color: '#07294D', fontSize: '1.25rem' }}>
                     {isKhmer ? LEADERSHIP_DATA.director.nameKm : LEADERSHIP_DATA.director.nameEn}
                   </h4>
-                  <div className="text-warning fw-semibold mb-2" style={{ fontSize: '0.95rem' }}>
+                  <div className="text-primary fw-semibold mb-2" style={{ fontSize: '0.95rem' }}>
                     {isKhmer ? LEADERSHIP_DATA.director.titleKm : LEADERSHIP_DATA.director.titleEn}
                   </div>
-                  <div className="d-flex align-items-center justify-content-center gap-2 text-white-50 small mb-2">
-                    <i className="fas fa-envelope"></i>
+                  <div className="d-flex align-items-center justify-content-center gap-2 text-muted small mb-3">
+                    <i className="fas fa-envelope text-primary"></i>
                     <span>{LEADERSHIP_DATA.director.email}</span>
                   </div>
-                  <div className="badge bg-white text-primary rounded-pill px-3 py-1">
-                    <i className="fas fa-external-link-alt me-1"></i>
+                  <div className="btn btn-sm btn-outline-primary rounded-pill px-4 py-1.5 fw-semibold">
+                    <i className="fas fa-id-card me-1.5"></i>
                     {t('organization.viewProfile')}
                   </div>
                 </div>
@@ -747,11 +773,11 @@ export const OrganizationPage = () => {
                       {/* Vertical line connecting crossbar to each card */}
                       <div className="org-tree-branch-vertical d-none d-md-block mx-auto" style={{ width: '2px', height: '16px', backgroundColor: '#cbd5e1', marginTop: '-16px' }}></div>
                       <div
-                        className="org-tree-card text-center p-4 rounded-4 shadow-sm border bg-white h-100"
+                        className="org-tree-card org-deputy-card text-center h-100"
                         onClick={() => setSelectedLeader(deputy)}
                         role="button"
                         tabIndex={0}
-                        style={{ cursor: 'pointer', borderTop: '4px solid #1e73be' }}
+                        style={{ cursor: 'pointer' }}
                       >
                         <OrgLeaderAvatar
                           image={deputy.image}
@@ -766,11 +792,11 @@ export const OrganizationPage = () => {
                           {isKhmer ? deputy.titleKm : deputy.titleEn}
                         </div>
                         <div className="text-muted small mb-3">
-                          <i className="fas fa-door-open me-1"></i>
+                          <i className="fas fa-door-open me-1 text-secondary"></i>
                           {deputy.room}
                         </div>
-                        <div className="badge bg-light text-secondary rounded-pill px-3 py-1">
-                          <i className="fas fa-id-card me-1"></i>
+                        <div className="badge bg-light text-secondary rounded-pill px-3 py-1.5 border">
+                          <i className="fas fa-id-card me-1 text-primary"></i>
                           {t('organization.viewProfile')}
                         </div>
                       </div>
