@@ -377,38 +377,42 @@ const OrgLeaderAvatar = ({ image, name, size = 80, isTopLeader = false, icon = '
   const [hasError, setHasError] = useState(false);
 
   return (
-    <div className="position-relative d-inline-block mb-3">
+    <div className="position-relative d-inline-flex justify-content-center align-items-center">
       {image && !hasError ? (
         <img
           src={image}
           alt={name}
-          className={`rounded-circle border ${isTopLeader ? 'border-3 border-warning shadow' : 'border-2 border-primary shadow-sm'}`}
-          style={{ width: `${size}px`, height: `${size}px`, objectFit: 'cover', display: 'block' }}
+          className="rounded-circle"
+          style={{
+            width: `${size}px`,
+            height: `${size}px`,
+            objectFit: 'cover',
+            display: 'block',
+            border: isTopLeader ? '3.5px solid #ffaf00' : '2.5px solid #1e73be',
+            boxShadow: isTopLeader
+              ? '0 0 0 4px rgba(255, 175, 0, 0.2), 0 8px 24px rgba(7, 41, 77, 0.12)'
+              : '0 4px 12px rgba(30, 115, 190, 0.15)'
+          }}
           onError={() => setHasError(true)}
         />
       ) : (
         <div
-          className={`rounded-circle ${isTopLeader ? 'border-3 border-warning shadow' : 'border-2 border-primary shadow-sm'} d-flex align-items-center justify-content-center text-white mx-auto`}
+          className="rounded-circle d-flex align-items-center justify-content-center text-white mx-auto"
           style={{
             width: `${size}px`,
             height: `${size}px`,
             background: isTopLeader
               ? 'linear-gradient(135deg, #07294D 0%, #1e73be 100%)'
               : 'linear-gradient(135deg, #1e73be 0%, #07294D 100%)',
+            border: isTopLeader ? '3.5px solid #ffaf00' : '2.5px solid #1e73be',
+            boxShadow: isTopLeader
+              ? '0 0 0 4px rgba(255, 175, 0, 0.2), 0 8px 24px rgba(7, 41, 77, 0.12)'
+              : '0 4px 12px rgba(30, 115, 190, 0.15)',
             fontSize: `${Math.round(size * 0.42)}px`
           }}
         >
           <i className={`fas ${isTopLeader ? 'fa-user-tie' : icon}`}></i>
         </div>
-      )}
-      {isTopLeader && (
-        <span
-          className="badge bg-warning text-dark position-absolute bottom-0 start-50 translate-middle-x rounded-pill px-2.5 py-1 shadow-sm d-inline-flex align-items-center gap-1"
-          style={{ fontSize: '0.72rem', fontWeight: '800', letterSpacing: '0.3px', border: '1px solid #fde68a' }}
-        >
-          <i className="fas fa-crown text-dark" style={{ fontSize: '0.68rem' }}></i>
-          <span>DIRECTOR</span>
-        </span>
       )}
     </div>
   );
@@ -726,35 +730,53 @@ export const OrganizationPage = () => {
               {/* TREE LEVEL 1: DIRECTOR (TOP) - CRISP WHITE DAYLIGHT CARD */}
               <div className="org-tree-level d-flex justify-content-center mb-4">
                 <div
-                  className="org-tree-card org-director-card-daylight text-center"
+                  className="org-tree-card org-director-card-daylight d-flex flex-column align-items-center text-center"
                   onClick={() => setSelectedLeader(LEADERSHIP_DATA.director)}
                   role="button"
                   tabIndex={0}
                 >
-                  <div className="org-director-ribbon">
-                    <i className="fas fa-crown"></i>
-                    <span>{isKhmer ? 'គណៈនាយិកាវិទ្យាស្ថាន' : 'Institute Directorate'}</span>
+                  {/* Top Directorate Ribbon */}
+                  <div className="d-flex justify-content-center w-100">
+                    <div className="org-director-ribbon">
+                      <i className="fas fa-crown text-warning"></i>
+                      <span>{isKhmer ? 'គណៈនាយិកាវិទ្យាស្ថាន' : 'Institute Directorate'}</span>
+                    </div>
                   </div>
 
-                  <OrgLeaderAvatar
-                    image={LEADERSHIP_DATA.director.image}
-                    name={isKhmer ? LEADERSHIP_DATA.director.nameKm : LEADERSHIP_DATA.director.nameEn}
-                    size={96}
-                    isTopLeader={true}
-                  />
+                  {/* Centered Executive Avatar */}
+                  <div className="d-flex justify-content-center mb-3">
+                    <OrgLeaderAvatar
+                      image={LEADERSHIP_DATA.director.image}
+                      name={isKhmer ? LEADERSHIP_DATA.director.nameKm : LEADERSHIP_DATA.director.nameEn}
+                      size={96}
+                      isTopLeader={true}
+                    />
+                  </div>
+
+                  {/* Director Name */}
                   <h4 className="fw-bold mb-1" style={{ color: '#07294D', fontSize: '1.25rem' }}>
                     {isKhmer ? LEADERSHIP_DATA.director.nameKm : LEADERSHIP_DATA.director.nameEn}
                   </h4>
-                  <div className="text-primary fw-semibold mb-2" style={{ fontSize: '0.95rem' }}>
+
+                  {/* Designation */}
+                  <div className="text-primary fw-semibold mb-2" style={{ fontSize: '0.98rem' }}>
                     {isKhmer ? LEADERSHIP_DATA.director.titleKm : LEADERSHIP_DATA.director.titleEn}
+                  </div>
+
+                  {/* Room & Email */}
+                  <div className="text-muted small mb-1">
+                    <i className="fas fa-door-open me-1.5 text-secondary"></i>
+                    {LEADERSHIP_DATA.director.room}
                   </div>
                   <div className="d-flex align-items-center justify-content-center gap-2 text-muted small mb-3">
                     <i className="fas fa-envelope text-primary"></i>
                     <span>{LEADERSHIP_DATA.director.email}</span>
                   </div>
-                  <div className="btn btn-sm btn-outline-primary rounded-pill px-4 py-1.5 fw-semibold">
-                    <i className="fas fa-id-card me-1.5"></i>
-                    {t('organization.viewProfile')}
+
+                  {/* Action CTA Button */}
+                  <div className="btn btn-sm btn-outline-primary rounded-pill px-4 py-1.5 fw-semibold d-inline-flex align-items-center gap-1.5">
+                    <i className="fas fa-id-card"></i>
+                    <span>{t('organization.viewProfile')}</span>
                   </div>
                 </div>
               </div>
@@ -773,18 +795,20 @@ export const OrganizationPage = () => {
                       {/* Vertical line connecting crossbar to each card */}
                       <div className="org-tree-branch-vertical d-none d-md-block mx-auto" style={{ width: '2px', height: '16px', backgroundColor: '#cbd5e1', marginTop: '-16px' }}></div>
                       <div
-                        className="org-tree-card org-deputy-card text-center h-100"
+                        className="org-tree-card org-deputy-card text-center h-100 d-flex flex-column align-items-center"
                         onClick={() => setSelectedLeader(deputy)}
                         role="button"
                         tabIndex={0}
                         style={{ cursor: 'pointer' }}
                       >
-                        <OrgLeaderAvatar
-                          image={deputy.image}
-                          name={isKhmer ? deputy.nameKm : deputy.nameEn}
-                          size={80}
-                          icon="fa-user-graduate"
-                        />
+                        <div className="d-flex justify-content-center mb-3">
+                          <OrgLeaderAvatar
+                            image={deputy.image}
+                            name={isKhmer ? deputy.nameKm : deputy.nameEn}
+                            size={80}
+                            icon="fa-user-graduate"
+                          />
+                        </div>
                         <h5 className="fw-bold mb-1" style={{ color: '#07294D', fontSize: '1.1rem' }}>
                           {isKhmer ? deputy.nameKm : deputy.nameEn}
                         </h5>
@@ -795,9 +819,9 @@ export const OrganizationPage = () => {
                           <i className="fas fa-door-open me-1 text-secondary"></i>
                           {deputy.room}
                         </div>
-                        <div className="badge bg-light text-secondary rounded-pill px-3 py-1.5 border">
-                          <i className="fas fa-id-card me-1 text-primary"></i>
-                          {t('organization.viewProfile')}
+                        <div className="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 fw-semibold d-inline-flex align-items-center gap-1.5 mt-auto">
+                          <i className="fas fa-id-card"></i>
+                          <span>{t('organization.viewProfile')}</span>
                         </div>
                       </div>
                     </div>
