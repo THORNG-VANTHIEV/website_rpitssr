@@ -11,8 +11,8 @@ class NoticeController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $limit = (int) $request->input('limit', 20);
-        $notices = Notice::orderBy('date', 'desc')->paginate($limit);
+        $limit = (int) $request->input('limit', 50);
+        $notices = Notice::orderBy('isPinned', 'desc')->orderBy('date', 'desc')->paginate($limit);
 
         return response()->json($notices->items(), 200);
     }

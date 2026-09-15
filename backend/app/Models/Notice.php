@@ -9,6 +9,9 @@ class Notice extends BaseModel
     protected $fillable = [
         'title',
         'content',
+        'category',
+        'fileUrl',
+        'isPinned',
         'date',
     ];
 
