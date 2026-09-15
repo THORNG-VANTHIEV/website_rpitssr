@@ -28,7 +28,7 @@ class AdminUserController extends Controller
             });
         }
 
-        $limit = (int) $request->input('limit', 20);
+        $limit = (int) $request->input('limit', 100);
         $users = $query->orderBy('id', 'desc')->paginate($limit);
 
         return response()->json($users->items(), 200);

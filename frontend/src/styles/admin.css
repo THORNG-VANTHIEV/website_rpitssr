@@ -1295,3 +1295,228 @@
   border: 1px solid #fef08a;
 }
 
+/* =========================================================
+   Admin User Management Standards (Daylight Institutional)
+   ========================================================= */
+.admin-user-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--admin-border);
+  margin-bottom: 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.admin-user-filter-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.admin-user-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  background: #f8fafc;
+  color: #64748b;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-user-filter-pill:hover {
+  background: #f1f5f9;
+  color: #07294D;
+}
+
+.admin-user-filter-pill.active {
+  background: #eff6ff;
+  color: #1e73be;
+  border-color: #bfdbfe;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(30, 115, 190, 0.08);
+}
+
+.admin-user-filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #e2e8f0;
+  color: #475569;
+  transition: all 0.2s ease;
+}
+
+.admin-user-filter-pill.active .admin-user-filter-count {
+  background: #1e73be;
+  color: #ffffff;
+}
+
+/* User Avatar Standards */
+.admin-user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.88rem;
+  flex-shrink: 0;
+  position: relative;
+  letter-spacing: 0.5px;
+}
+
+.admin-user-avatar.role-admin {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1.5px solid #fecaca;
+}
+
+.admin-user-avatar.role-sub_admin {
+  background: #e0e7ff;
+  color: #4338ca;
+  border: 1.5px solid #c7d2fe;
+}
+
+.admin-user-avatar.role-teacher {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1.5px solid #fde68a;
+}
+
+.admin-user-avatar.role-student {
+  background: #eff6ff;
+  color: #1e73be;
+  border: 1.5px solid #bfdbfe;
+}
+
+.admin-user-avatar-role-dot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-username-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #07294D;
+  font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.admin-action-btn-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.admin-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--admin-border);
+  background: #ffffff;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.admin-icon-btn:hover {
+  background: #f8fafc;
+  color: #07294D;
+  border-color: #cbd5e1;
+}
+
+.admin-icon-btn.primary:hover {
+  background: #eff6ff;
+  color: #1e73be;
+  border-color: #bfdbfe;
+}
+
+.admin-icon-btn.warning:hover {
+  background: #fffbeb;
+  color: #d97706;
+  border-color: #fde68a;
+}
+
+.admin-icon-btn.danger:hover {
+  background: #fef2f2;
+  color: #ef4444;
+  border-color: #fecaca;
+}
+
+/* Modal Form Sections */
+.admin-modal-section-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.admin-modal-section-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #07294D;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-input-with-action {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.admin-input-action-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.15s ease;
+}
+
+.admin-input-action-btn:hover {
+  color: #07294D;
+}
+
+
