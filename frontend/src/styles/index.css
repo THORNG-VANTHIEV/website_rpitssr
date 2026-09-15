@@ -6520,13 +6520,41 @@ i {
   transform: translateX(4px);
 }
 
+.blog-spotlight-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.blog-spotlight-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.blog-spotlight-meta-item i {
+  color: #1e73be;
+  font-size: 0.95rem;
+}
+
+.blog-spotlight-meta-divider {
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  user-select: none;
+}
+
 .blog-spotlight-cat-tag {
   position: static !important;
   display: inline-flex;
   align-items: center;
   font-size: 0.76rem;
   font-weight: 700;
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: 20px;
   letter-spacing: 0.3px;
   width: fit-content;

@@ -464,18 +464,18 @@ export const BlogPage = () => {
 
                         <div className="col-lg-6 blog-spotlight-body">
                           {/* Category Tag & Metadata */}
-                          <div className="d-flex align-items-center flex-wrap gap-2.5 mb-3">
+                          <div className="blog-spotlight-meta">
                             <span className="blog-spotlight-cat-tag" style={spotlightCatStyle}>
                               {spotlightCatName}
                             </span>
-                            <span className="text-muted small d-inline-flex align-items-center gap-1.5 ms-1">
-                              <i className="far fa-calendar-alt text-primary"></i>
-                              {formatKhmerDate(spotlightPost.publishedAt || spotlightPost.createdAt, isKhmer)}
+                            <span className="blog-spotlight-meta-item">
+                              <i className="far fa-calendar-alt"></i>
+                              <span>{formatKhmerDate(spotlightPost.publishedAt || spotlightPost.createdAt, isKhmer)}</span>
                             </span>
-                            <span className="text-muted small">•</span>
-                            <span className="text-muted small d-inline-flex align-items-center gap-1.5">
-                              <i className="far fa-user text-primary"></i>
-                              {spotlightPost.author || 'RPITSSR Press'}
+                            <span className="blog-spotlight-meta-divider">•</span>
+                            <span className="blog-spotlight-meta-item">
+                              <i className="far fa-user"></i>
+                              <span>{spotlightPost.author || 'RPITSSR Press'}</span>
                             </span>
                           </div>
 
@@ -502,12 +502,12 @@ export const BlogPage = () => {
                             </Link>
 
                             <div className="d-flex align-items-center gap-3 text-muted small">
-                              <span className="d-inline-flex align-items-center gap-1.5">
+                              <span className="d-inline-flex align-items-center gap-2">
                                 <i className="far fa-clock text-primary"></i>
                                 <span>{isKhmer ? 'អាន ៣ នាទី' : '3 min read'}</span>
                               </span>
                               {spotlightPost.viewCount !== undefined && spotlightPost.viewCount > 0 && (
-                                <span className="d-inline-flex align-items-center gap-1.5">
+                                <span className="d-inline-flex align-items-center gap-2">
                                   <i className="far fa-eye text-secondary"></i>
                                   <span>{spotlightPost.viewCount}</span>
                                 </span>
