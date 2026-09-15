@@ -1998,6 +1998,220 @@
   border: 1px solid #fde68a;
 }
 
+/* =========================================================
+   Admin Scrolling Banners & Ticker Simulator Styles
+   ========================================================= */
+.admin-ticker-preview-card {
+  background: linear-gradient(135deg, #07294D 0%, #0d3c61 100%);
+  border-radius: 16px;
+  padding: 18px 22px;
+  color: #ffffff;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 25px rgba(7, 41, 77, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-ticker-preview-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ffaf00, #1e73be, #10b981);
+}
+
+.admin-ticker-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-ticker-live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #ffffff;
+}
+
+.admin-ticker-pulse-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: adminPulse 1.8s infinite;
+}
+
+.admin-ticker-pulse-dot.paused {
+  background-color: #f59e0b;
+  animation: none;
+}
+
+@keyframes adminPulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.admin-ticker-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-ticker-btn-control {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-ticker-btn-control:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.admin-ticker-track-container {
+  overflow: hidden;
+  position: relative;
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 10px;
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+}
+
+.admin-ticker-track-container::before,
+.admin-ticker-track-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 45px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.admin-ticker-track-container::before {
+  left: 0;
+  background: linear-gradient(90deg, rgba(7, 41, 77, 0.95) 0%, transparent 100%);
+}
+
+.admin-ticker-track-container::after {
+  right: 0;
+  background: linear-gradient(270deg, rgba(7, 41, 77, 0.95) 0%, transparent 100%);
+}
+
+.admin-ticker-track-content {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: adminTickerMarquee 28s linear infinite;
+  gap: 28px;
+}
+
+.admin-ticker-track-content.paused {
+  animation-play-state: paused !important;
+}
+
+@keyframes adminTickerMarquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.admin-ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.92rem;
+  color: #f8fafc;
+  font-weight: 500;
+}
+
+.admin-ticker-separator {
+  color: #ffaf00;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.admin-banner-order-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #07294D;
+  font-weight: 700;
+  font-size: 0.82rem;
+  border: 1px solid #cbd5e1;
+}
+
+.admin-banner-char-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  font-weight: 600;
+}
+
+.admin-banner-preview-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: #07294D;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.admin-quick-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #1e73be;
+  border: 1px solid #bfdbfe;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.admin-quick-tag-chip:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  transform: translateY(-1px);
+}
+
+
 
 
 

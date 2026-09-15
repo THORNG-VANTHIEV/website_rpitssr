@@ -14,6 +14,8 @@ export const AdminDataTable = ({
   searchPlaceholder,
   customHeaderActions,
   keyField = 'id',
+  hideSearch = false,
+  hideHeader = false,
 }) => {
   const { currentLanguage } = useLanguage();
   const isKhmer = currentLanguage === 'km';
@@ -23,7 +25,7 @@ export const AdminDataTable = ({
 
   // Filter data based on search term
   const filteredData = data.filter((item) => {
-    if (!searchTerm) return true;
+    if (!searchTerm || hideSearch) return true;
     const term = searchTerm.toLowerCase();
     return Object.values(item).some((val) => {
       if (val === null || val === undefined) return false;
@@ -38,28 +40,31 @@ export const AdminDataTable = ({
 
   return (
     <div className="admin-card">
-      <div className="admin-card-header" style={{ flexWrap: 'wrap', gap: '16px' }}>
-        <div>
-          <h3 className="admin-card-title">{title}</h3>
-          {subtitle && (
-            <p style={{ margin: '4px 0 0', fontSize: '0.82rem', color: 'var(--admin-text-muted)' }}>
-              {subtitle}
-            </p>
-          )}
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-          {/* Real-time search */}
-          <div className="admin-search-wrapper">
-            <Search className="admin-search-icon" size={16} />
-            <input
-              type="text"
-              className="admin-search-input"
-              placeholder={resolvedSearchPlaceholder}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      {!hideHeader && (
+        <div className="admin-card-header" style={{ flexWrap: 'wrap', gap: '16px' }}>
+          <div>
+            <h3 className="admin-card-title">{title}</h3>
+            {subtitle && (
+              <p style={{ margin: '4px 0 0', fontSize: '0.82rem', color: 'var(--admin-text-muted)' }}>
+                {subtitle}
+              </p>
+            )}
           </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            {/* Real-time search */}
+            {!hideSearch && (
+              <div className="admin-search-wrapper">
+                <Search className="admin-search-icon" size={16} />
+                <input
+                  type="text"
+                  className="admin-search-input"
+                  placeholder={resolvedSearchPlaceholder}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            )}
 
           {onRefresh && (
             <button
@@ -82,6 +87,7 @@ export const AdminDataTable = ({
           )}
         </div>
       </div>
+      )}
 
       <div className="admin-table-container">
         <table className="admin-table">
