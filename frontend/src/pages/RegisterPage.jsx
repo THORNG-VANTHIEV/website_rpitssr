@@ -598,68 +598,55 @@ export const RegisterPage = () => {
                   </div>
 
                   {/* Terms & Conditions Agreement */}
-                  <div className="auth-terms-box">
-                    <div className="form-check mb-0">
+                  <div className={`auth-terms-box ${formData.agreeTerms ? 'checked' : ''}`}>
+                    <label className="auth-terms-label" htmlFor="agreeTermsCheckbox">
                       <input
-                        className="form-check-input"
                         type="checkbox"
                         id="agreeTermsCheckbox"
                         name="agreeTerms"
+                        className="auth-terms-checkbox"
                         checked={formData.agreeTerms}
                         onChange={handleChange}
                         required
-                        style={{ cursor: 'pointer' }}
                       />
-                      <label
-                        className="form-check-label"
-                        htmlFor="agreeTermsCheckbox"
-                        style={{
-                          fontSize: '0.86rem',
-                          color: '#334155',
-                          cursor: 'pointer',
-                          userSelect: 'none',
-                          lineHeight: 1.5
-                        }}
-                      >
+                      <span className="auth-terms-text">
                         {isKhmer ? (
                           <>
                             ខ្ញុំយល់ព្រមតាម{' '}
                             <button
                               type="button"
-                              className="btn btn-link p-0 text-decoration-none"
-                              style={{
-                                color: '#1e73be',
-                                fontWeight: 700,
-                                fontSize: 'inherit',
-                                verticalAlign: 'baseline'
+                              className="auth-terms-link-btn"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setShowTermsModal(true);
                               }}
-                              onClick={() => setShowTermsModal(true)}
                             >
                               លក្ខខណ្ឌប្រើប្រាស់
                             </button>{' '}
-                            និងគោលការណ៍រក្សាការសម្ងាត់របស់វិទ្យាស្ថាន RPITSSR
+                            និងគោលការណ៍រក្សាការសម្ងាត់របស់វិទ្យាស្ថាន{' '}
+                            <span className="auth-terms-brand">RPITSSR</span>
                           </>
                         ) : (
                           <>
                             I agree to the{' '}
                             <button
                               type="button"
-                              className="btn btn-link p-0 text-decoration-none"
-                              style={{
-                                color: '#1e73be',
-                                fontWeight: 700,
-                                fontSize: 'inherit',
-                                verticalAlign: 'baseline'
+                              className="auth-terms-link-btn"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setShowTermsModal(true);
                               }}
-                              onClick={() => setShowTermsModal(true)}
                             >
                               Terms of Service
                             </button>{' '}
-                            and Academic Privacy Policy
+                            and Academic Privacy Policy of{' '}
+                            <span className="auth-terms-brand">RPITSSR</span>
                           </>
                         )}
-                      </label>
-                    </div>
+                      </span>
+                    </label>
                   </div>
 
                   {/* Submit Button */}
