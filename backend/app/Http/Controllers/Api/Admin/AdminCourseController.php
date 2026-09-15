@@ -21,7 +21,7 @@ class AdminCourseController extends Controller
             });
         }
 
-        $limit = (int) $request->input('limit', 20);
+        $limit = (int) $request->input('limit', 100);
         $courses = $query->orderBy('createdAt', 'desc')->paginate($limit);
 
         return response()->json($courses->items(), 200);
