@@ -425,8 +425,13 @@ export const LoginPage = () => {
                   </div>
 
                   {/* Register Link Footer */}
-                  <div className="text-center mt-4 pt-3 border-top" style={{ fontSize: '0.9rem', color: '#64748b' }}>
-                    <span>{isKhmer ? 'មិនទាន់មានគណនីមែនទេ? ' : "Don't have an account? "}</span>
+                  <div
+                    className="d-flex align-items-center justify-content-center flex-wrap gap-2 text-center mt-4 pt-3 border-top"
+                    style={{ fontSize: '0.92rem', color: '#64748b' }}
+                  >
+                    <span>
+                      {isKhmer ? 'មិនទាន់មានគណនីមែនទេ?' : "Don't have an account?"}
+                    </span>
                     <Link
                       to="/register"
                       style={{ color: '#1e73be', fontWeight: 700, textDecoration: 'none' }}

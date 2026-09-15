@@ -679,11 +679,11 @@ export const RegisterPage = () => {
 
                   {/* Login Link Footer */}
                   <div
-                    className="text-center mt-4 pt-3 border-top"
-                    style={{ fontSize: '0.9rem', color: '#64748b' }}
+                    className="d-flex align-items-center justify-content-center flex-wrap gap-2 text-center mt-4 pt-3 border-top"
+                    style={{ fontSize: '0.92rem', color: '#64748b' }}
                   >
                     <span>
-                      {isKhmer ? 'មានគណនីរួចរាល់ហើយមែនទេ? ' : 'Already have an account? '}
+                      {isKhmer ? 'មានគណនីរួចរាល់ហើយមែនទេ?' : 'Already have an account?'}
                     </span>
                     <Link
                       to="/login"
