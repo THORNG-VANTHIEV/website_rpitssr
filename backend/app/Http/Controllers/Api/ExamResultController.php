@@ -14,7 +14,7 @@ class ExamResultController extends Controller
         $query = ExamResult::where('isPublished', true);
 
         if ($request->has('courseName') && !empty($request->courseName)) {
-            $query->where('courseName', $request->courseName);
+            $query->where('courseName', 'like', '%' . $request->courseName . '%');
         }
 
         if ($request->has('semester') && !empty($request->semester)) {
@@ -30,10 +30,24 @@ class ExamResultController extends Controller
         }
 
         if ($request->has('studentId') && !empty($request->studentId)) {
-            $query->where('studentId', $request->studentId);
+            $query->where('studentId', 'like', '%' . $request->studentId . '%');
         }
 
-        $limit = (int) $request->input('limit', 20);
+        if ($request->has('search') && !empty($request->search)) {
+            $s = trim($request->search);
+            $query->where(function ($q) use ($s) {
+                $q->where('courseName', 'like', "%{$s}%")
+                  ->orWhere('studentName', 'like', "%{$s}%")
+                  ->orWhere('studentId', 'like', "%{$s}%")
+                  ->orWhere('subject', 'like', "%{$s}%")
+                  ->orWhere('className', 'like', "%{$s}%")
+                  ->orWhere('examName', 'like', "%{$s}%");
+            });
+        }
+
+        $query->orderBy('examDate', 'desc')->orderBy('id', 'desc');
+
+        $limit = (int) $request->input('limit', 50);
         $results = $query->paginate($limit);
 
         return response()->json($results->items(), 200);
