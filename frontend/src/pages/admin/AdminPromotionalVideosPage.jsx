@@ -159,13 +159,33 @@ export const AdminPromotionalVideosPage = () => {
     };
   };
 
+  // Extract Unique Categories dynamically from actual video records
+  const uniqueCategories = useMemo(() => {
+    const cats = [];
+    videos.forEach((v) => {
+      const cat = (v.category || '').trim();
+      if (cat && !cats.includes(cat)) {
+        cats.push(cat);
+      }
+    });
+    return cats;
+  }, [videos]);
+
   // KPI Calculations
   const totalVideos = videos.length;
   const featuredVideos = videos.filter((v) => v.is_featured).length;
   const activeVideos = videos.filter((v) => v.is_active).length;
-  const tvetScholarshipVideos = videos.filter(
-    (v) => (v.category || '').includes('100%') || (v.category || '').includes('1.5M')
-  ).length;
+  const tvetScholarshipVideos = videos.filter((v) => {
+    const cat = v.category || '';
+    return (
+      cat.includes('100%') ||
+      cat.includes('១០០%') ||
+      cat.includes('អាហារូបករណ៍') ||
+      cat.includes('1.5M') ||
+      cat.includes('១.៥') ||
+      cat.includes('TVET')
+    );
+  }).length;
 
   // Filtered Videos
   const filteredVideos = useMemo(() => {
@@ -177,11 +197,13 @@ export const AdminPromotionalVideosPage = () => {
         v.category?.toLowerCase().includes(searchTerm.toLowerCase());
 
       let matchFilter = true;
-      if (selectedFilter === 'featured') matchFilter = Boolean(v.is_featured);
-      else if (selectedFilter === 'scholarship') matchFilter = (v.category || '').includes('100%');
-      else if (selectedFilter === 'tvet') matchFilter = (v.category || '').includes('1.5M');
-      else if (selectedFilter === 'ict') matchFilter = (v.category || '').includes('ICT') || (v.category || '').includes('ព័ត៌មានវិទ្យា');
-      else if (selectedFilter === 'other') matchFilter = (v.category || '').includes('សម្ភាសន៍') || (v.category || '').includes('ទស្សនកិច្ច');
+      if (selectedFilter === 'all') {
+        matchFilter = true;
+      } else if (selectedFilter === 'featured') {
+        matchFilter = Boolean(v.is_featured);
+      } else {
+        matchFilter = (v.category || '').trim() === selectedFilter;
+      }
 
       return matchSearch && matchFilter;
     });
@@ -870,62 +892,31 @@ export const AdminPromotionalVideosPage = () => {
             {isKhmer ? 'Featured ចម្បង' : 'Featured'} ({featuredVideos})
           </button>
 
-          <button
-            type="button"
-            onClick={() => setSelectedFilter('scholarship')}
-            style={{
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              fontSize: '0.82rem',
-              fontWeight: 600,
-              border: '1px solid',
-              borderColor: selectedFilter === 'scholarship' ? '#1e73be' : '#e2e8f0',
-              backgroundColor: selectedFilter === 'scholarship' ? '#eff6ff' : '#ffffff',
-              color: selectedFilter === 'scholarship' ? '#1e73be' : '#64748b',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            {isKhmer ? 'អាហារូបករណ៍ ១០០%' : '100% Scholarship'}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setSelectedFilter('tvet')}
-            style={{
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              fontSize: '0.82rem',
-              fontWeight: 600,
-              border: '1px solid',
-              borderColor: selectedFilter === 'tvet' ? '#1e73be' : '#e2e8f0',
-              backgroundColor: selectedFilter === 'tvet' ? '#eff6ff' : '#ffffff',
-              color: selectedFilter === 'tvet' ? '#1e73be' : '#64748b',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            {isKhmer ? 'កម្មវិធី TVET 1.5M' : 'TVET 1.5M'}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setSelectedFilter('ict')}
-            style={{
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              fontSize: '0.82rem',
-              fontWeight: 600,
-              border: '1px solid',
-              borderColor: selectedFilter === 'ict' ? '#1e73be' : '#e2e8f0',
-              backgroundColor: selectedFilter === 'ict' ? '#eff6ff' : '#ffffff',
-              color: selectedFilter === 'ict' ? '#1e73be' : '#64748b',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            {isKhmer ? 'ដេប៉ាតឺម៉ង់ ICT' : 'ICT Department'}
-          </button>
+          {uniqueCategories.map((cat) => {
+            const count = videos.filter((v) => (v.category || '').trim() === cat).length;
+            const isSelected = selectedFilter === cat;
+            return (
+              <button
+                type="button"
+                key={cat}
+                onClick={() => setSelectedFilter(cat)}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: '9999px',
+                  fontSize: '0.82rem',
+                  fontWeight: isSelected ? 700 : 600,
+                  border: '1px solid',
+                  borderColor: isSelected ? '#1e73be' : '#e2e8f0',
+                  backgroundColor: isSelected ? '#eff6ff' : '#ffffff',
+                  color: isSelected ? '#1e73be' : '#64748b',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                {cat} ({count})
+              </button>
+            );
+          })}
         </div>
 
         {/* Live Search */}
