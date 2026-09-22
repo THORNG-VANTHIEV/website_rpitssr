@@ -49,10 +49,16 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
   };
 
+  const logoutAll = async () => {
+    await authService.logoutAll();
+    setUser(null);
+    setToken(null);
+  };
+
   const isAdmin = user && (user.role === 'admin' || user.role === 'sub_admin');
 
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated: !!token, isAdmin, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, isAuthenticated: !!token, isAdmin, loading, login, logout, logoutAll, clearSession: authService.clearSession }}>
       {children}
     </AuthContext.Provider>
   );

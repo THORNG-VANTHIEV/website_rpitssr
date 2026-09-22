@@ -11,6 +11,7 @@ import {
   Phone,
   Mail,
   Plus,
+  ArrowRight,
   RefreshCw,
   Edit2,
   Trash2,
@@ -380,6 +381,190 @@ export const AdminTeachersPage = () => {
     },
   ];
 
+  // Mobile Card Renderer (< 768px viewports)
+  const renderMobileCard = (row) => {
+    const des = row.designation || 'Lecturer';
+    const isHead = /director|head|dean|president|ប្រធាន|នាយក/i.test(des);
+
+    return (
+      <div className="admin-user-mobile-card">
+        {/* Top: Avatar, Name, Designation & Role Badge */}
+        <div className="admin-user-mobile-card-top">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+            <div className="admin-teacher-avatar-wrapper" style={{ width: '44px', height: '44px', flexShrink: 0 }}>
+              <img
+                src={row.imageUrl || '/images/teacher-all.jpg'}
+                alt={row.name}
+                className="admin-teacher-avatar-img"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = '/images/teacher-all.jpg';
+                }}
+              />
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div
+                style={{
+                  fontWeight: '700',
+                  color: '#07294D',
+                  fontSize: '0.92rem',
+                  lineHeight: 1.3,
+                  wordBreak: 'break-word',
+                }}
+              >
+                {row.name}
+              </div>
+              <div
+                style={{
+                  fontSize: '0.78rem',
+                  color: '#64748b',
+                  marginTop: '2px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+              >
+                <span>{des}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Role / Leadership Badge */}
+          <div style={{ flexShrink: 0 }}>
+            {isHead ? (
+              <span
+                className="admin-badge admin-badge-warning"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', padding: '3px 8px' }}
+              >
+                <Award size={12} />
+                <span>{isKhmer ? 'ថ្នាក់ដឹកនាំ' : 'Leader'}</span>
+              </span>
+            ) : (
+              <span
+                className="admin-badge admin-badge-info"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', padding: '3px 8px' }}
+              >
+                <GraduationCap size={12} />
+                <span>{isKhmer ? 'សាស្ត្រាចារ្យ' : 'Faculty'}</span>
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Details Block: Department, Subject, Email & Phone */}
+        <div className="admin-user-mobile-card-details">
+          {/* Department */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.80rem', color: '#1e73be', fontWeight: '600' }}>
+            <Building2 size={13} style={{ flexShrink: 0 }} />
+            <span>{row.department || (isKhmer ? 'ដេប៉ាតឺម៉ង់ទូទៅ' : 'General Department')}</span>
+          </div>
+
+          {/* Subject / Specialization if present */}
+          {row.subject && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#334155', marginTop: '5px' }}>
+              <BookOpen size={13} style={{ color: '#059669', flexShrink: 0 }} />
+              <span style={{ fontWeight: '500' }}>{row.subject}</span>
+            </div>
+          )}
+
+          {/* Email */}
+          {row.email && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#64748b', marginTop: '5px' }}>
+              <Mail size={13} style={{ color: '#94a3b8', flexShrink: 0 }} />
+              <span style={{ wordBreak: 'break-all' }}>{row.email}</span>
+            </div>
+          )}
+
+          {/* Phone & Experience footer row */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: '8px',
+              paddingTop: '6px',
+              borderTop: '1px dashed #e2e8f0',
+              fontSize: '0.75rem',
+            }}
+          >
+            {row.phone ? (
+              <a
+                href={`tel:${row.phone.replace(/\s+/g, '')}`}
+                style={{
+                  color: '#1e73be',
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontWeight: '600',
+                }}
+              >
+                <Phone size={12} />
+                <span>{row.phone}</span>
+              </a>
+            ) : (
+              <span style={{ color: '#94a3b8' }}>{isKhmer ? 'គ្មានលេខទូរស័ព្ទ' : 'No phone'}</span>
+            )}
+
+            {row.experience ? (
+              <span
+                style={{
+                  color: '#ea580c',
+                  background: '#fff7ed',
+                  border: '1px solid #fed7aa',
+                  padding: '2px 8px',
+                  borderRadius: '9999px',
+                  fontSize: '0.70rem',
+                  fontWeight: '600',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  maxWidth: '160px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                <Briefcase size={11} />
+                <span>{row.experience}</span>
+              </span>
+            ) : null}
+          </div>
+        </div>
+
+        {/* Action Buttons Bar */}
+        <div className="admin-user-mobile-card-actions">
+          <button
+            onClick={() => handleOpenPreview(row)}
+            className="admin-user-mobile-action-btn view"
+            title={isKhmer ? 'មើលប្រវត្តិរូប' : 'View Profile'}
+          >
+            <Eye size={13} />
+            <span>{isKhmer ? 'ប្រវត្តិរូប' : 'Profile'}</span>
+          </button>
+
+          <button
+            onClick={() => handleOpenEdit(row)}
+            className="admin-user-mobile-action-btn edit"
+            title={isKhmer ? 'កែសម្រួល' : 'Edit'}
+          >
+            <Edit2 size={13} />
+            <span>{isKhmer ? 'កែសម្រួល' : 'Edit'}</span>
+          </button>
+
+          <button
+            onClick={() => handleOpenDelete(row)}
+            className="admin-user-mobile-action-btn delete"
+            title={isKhmer ? 'លុប' : 'Delete'}
+          >
+            <Trash2 size={13} />
+            <span>{isKhmer ? 'លុប' : 'Delete'}</span>
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={{ maxWidth: '1440px', margin: '0 auto', paddingBottom: '40px' }}>
       {/* Floating Alert Toast */}
@@ -425,6 +610,7 @@ export const AdminTeachersPage = () => {
 
       {/* Header Banner */}
       <div
+        className="admin-teachers-header"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -471,7 +657,7 @@ export const AdminTeachersPage = () => {
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="admin-teachers-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button
             onClick={fetchData}
             className="admin-btn admin-btn-outline"
@@ -499,79 +685,108 @@ export const AdminTeachersPage = () => {
       </div>
 
       {/* 4-Card Institutional KPI Metric Strip */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap: '16px',
-          marginBottom: '24px',
-        }}
-      >
+      <div className="admin-kpi-grid admin-teacher-kpis">
         {/* Total Teachers */}
         <div className="admin-kpi-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div className="admin-kpi-icon-badge" style={{ background: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}>
-              <GraduationCap size={22} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'សាស្ត្រាចារ្យសរុប' : 'Total Faculty'}</span>
+              <div className="admin-kpi-value">{metrics.total}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#1e73be' }} />
+                <span>{isKhmer ? 'សាស្ត្រាចារ្យ និងគ្រូឧទ្ទេសសកម្ម' : 'Active academic educators'}</span>
+              </div>
             </div>
-            <span className="admin-kpi-tag" style={{ background: '#eff6ff', color: '#1e73be' }}>
-              {isKhmer ? 'សរុប' : 'Total'}
-            </span>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#eff6ff', color: '#1e73be' }}>
+                {isKhmer ? 'សរុប' : 'Total'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}>
+                <GraduationCap size={24} />
+              </div>
+            </div>
           </div>
-          <div className="admin-kpi-value">{metrics.total}</div>
-          <div className="admin-kpi-title">{isKhmer ? 'សាស្ត្រាចារ្យសរុប' : 'Total Faculty'}</div>
-          <div className="admin-kpi-subtitle">
-            <span>{isKhmer ? 'សាស្ត្រាចារ្យ និងគ្រូឧទ្ទេសសកម្ម' : 'Active academic educators'}</span>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'គ្រប់គ្រងគ្រូបង្រៀន' : 'Manage faculty'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* Department Heads & Leaders */}
         <div className="admin-kpi-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div className="admin-kpi-icon-badge" style={{ background: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa' }}>
-              <Award size={22} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'ប្រធានដេប៉ាតឺម៉ង់' : 'Department Heads & Execs'}</span>
+              <div className="admin-kpi-value">{metrics.leaders}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#ea580c' }} />
+                <span>{isKhmer ? 'ថ្នាក់ដឹកនាំ និងប្រធានផ្នែក' : 'Departmental leadership'}</span>
+              </div>
             </div>
-            <span className="admin-kpi-tag" style={{ background: '#fff7ed', color: '#ea580c' }}>
-              {isKhmer ? 'ថ្នាក់ដឹកនាំ' : 'Leadership'}
-            </span>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#fff7ed', color: '#ea580c' }}>
+                {isKhmer ? 'ថ្នាក់ដឹកនាំ' : 'Leadership'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa' }}>
+                <Award size={24} />
+              </div>
+            </div>
           </div>
-          <div className="admin-kpi-value">{metrics.leaders}</div>
-          <div className="admin-kpi-title">{isKhmer ? 'ប្រធានដេប៉ាតឺម៉ង់' : 'Department Heads & Execs'}</div>
-          <div className="admin-kpi-subtitle">
-            <span>{isKhmer ? 'ថ្នាក់ដឹកនាំ និងប្រធានផ្នែក' : 'Departmental leadership'}</span>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'រចនាសម្ព័ន្ធដឹកនាំ' : 'Leadership structure'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* Academic Departments */}
         <div className="admin-kpi-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div className="admin-kpi-icon-badge" style={{ background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}>
-              <Building2 size={22} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'ដេប៉ាតឺម៉ង់ជំនាញ' : 'Specialized Departments'}</span>
+              <div className="admin-kpi-value">{metrics.depts}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#059669' }} />
+                <span>{isKhmer ? 'ផ្នែកបច្ចេកវិទ្យា និងវិស្វកម្ម' : 'Tech & Engineering faculties'}</span>
+              </div>
             </div>
-            <span className="admin-kpi-tag" style={{ background: '#f0fdf4', color: '#059669' }}>
-              {isKhmer ? 'ដេប៉ាតឺម៉ង់' : 'Depts'}
-            </span>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#f0fdf4', color: '#059669' }}>
+                {isKhmer ? 'ដេប៉ាតឺម៉ង់' : 'Depts'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}>
+                <Building2 size={24} />
+              </div>
+            </div>
           </div>
-          <div className="admin-kpi-value">{metrics.depts}</div>
-          <div className="admin-kpi-title">{isKhmer ? 'ដេប៉ាតឺម៉ង់ជំនាញ' : 'Specialized Departments'}</div>
-          <div className="admin-kpi-subtitle">
-            <span>{isKhmer ? 'ផ្នែកបច្ចេកវិទ្យា និងវិស្វកម្ម' : 'Tech & Engineering faculties'}</span>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'ដេប៉ាតឺម៉ង់បណ្តុះបណ្តាល' : 'Training departments'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* Advanced Qualifications */}
         <div className="admin-kpi-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div className="admin-kpi-icon-badge" style={{ background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}>
-              <BookOpen size={22} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'កម្រិតបណ្ឌិត & អនុបណ្ឌិត' : 'Postgraduate Degrees'}</span>
+              <div className="admin-kpi-value">{metrics.postgrad}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#7c3aed' }} />
+                <span>{isKhmer ? 'បណ្ឌិត និងអនុបណ្ឌិតជំនាញ' : 'Ph.D & Master holders'}</span>
+              </div>
             </div>
-            <span className="admin-kpi-tag" style={{ background: '#faf5ff', color: '#7c3aed' }}>
-              {isKhmer ? 'គុណវុឌ្ឍិ' : 'Degrees'}
-            </span>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#faf5ff', color: '#7c3aed' }}>
+                {isKhmer ? 'គុណវុឌ្ឍិ' : 'Degrees'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}>
+                <BookOpen size={24} />
+              </div>
+            </div>
           </div>
-          <div className="admin-kpi-value">{metrics.postgrad}</div>
-          <div className="admin-kpi-title">{isKhmer ? 'កម្រិតបណ្ឌិត & អនុបណ្ឌិត' : 'Postgraduate Degrees'}</div>
-          <div className="admin-kpi-subtitle">
-            <span>{isKhmer ? 'បណ្ឌិត និងអនុបណ្ឌិតជំនាញ' : 'Ph.D & Master holders'}</span>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'កម្រិតគុណវុឌ្ឍិខ្ពស់' : 'Advanced qualifications'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
       </div>
@@ -618,6 +833,7 @@ export const AdminTeachersPage = () => {
         addLabel={isKhmer ? 'បន្ថែមសាស្ត្រាចារ្យថ្មី' : 'Add New Teacher'}
         onRefresh={fetchData}
         searchPlaceholder={isKhmer ? 'ស្វែងរកតាមឈ្មោះ, អ៊ីមែល, ឬដេប៉ាតឺម៉ង់...' : 'Search teachers by name, email or department...'}
+        renderMobileCard={renderMobileCard}
       />
 
       {/* =========================================================

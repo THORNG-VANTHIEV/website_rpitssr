@@ -24,7 +24,8 @@ import {
   Check,
   Calendar,
   Building,
-  GraduationCap
+  GraduationCap,
+  ArrowRight
 } from 'lucide-react';
 
 export const AdminGalleryPage = () => {
@@ -399,10 +400,157 @@ export const AdminGalleryPage = () => {
     },
   ];
 
+  // Mobile Card Renderer (< 768px viewports in table mode)
+  const renderMobileCard = (row) => {
+    const meta = getCategoryMeta(row.category);
+    const IconComp = meta.icon;
+    const isActive = row.isActive !== false;
+
+    return (
+      <div className="admin-user-mobile-card">
+        {/* Top: Thumbnail, Title, Category Badge & Status */}
+        <div className="admin-user-mobile-card-top">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flex: 1 }}>
+            <div
+              className="admin-gallery-thumb-wrapper"
+              style={{ width: '56px', height: '42px', cursor: 'pointer', flexShrink: 0 }}
+              onClick={() => openLightbox(row)}
+            >
+              <img
+                src={row.imageUrl}
+                alt={row.title || ''}
+                className="admin-gallery-thumb-img"
+                onError={(e) => {
+                  e.target.src = '/images/gallery/school.jpg';
+                }}
+              />
+            </div>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div
+                style={{
+                  fontWeight: '700',
+                  color: '#07294D',
+                  fontSize: '0.90rem',
+                  lineHeight: 1.35,
+                  wordBreak: 'break-word',
+                }}
+              >
+                {row.title || (isKhmer ? 'រូបភាពគ្មានចំណងជើង' : 'Untitled Photo')}
+              </div>
+              <div style={{ marginTop: '4px' }}>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '2px 8px',
+                    borderRadius: '9999px',
+                    fontSize: '0.70rem',
+                    fontWeight: 700,
+                    background: meta.bg,
+                    color: meta.color,
+                    border: `1px solid ${meta.border}`,
+                  }}
+                >
+                  <IconComp size={10} />
+                  <span>{meta.label}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Status Badge */}
+          <div style={{ flexShrink: 0 }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '3px 8px',
+                borderRadius: '9999px',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                background: isActive ? '#f0fdf4' : '#f8fafc',
+                color: isActive ? '#166534' : '#64748b',
+                border: `1px solid ${isActive ? '#bbf7d0' : '#e2e8f0'}`,
+              }}
+            >
+              <span
+                style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  backgroundColor: isActive ? '#22c55e' : '#94a3b8',
+                }}
+              />
+              <span>{isActive ? (isKhmer ? 'បង្ហាញ' : 'Active') : (isKhmer ? 'លាក់' : 'Hidden')}</span>
+            </span>
+          </div>
+        </div>
+
+        {/* Details: Order & Description */}
+        <div className="admin-user-mobile-card-details">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: row.description ? '6px' : '0' }}>
+            <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
+              {isKhmer ? 'លំដាប់បង្ហាញ៖' : 'Order:'} <strong>#{row.order ?? 0}</strong>
+            </span>
+          </div>
+
+          {row.description && (
+            <div
+              style={{
+                fontSize: '0.76rem',
+                color: '#64748b',
+                paddingTop: '6px',
+                borderTop: '1px dashed #e2e8f0',
+                lineHeight: 1.4,
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
+              {row.description}
+            </div>
+          )}
+        </div>
+
+        {/* Actions Bar */}
+        <div className="admin-user-mobile-card-actions">
+          <button
+            onClick={() => openLightbox(row)}
+            className="admin-user-mobile-action-btn view"
+            title={isKhmer ? 'មើលរូបភាពធំ' : 'View Full Image'}
+          >
+            <Eye size={13} />
+            <span>{isKhmer ? 'មើលរូបភាព' : 'View'}</span>
+          </button>
+          <button
+            onClick={() => openEditModal(row)}
+            className="admin-user-mobile-action-btn edit"
+            title={isKhmer ? 'កែសម្រួល' : 'Edit Photo'}
+          >
+            <Edit2 size={13} />
+            <span>{isKhmer ? 'កែប្រែ' : 'Edit'}</span>
+          </button>
+          <button
+            onClick={() => openDeleteModal(row)}
+            className="admin-user-mobile-action-btn delete"
+            title={isKhmer ? 'លុប' : 'Delete Photo'}
+          >
+            <Trash2 size={13} />
+            <span>{isKhmer ? 'លុប' : 'Delete'}</span>
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div>
       {/* 1. Institutional Header Banner */}
       <div
+        className="admin-gallery-header"
         style={{
           background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
           borderRadius: '20px',
@@ -434,27 +582,28 @@ export const AdminGalleryPage = () => {
             }}
           >
             <ImageIcon size={14} />
-            {isKhmer ? 'ការគ្រប់គ្រងវិចិត្រសាលរូបភាពស្ថាប័ន' : 'Institutional Photo Gallery & Media Vault'}
+            <span>{isKhmer ? 'ការគ្រប់គ្រងវិចិត្រសាលរូបភាពស្ថាប័ន' : 'Institutional Photo Gallery & Media Vault'}</span>
           </div>
           <h1
             style={{
-              fontSize: '1.6rem',
+              fontSize: '1.65rem',
               fontWeight: 800,
               color: '#07294D',
               margin: '0 0 6px 0',
               lineHeight: 1.2,
+              letterSpacing: '-0.3px',
             }}
           >
             {isKhmer ? 'វិចិត្រសាលរូបភាពស្ថាប័ន' : 'Campus Photo Gallery'}
           </h1>
-          <p style={{ margin: 0, color: '#64748b', fontSize: '0.88rem' }}>
+          <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>
             {isKhmer
               ? 'គ្រប់គ្រងរូបភាពសកម្មភាពសិក្សា សិក្ខាសាលា រោងជាងបច្ចេកវិទ្យា ពិធីប្រគល់សញ្ញាបត្រ និងទិដ្ឋភាពបរិវេណវិទ្យាស្ថាន'
-              : 'Manage high-resolution institutional photos, laboratory workshops, campus life, and event showcases'}
+              : 'Manage high-resolution institutional photos, laboratory workshops, campus life, and event showcases.'}
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="admin-gallery-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
           {/* Dual View Toggle */}
           <div
             style={{
@@ -485,7 +634,7 @@ export const AdminGalleryPage = () => {
               }}
             >
               <LayoutGrid size={14} />
-              {isKhmer ? 'ផ្ទាំងកាត' : 'Grid'}
+              <span>{isKhmer ? 'ផ្ទាំងកាត' : 'Grid'}</span>
             </button>
             <button
               type="button"
@@ -507,7 +656,7 @@ export const AdminGalleryPage = () => {
               }}
             >
               <List size={14} />
-              {isKhmer ? 'តារាង' : 'Table'}
+              <span>{isKhmer ? 'តារាង' : 'Table'}</span>
             </button>
           </div>
 
@@ -515,17 +664,10 @@ export const AdminGalleryPage = () => {
             onClick={fetchData}
             disabled={loading}
             className="admin-btn admin-btn-outline"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              borderRadius: '12px',
-              padding: '9px 16px',
-              fontWeight: 600,
-            }}
+            title={isKhmer ? 'ធ្វើបច្ចុប្បន្នភាព' : 'Refresh'}
           >
             <RotateCw size={15} className={loading ? 'fa-spin' : ''} />
-            {isKhmer ? 'ធ្វើបច្ចុប្បន្នភាព' : 'Refresh'}
+            <span>{isKhmer ? 'ធ្វើបច្ចុប្បន្នភាព' : 'Refresh'}</span>
           </button>
           <button
             onClick={openAddModal}
@@ -534,283 +676,168 @@ export const AdminGalleryPage = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              borderRadius: '12px',
-              padding: '9px 18px',
-              fontWeight: 600,
-              background: 'linear-gradient(135deg, #07294D 0%, #1e73be 100%)',
-              border: 'none',
-              boxShadow: '0 4px 12px rgba(7, 41, 77, 0.15)',
+              boxShadow: '0 4px 14px rgba(7, 41, 77, 0.15)',
             }}
           >
             <Plus size={16} />
-            {isKhmer ? 'បង្ហោះរូបភាពថ្មី' : 'Add Photo'}
+            <span>{isKhmer ? 'បង្ហោះរូបភាពថ្មី' : 'Add Photo'}</span>
           </button>
         </div>
       </div>
 
       {/* 2. 4-Card Institutional KPI Metric Strip */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '16px',
-          marginBottom: '24px',
-        }}
-      >
+      <div className="admin-kpi-grid admin-gallery-kpis">
         {/* KPI 1: Total Photos */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
-        >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#eff6ff',
-              color: '#1e73be',
-              border: '1px solid #dbeafe',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <ImageIcon size={22} />
+        <div className="admin-kpi-card" onClick={() => setSelectedCategory('all')}>
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'រូបភាពសរុប' : 'Total Photos'}</span>
+              <div className="admin-kpi-value">{totalPhotos}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#1e73be' }} />
+                <span>{isKhmer ? 'បណ្ណាល័យរូបភាពស្ថាប័ន' : 'Institutional media vault'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#eff6ff', color: '#1e73be' }}>
+                {isKhmer ? 'សរុប' : 'Total'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}>
+                <ImageIcon size={22} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'រូបភាពសរុប' : 'Total Photos'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {totalPhotos} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#1e73be' }}>{isKhmer ? 'សន្លឹក' : 'Images'}</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'រូបភាពទាំងអស់' : 'All photos'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* KPI 2: Active Showcase */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
-        >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#f0fdf4',
-              color: '#059669',
-              border: '1px solid #bbf7d0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <CheckCircle2 size={22} />
+        <div className="admin-kpi-card">
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'ស្ថានភាពបង្ហាញ' : 'Active Showcase'}</span>
+              <div className="admin-kpi-value">{activePhotos} / {totalPhotos}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#059669' }} />
+                <span>{isKhmer ? 'កំពុងផ្សាយលើគេហទំព័រ' : 'Published on portal'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#f0fdf4', color: '#059669' }}>
+                {isKhmer ? 'សកម្ម' : 'Active'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}>
+                <CheckCircle2 size={22} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'ស្ថានភាពបង្ហាញ' : 'Active Showcase'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {activePhotos} / {totalPhotos}{' '}
-              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#059669' }}>(100%)</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'ស្ថានភាពរូបភាព' : 'Active photos'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* KPI 3: Academic & Labs */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
-        >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#faf5ff',
-              color: '#7c3aed',
-              border: '1px solid #e9d5ff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <GraduationCap size={22} />
+        <div className="admin-kpi-card" onClick={() => setSelectedCategory('academic')}>
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'អាល់ប៊ុមសិក្សា & រោងជាង' : 'Academic & Labs'}</span>
+              <div className="admin-kpi-value">{academicPhotos}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#7c3aed' }} />
+                <span>{isKhmer ? 'សកម្មភាពសិក្សាជាក់ស្តែង' : 'Classrooms & workshops'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#faf5ff', color: '#7c3aed' }}>
+                {isKhmer ? 'សិក្សា' : 'Academic'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}>
+                <GraduationCap size={22} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'អាល់ប៊ុមសិក្សា & រោងជាង' : 'Academic & Labs'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {academicPhotos} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#7c3aed' }}>{isKhmer ? 'សន្លឹក' : 'Photos'}</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'រូបភាពសិក្សា' : 'Academic album'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* KPI 4: Campus Life & Events */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
-        >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#fff7ed',
-              color: '#ea580c',
-              border: '1px solid #fed7aa',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <Building size={22} />
+        <div className="admin-kpi-card" onClick={() => setSelectedCategory('campus')}>
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'ទិដ្ឋភាព & ព្រឹត្តិការណ៍' : 'Campus & Events'}</span>
+              <div className="admin-kpi-value">{campusEventPhotos}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#ea580c' }} />
+                <span>{isKhmer ? 'បរិវេណ និងកម្មវិធីជាតិ' : 'Grounds & ceremonies'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#fff7ed', color: '#ea580c' }}>
+                {isKhmer ? 'ទិដ្ឋភាព' : 'Campus'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa' }}>
+                <Building size={22} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'ទិដ្ឋភាព & ព្រឹត្តិការណ៍' : 'Campus & Events'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {campusEventPhotos} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#ea580c' }}>{isKhmer ? 'សន្លឹក' : 'Photos'}</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'ទិដ្ឋភាពស្ថាប័ន' : 'Campus album'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
       </div>
 
-      {/* 3. Category Filter Tabs & Live Search */}
-      <div
-        style={{
-          background: '#ffffff',
-          borderRadius: '16px',
-          border: '1px solid #e2e8f0',
-          padding: '14px 18px',
-          marginBottom: '20px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px',
-        }}
-      >
-        {/* Category Tabs */}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <button
-            type="button"
-            onClick={() => setSelectedCategory('all')}
-            style={{
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              border: '1px solid',
-              borderColor: selectedCategory === 'all' ? '#1e73be' : '#e2e8f0',
-              backgroundColor: selectedCategory === 'all' ? '#eff6ff' : '#ffffff',
-              color: selectedCategory === 'all' ? '#1e73be' : '#64748b',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            {isKhmer ? 'ទាំងអស់' : 'All Photos'} ({totalPhotos})
-          </button>
+      {/* 3. Category Filter Tabs Strip */}
+      <div className="admin-user-filter-bar">
+        <button
+          type="button"
+          className={`admin-user-filter-pill ${selectedCategory === 'all' ? 'active' : ''}`}
+          onClick={() => setSelectedCategory('all')}
+        >
+          <ImageIcon size={14} />
+          <span>{isKhmer ? 'ទាំងអស់' : 'All Photos'}</span>
+          <span className="admin-user-filter-count">{totalPhotos}</span>
+        </button>
 
-          <button
-            type="button"
-            onClick={() => setSelectedCategory('academic')}
-            style={{
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              fontSize: '0.82rem',
-              fontWeight: 600,
-              border: '1px solid',
-              borderColor: selectedCategory === 'academic' ? '#1e73be' : '#e2e8f0',
-              backgroundColor: selectedCategory === 'academic' ? '#eff6ff' : '#ffffff',
-              color: selectedCategory === 'academic' ? '#1e73be' : '#64748b',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            {isKhmer ? 'សកម្មភាពសិក្សា & រោងជាង' : 'Academic & Labs'} ({academicPhotos})
-          </button>
+        <button
+          type="button"
+          className={`admin-user-filter-pill ${selectedCategory === 'academic' ? 'active' : ''}`}
+          onClick={() => setSelectedCategory('academic')}
+        >
+          <GraduationCap size={13} />
+          <span>{isKhmer ? 'សកម្មភាពសិក្សា & រោងជាង' : 'Academic & Labs'}</span>
+          <span className="admin-user-filter-count">{academicPhotos}</span>
+        </button>
 
-          <button
-            type="button"
-            onClick={() => setSelectedCategory('campus')}
-            style={{
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              fontSize: '0.82rem',
-              fontWeight: 600,
-              border: '1px solid',
-              borderColor: selectedCategory === 'campus' ? '#1e73be' : '#e2e8f0',
-              backgroundColor: selectedCategory === 'campus' ? '#eff6ff' : '#ffffff',
-              color: selectedCategory === 'campus' ? '#1e73be' : '#64748b',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            {isKhmer ? 'បរិវេណវិទ្យាស្ថាន' : 'Campus Life'} ({images.filter((i) => i.category === 'campus').length})
-          </button>
+        <button
+          type="button"
+          className={`admin-user-filter-pill ${selectedCategory === 'campus' ? 'active' : ''}`}
+          onClick={() => setSelectedCategory('campus')}
+        >
+          <Building size={13} />
+          <span>{isKhmer ? 'បរិវេណវិទ្យាស្ថាន' : 'Campus Life'}</span>
+          <span className="admin-user-filter-count">{images.filter((i) => (i.category || '').toLowerCase() === 'campus').length}</span>
+        </button>
 
-          <button
-            type="button"
-            onClick={() => setSelectedCategory('events')}
-            style={{
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              fontSize: '0.82rem',
-              fontWeight: 600,
-              border: '1px solid',
-              borderColor: selectedCategory === 'events' ? '#1e73be' : '#e2e8f0',
-              backgroundColor: selectedCategory === 'events' ? '#eff6ff' : '#ffffff',
-              color: selectedCategory === 'events' ? '#1e73be' : '#64748b',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            {isKhmer ? 'ព្រឹត្តិការណ៍ & កម្មវិធី' : 'Events'} ({images.filter((i) => i.category === 'events').length})
-          </button>
-        </div>
+        <button
+          type="button"
+          className={`admin-user-filter-pill ${selectedCategory === 'events' ? 'active' : ''}`}
+          onClick={() => setSelectedCategory('events')}
+        >
+          <Calendar size={13} />
+          <span>{isKhmer ? 'ព្រឹត្តិការណ៍ & កម្មវិធី' : 'Events'}</span>
+          <span className="admin-user-filter-count">{images.filter((i) => (i.category || '').toLowerCase() === 'events').length}</span>
+        </button>
+      </div>
 
-        {/* Live Search */}
-        <div style={{ position: 'relative', minWidth: '260px' }}>
+      {/* Search Input for Grid Mode */}
+      {viewMode === 'grid' && (
+        <div style={{ position: 'relative', maxWidth: '380px', marginBottom: '20px' }}>
           <Search
             size={16}
             style={{
@@ -828,11 +855,12 @@ export const AdminGalleryPage = () => {
             placeholder={isKhmer ? 'ស្វែងរកចំណងជើង ឬការពិពណ៌នា...' : 'Search photos or album...'}
             style={{
               width: '100%',
-              padding: '7px 32px 7px 36px',
+              padding: '8px 32px 8px 36px',
               borderRadius: '10px',
               border: '1px solid #e2e8f0',
               fontSize: '0.84rem',
               outline: 'none',
+              background: '#ffffff',
             }}
           />
           {searchTerm && (
@@ -854,7 +882,7 @@ export const AdminGalleryPage = () => {
             </button>
           )}
         </div>
-      </div>
+      )}
 
       {/* 4. Display Content: Grid Mode vs Table Mode */}
       {viewMode === 'grid' ? (
@@ -1029,6 +1057,11 @@ export const AdminGalleryPage = () => {
               ? `បង្ហាញ ${filteredImages.length} ក្នុងចំណោមរូបភាពសរុប ${totalPhotos}`
               : `Showing ${filteredImages.length} of ${totalPhotos} photos`
           }
+          onAdd={openAddModal}
+          addLabel={isKhmer ? 'បង្ហោះរូបភាពថ្មី' : 'Add Photo'}
+          onRefresh={fetchData}
+          searchPlaceholder={isKhmer ? 'ស្វែងរកចំណងជើង ឬការពិពណ៌នា...' : 'Search photos or album...'}
+          renderMobileCard={renderMobileCard}
         />
       )}
 

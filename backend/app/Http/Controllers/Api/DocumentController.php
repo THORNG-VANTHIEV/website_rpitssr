@@ -31,18 +31,18 @@ class DocumentController extends Controller
             $search = trim($request->input('search'));
             $query->where(function ($q) use ($search) {
                 $q->where('title_km', 'like', "%{$search}%")
-                  ->orWhere('title_en', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%")
-                  ->orWhere('description_km', 'like', "%{$search}%")
-                  ->orWhere('description_en', 'like', "%{$search}%");
+                    ->orWhere('title_en', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('description_km', 'like', "%{$search}%")
+                    ->orWhere('description_en', 'like', "%{$search}%");
             });
         }
 
         // Ordering
         $documents = $query->orderBy('order', 'asc')
-                           ->orderBy('downloads_count', 'desc')
-                           ->orderBy('id', 'asc')
-                           ->get();
+            ->orderBy('downloads_count', 'desc')
+            ->orderBy('id', 'asc')
+            ->get();
 
         return response()->json([
             'success' => true,
@@ -57,11 +57,11 @@ class DocumentController extends Controller
     public function show($id): JsonResponse
     {
         $document = Document::where('is_active', true)
-                            ->where(function ($q) use ($id) {
-                                $q->where('id', $id)->orWhere('code', $id);
-                            })->first();
+            ->where(function ($q) use ($id) {
+                $q->where('id', $id)->orWhere('code', $id);
+            })->first();
 
-        if (!$document) {
+        if (! $document) {
             return response()->json([
                 'success' => false,
                 'error' => 'Document not found',
@@ -79,9 +79,9 @@ class DocumentController extends Controller
      */
     public function incrementDownload($id): JsonResponse
     {
-        $document = Document::find($id);
+        $document = Document::where('is_active', true)->find($id);
 
-        if (!$document) {
+        if (! $document) {
             return response()->json([
                 'success' => false,
                 'error' => 'Document not found',

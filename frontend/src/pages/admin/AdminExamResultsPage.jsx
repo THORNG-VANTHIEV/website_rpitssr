@@ -27,7 +27,8 @@ import {
   User,
   ExternalLink,
   ShieldCheck,
-  Clock
+  Clock,
+  ArrowRight
 } from 'lucide-react';
 
 export const AdminExamResultsPage = () => {
@@ -50,8 +51,7 @@ export const AdminExamResultsPage = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Filter and Search State
-  const [searchTerm, setSearchTerm] = useState('');
+  // Filter State
   const [selectedMajor, setSelectedMajor] = useState('all');
   const [selectedGrade, setSelectedGrade] = useState('all');
 
@@ -150,21 +150,11 @@ export const AdminExamResultsPage = () => {
   // Filtered Results
   const filteredResults = useMemo(() => {
     return results.filter((row) => {
-      const matchSearch =
-        searchTerm === '' ||
-        row.studentName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        row.studentId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        row.courseName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        row.className?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        row.subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        row.examName?.toLowerCase().includes(searchTerm.toLowerCase());
-
       const matchMajor = selectedMajor === 'all' || row.courseName === selectedMajor;
       const matchGrade = selectedGrade === 'all' || (row.grade || '').toUpperCase() === selectedGrade;
-
-      return matchSearch && matchMajor && matchGrade;
+      return matchMajor && matchGrade;
     });
-  }, [results, searchTerm, selectedMajor, selectedGrade]);
+  }, [results, selectedMajor, selectedGrade]);
 
   const openAddModal = () => {
     setEditingResult(null);
@@ -379,104 +369,156 @@ export const AdminExamResultsPage = () => {
     return clean.slice(0, 2).toUpperCase() || 'ST';
   };
 
+  // Helper to cleanly separate Khmer and English names
+  const parseStudentName = (rawName = '') => {
+    if (!rawName) return { primary: isKhmer ? 'និស្សិតមិនបញ្ជាក់ឈ្មោះ' : 'Unnamed Student', secondary: '' };
+    const match = rawName.match(/^(.*?)\s*\((.*?)\)$/);
+    if (match) {
+      return {
+        primary: match[1].trim(),
+        secondary: match[2].trim(),
+      };
+    }
+    return {
+      primary: rawName.trim(),
+      secondary: '',
+    };
+  };
+
   const columns = [
     {
       header: isKhmer ? 'និស្សិត & អត្តលេខ' : 'Student & ID',
-      render: (row) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
-              color: '#1e73be',
-              border: '1px solid #bfdbfe',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: '800',
-              fontSize: '0.85rem',
-              flexShrink: 0,
-            }}
-          >
-            {getInitials(row.studentName)}
-          </div>
-          <div>
-            <div style={{ fontWeight: '700', color: '#07294D', fontSize: '0.92rem' }}>
-              {row.studentName || (isKhmer ? 'និស្សិតមិនបញ្ជាក់ឈ្មោះ' : 'Unnamed Student')}
+      width: '23%',
+      render: (row) => {
+        const { primary, secondary } = parseStudentName(row.studentName);
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+            <div
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+                color: '#1e73be',
+                border: '1px solid #bfdbfe',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: '800',
+                fontSize: '0.8rem',
+                flexShrink: 0,
+              }}
+            >
+              {getInitials(row.studentName)}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
-              <span className="admin-cat-slug-pill">{row.studentId || 'NO-ID'}</span>
-              {row.className && (
-                <span style={{ fontSize: '0.74rem', color: '#64748b' }}>• {row.className}</span>
-              )}
+            <div style={{ minWidth: 0, overflow: 'hidden' }}>
+              <div
+                style={{
+                  fontWeight: '700',
+                  color: '#07294D',
+                  fontSize: '0.88rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+                title={row.studentName}
+              >
+                <span>{primary}</span>
+                {secondary && (
+                  <span style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: '500' }}>
+                    ({secondary})
+                  </span>
+                )}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '3px', whiteSpace: 'nowrap' }}>
+                <span className="admin-student-id-pill">{row.studentId || 'NO-ID'}</span>
+                {row.className && (
+                  <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '500' }}>
+                    • {row.className}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      ),
+        );
+      },
     },
     {
-      header: isKhmer ? 'ជំនាញ & ការប្រឡង' : 'Major & Exam',
+      header: isKhmer ? 'ជំនាញ & ព័ត៌មានប្រឡង' : 'Major & Exam Details',
+      width: '34%',
       render: (row) => (
-        <div style={{ maxWidth: '280px' }}>
-          <div style={{ fontWeight: '700', color: '#1e293b', fontSize: '0.88rem' }}>
-            {row.courseName}
-          </div>
+        <div style={{ minWidth: 0, overflow: 'hidden' }}>
           <div
             style={{
-              fontSize: '0.76rem',
-              color: '#64748b',
-              marginTop: '3px',
+              fontWeight: '700',
+              color: '#07294D',
+              fontSize: '0.86rem',
+              lineHeight: '1.3',
+              marginBottom: '3px',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
             }}
+            title={row.courseName}
           >
-            {row.examName} {row.subject && `• ${row.subject}`}
+            {row.courseName}
           </div>
-        </div>
-      ),
-    },
-    {
-      header: isKhmer ? 'ឆមាស & ជំនាន់' : 'Term & Generation',
-      render: (row) => (
-        <div>
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
-              padding: '2px 8px',
-              borderRadius: '6px',
-              background: '#eff6ff',
-              color: '#1e73be',
-              fontSize: '0.76rem',
-              fontWeight: 700,
-              border: '1px solid #dbeafe',
-            }}
-          >
-            {row.semester}
-          </span>
-          <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '3px' }}>
-            {row.year} {row.generation && `• ${row.generation}`}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.73rem', minWidth: 0 }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '1px 6px',
+                borderRadius: '5px',
+                background: '#eff6ff',
+                color: '#1e73be',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                border: '1px solid #dbeafe',
+                flexShrink: 0,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {row.semester}
+            </span>
+            <span style={{ color: '#64748b', fontWeight: '500', flexShrink: 0, whiteSpace: 'nowrap' }}>
+              {row.year} {row.generation && `• ${row.generation}`}
+            </span>
+            {row.examName && (
+              <span
+                style={{
+                  color: '#94a3b8',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  minWidth: 0,
+                }}
+                title={`${row.examName || ''} ${row.subject ? '• ' + row.subject : ''}`}
+              >
+                • {row.examName}
+              </span>
+            )}
           </div>
         </div>
       ),
     },
     {
       header: isKhmer ? 'ពិន្ទុ & និទ្ទេស' : 'Score & Grade',
+      width: '14%',
       render: (row) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}>
           {getGradeBadge(row.grade)}
           <div>
-            <div style={{ fontSize: '0.86rem', fontWeight: '800', color: '#07294D' }}>
+            <div style={{ fontSize: '0.84rem', fontWeight: '800', color: '#07294D', lineHeight: '1.2' }}>
               {row.obtainedMarks ?? '--'}
-              <span style={{ fontSize: '0.75rem', fontWeight: '500', color: '#94a3b8' }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: '500', color: '#94a3b8' }}>
                 /{row.totalMarks ?? 100}
               </span>
             </div>
-            <div style={{ fontSize: '0.74rem', fontWeight: '600', color: '#059669' }}>
+            <div style={{ fontSize: '0.72rem', fontWeight: '600', color: '#059669', marginTop: '2px' }}>
               {row.percentage != null ? `${row.percentage}%` : ''}
             </div>
           </div>
@@ -485,107 +527,301 @@ export const AdminExamResultsPage = () => {
     },
     {
       header: isKhmer ? 'ឯកសារភ្ជាប់' : 'Document',
+      width: '9%',
       render: (row) => {
         const fileUrl = row.resultPdfUrl || row.resultImageUrl;
         if (!fileUrl) {
-          return <span style={{ color: '#94a3b8', fontSize: '0.78rem', fontStyle: 'italic' }}>{isKhmer ? 'គ្មានឯកសារ' : 'No File'}</span>;
+          return <span style={{ color: '#cbd5e1', fontSize: '0.74rem' }}>--</span>;
         }
 
         const isPdf = Boolean(row.resultPdfUrl || fileUrl.toLowerCase().endsWith('.pdf'));
         return (
-          <a
-            href={fileUrl}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-              color: isPdf ? '#be123c' : '#1e73be',
-              fontWeight: '700',
-              fontSize: '0.78rem',
-              textDecoration: 'none',
-              padding: '3px 9px',
-              borderRadius: '8px',
-              background: isPdf ? '#fff1f2' : '#eff6ff',
-              border: `1px solid ${isPdf ? '#fecdd3' : '#dbeafe'}`,
-            }}
-          >
-            {isPdf ? <FileText size={13} /> : <ImageIcon size={13} />}
-            <span>{isPdf ? 'PDF' : (isKhmer ? 'រូបភាព' : 'Image')}</span>
-          </a>
+          <div style={{ whiteSpace: 'nowrap' }}>
+            <a
+              href={fileUrl}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                color: isPdf ? '#be123c' : '#1e73be',
+                fontWeight: '700',
+                fontSize: '0.74rem',
+                textDecoration: 'none',
+                padding: '2px 7px',
+                borderRadius: '6px',
+                background: isPdf ? '#fff1f2' : '#eff6ff',
+                border: `1px solid ${isPdf ? '#fecdd3' : '#dbeafe'}`,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {isPdf ? <FileText size={12} /> : <ImageIcon size={12} />}
+              <span>{isPdf ? 'PDF' : (isKhmer ? 'រូបភាព' : 'Image')}</span>
+            </a>
+          </div>
         );
       },
     },
     {
       header: isKhmer ? 'ស្ថានភាព' : 'Status',
+      width: '9%',
       render: (row) => (
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '3px 10px',
-            borderRadius: '9999px',
-            fontSize: '0.76rem',
-            fontWeight: 700,
-            background: row.isPublished ? '#f0fdf4' : '#fffbeb',
-            color: row.isPublished ? '#166534' : '#b45309',
-            border: `1px solid ${row.isPublished ? '#bbf7d0' : '#fef3c7'}`,
-          }}
-        >
+        <div style={{ whiteSpace: 'nowrap' }}>
           <span
             style={{
-              width: '7px',
-              height: '7px',
-              borderRadius: '50%',
-              backgroundColor: row.isPublished ? '#22c55e' : '#f59e0b',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              padding: '2px 8px',
+              borderRadius: '9999px',
+              fontSize: '0.74rem',
+              fontWeight: 700,
+              background: row.isPublished ? '#f0fdf4' : '#fffbeb',
+              color: row.isPublished ? '#166534' : '#b45309',
+              border: `1px solid ${row.isPublished ? '#bbf7d0' : '#fef3c7'}`,
+              whiteSpace: 'nowrap',
             }}
-          />
-          {row.isPublished
-            ? (isKhmer ? 'បានផ្សាយ' : 'Published')
-            : (isKhmer ? 'ព្រាង' : 'Draft')}
-        </span>
+          >
+            <span
+              style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: row.isPublished ? '#22c55e' : '#f59e0b',
+                flexShrink: 0,
+              }}
+            />
+            {row.isPublished
+              ? (isKhmer ? 'បានផ្សាយ' : 'Published')
+              : (isKhmer ? 'ព្រាង' : 'Draft')}
+          </span>
+        </div>
       ),
     },
     {
       header: isKhmer ? 'ប្រតិបត្តិការ' : 'Actions',
       align: 'right',
+      width: '11%',
       render: (row) => (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '4px', whiteSpace: 'nowrap' }}>
           <button
             onClick={() => setSelectedTranscript(row)}
             className="admin-btn admin-btn-outline admin-btn-sm"
             title={isKhmer ? 'ពិនិត្យតារាងពិន្ទុផ្លូវការ' : 'View Official Transcript'}
-            style={{ padding: '6px 9px', borderRadius: '8px', color: '#1e73be', borderColor: '#dbeafe', background: '#eff6ff' }}
+            style={{ padding: '5px 8px', borderRadius: '7px', color: '#1e73be', borderColor: '#dbeafe', background: '#eff6ff' }}
           >
-            <Eye size={14} />
+            <Eye size={13} />
           </button>
           <button
             onClick={() => openEditModal(row)}
             className="admin-btn admin-btn-outline admin-btn-sm"
             title={isKhmer ? 'កែសម្រួល' : 'Edit Result'}
-            style={{ padding: '6px 9px', borderRadius: '8px' }}
+            style={{ padding: '5px 8px', borderRadius: '7px' }}
           >
-            <Edit2 size={14} />
+            <Edit2 size={13} />
           </button>
           <button
             onClick={() => openDeleteModal(row)}
             className="admin-btn admin-btn-danger admin-btn-sm"
             title={isKhmer ? 'លុប' : 'Delete Result'}
-            style={{ padding: '6px 9px', borderRadius: '8px' }}
+            style={{ padding: '5px 8px', borderRadius: '7px' }}
           >
-            <Trash2 size={14} />
+            <Trash2 size={13} />
           </button>
         </div>
       ),
     },
   ];
 
+  // Mobile Adaptive Card View Renderer for touch devices (< 768px)
+  const renderMobileCard = (row) => {
+    const { primary, secondary } = parseStudentName(row.studentName);
+    const fileUrl = row.resultPdfUrl || row.resultImageUrl;
+    const isPdf = Boolean(row.resultPdfUrl || (fileUrl && fileUrl.toLowerCase().endsWith('.pdf')));
+
+    return (
+      <div className="admin-user-mobile-card">
+        {/* 1. Top Row: Avatar, Student Name, Student ID & Grade Badge */}
+        <div className="admin-user-mobile-card-top">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+            <div
+              style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+                color: '#1e73be',
+                border: '1px solid #bfdbfe',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: '800',
+                fontSize: '0.86rem',
+                flexShrink: 0,
+              }}
+            >
+              {getInitials(row.studentName)}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontWeight: '700', color: '#07294D', fontSize: '0.92rem', lineHeight: '1.2' }}>
+                <span>{primary}</span>
+                {secondary && (
+                  <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '500', marginLeft: '5px' }}>
+                    ({secondary})
+                  </span>
+                )}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '3px', flexWrap: 'wrap' }}>
+                <span className="admin-student-id-pill">{row.studentId || 'NO-ID'}</span>
+                {row.className && (
+                  <span style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: '500' }}>
+                    • {row.className}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Grade Badge & Marks */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              {getGradeBadge(row.grade)}
+              <span style={{ fontSize: '0.94rem', fontWeight: '800', color: '#07294D' }}>
+                {row.obtainedMarks ?? '--'}
+                <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '500' }}>
+                  /{row.totalMarks ?? 100}
+                </span>
+              </span>
+            </div>
+            {row.percentage != null && (
+              <span style={{ fontSize: '0.74rem', fontWeight: '700', color: '#059669', marginTop: '2px' }}>
+                {row.percentage}%
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* 2. Middle Block: Major, Semester & Exam Details */}
+        <div className="admin-user-mobile-card-details">
+          <div style={{ fontWeight: '700', color: '#07294D', marginBottom: '4px', lineHeight: '1.3' }}>
+            {row.courseName}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', color: '#64748b', marginBottom: '8px' }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '2px 7px',
+                borderRadius: '5px',
+                background: '#eff6ff',
+                color: '#1e73be',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                border: '1px solid #dbeafe',
+                flexShrink: 0,
+              }}
+            >
+              {row.semester}
+            </span>
+            <span style={{ fontWeight: '500', fontSize: '0.76rem' }}>
+              {row.year} {row.generation && `• ${row.generation}`}
+            </span>
+            {row.examName && <span style={{ color: '#94a3b8', fontSize: '0.76rem' }}>• {row.examName}</span>}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '6px', borderTop: '1px dashed #e2e8f0', gap: '6px' }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '2px 8px',
+                borderRadius: '9999px',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                background: row.isPublished ? '#f0fdf4' : '#fffbeb',
+                color: row.isPublished ? '#166534' : '#b45309',
+                border: `1px solid ${row.isPublished ? '#bbf7d0' : '#fef3c7'}`,
+              }}
+            >
+              <span
+                style={{
+                  width: '5px',
+                  height: '5px',
+                  borderRadius: '50%',
+                  backgroundColor: row.isPublished ? '#22c55e' : '#f59e0b',
+                }}
+              />
+              {row.isPublished ? (isKhmer ? 'បានផ្សាយ' : 'Published') : (isKhmer ? 'ព្រាង' : 'Draft')}
+            </span>
+
+            {fileUrl ? (
+              <a
+                href={fileUrl}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  color: isPdf ? '#be123c' : '#1e73be',
+                  fontWeight: '700',
+                  fontSize: '0.72rem',
+                  textDecoration: 'none',
+                  padding: '2px 8px',
+                  borderRadius: '6px',
+                  background: isPdf ? '#fff1f2' : '#eff6ff',
+                  border: `1px solid ${isPdf ? '#fecdd3' : '#dbeafe'}`,
+                }}
+              >
+                {isPdf ? <FileText size={11} /> : <ImageIcon size={11} />}
+                <span>{isPdf ? 'PDF ភ្ជាប់' : (isKhmer ? 'រូបភាព' : 'Image')}</span>
+              </a>
+            ) : (
+              <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                {isKhmer ? 'គ្មានឯកសារភ្ជាប់' : 'No Attachment'}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* 3. Action Buttons */}
+        <div className="admin-user-mobile-card-actions">
+          <button
+            onClick={() => setSelectedTranscript(row)}
+            className="admin-user-mobile-action-btn view"
+            title={isKhmer ? 'ពិនិត្យតារាងពិន្ទុផ្លូវការ' : 'View Official Transcript'}
+          >
+            <Eye size={13} />
+            <span>{isKhmer ? 'តារាងពិន្ទុ' : 'Transcript'}</span>
+          </button>
+          <button
+            onClick={() => openEditModal(row)}
+            className="admin-user-mobile-action-btn edit"
+            title={isKhmer ? 'កែសម្រួល' : 'Edit Result'}
+          >
+            <Edit2 size={13} />
+            <span>{isKhmer ? 'កែសម្រួល' : 'Edit'}</span>
+          </button>
+          <button
+            onClick={() => openDeleteModal(row)}
+            className="admin-user-mobile-action-btn delete"
+            title={isKhmer ? 'លុប' : 'Delete Result'}
+          >
+            <Trash2 size={13} />
+            <span>{isKhmer ? 'លុប' : 'Delete'}</span>
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div>
       {/* 1. Header Banner with Trust Badge */}
       <div
+        className="admin-exam-header"
         style={{
           background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
           borderRadius: '20px',
@@ -637,7 +873,7 @@ export const AdminExamResultsPage = () => {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div className="admin-exam-header-actions" style={{ display: 'flex', gap: '10px' }}>
           <button
             onClick={fetchData}
             disabled={loading}
@@ -676,307 +912,156 @@ export const AdminExamResultsPage = () => {
       </div>
 
       {/* 2. 4-Card Institutional KPI Metric Strip */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '16px',
-          marginBottom: '24px',
-        }}
-      >
+      <div className="admin-kpi-grid">
         {/* KPI 1: Published Results */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
-        >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#eff6ff',
-              color: '#1e73be',
-              border: '1px solid #dbeafe',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <Award size={22} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'លទ្ធផលបានផ្សាយ' : 'Published Results'}
+        <div className="admin-kpi-card">
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'លទ្ធផលបានផ្សាយ' : 'Published Results'}</span>
+              <div className="admin-kpi-value">
+                {publishedResults} <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 600 }}>/ {totalResults}</span>
+              </div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#1e73be' }} />
+                <span>{totalResults > 0 ? Math.round((publishedResults / totalResults) * 100) : 0}% {isKhmer ? 'នៃលទ្ធផលសរុប' : 'active availability'}</span>
+              </div>
             </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {publishedResults} / {totalResults}{' '}
-              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#1e73be' }}>
-                ({totalResults > 0 ? Math.round((publishedResults / totalResults) * 100) : 0}%)
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#eff6ff', color: '#1e73be' }}>
+                {isKhmer ? 'ផ្សព្វផ្សាយ' : 'Published'}
               </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}>
+                <Award size={24} />
+              </div>
             </div>
+          </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'ពិនិត្យលទ្ធផលផ្សាយ' : 'Manage results'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* KPI 2: Honors / Distinction */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
-        >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#f0fdf4',
-              color: '#059669',
-              border: '1px solid #bbf7d0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <Sparkles size={22} />
+        <div className="admin-kpi-card">
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'និទ្ទេសឆ្នើម A & B+' : 'Honors (A & B+)'}</span>
+              <div className="admin-kpi-value">{honorsResults}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#059669' }} />
+                <span>{isKhmer ? 'និស្សិតឆ្នើមប្រចាំឆមាស' : 'Exemplary performance'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#f0fdf4', color: '#059669' }}>
+                {isKhmer ? 'ឆ្នើម' : 'Honors'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}>
+                <Sparkles size={24} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'និទ្ទេសឆ្នើម A & B+' : 'Honors (A & B+)'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {honorsResults} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#059669' }}>{isKhmer ? 'រូប' : 'Students'}</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'បញ្ជីនិស្សិតឆ្នើម' : 'View honors list'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* KPI 3: Average Performance */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
-        >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#fefce8',
-              color: '#ca8a04',
-              border: '1px solid #fef08a',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <CheckCircle2 size={22} />
+        <div className="admin-kpi-card">
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'ពិន្ទុមធ្យមសរុប' : 'Average Performance'}</span>
+              <div className="admin-kpi-value">{averagePercentage}%</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#ca8a04' }} />
+                <span>{isKhmer ? 'មធ្យមភាគពិន្ទុស្ថាប័ន' : 'Institutional score average'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#fefce8', color: '#ca8a04' }}>
+                {isKhmer ? 'មធ្យម' : 'Average'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#fefce8', color: '#ca8a04', border: '1px solid #fef08a' }}>
+                <CheckCircle2 size={24} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'ពិន្ទុមធ្យមសរុប' : 'Average Performance'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {averagePercentage}% <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#ca8a04' }}>{isKhmer ? 'មធ្យម' : 'Avg'}</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'វិភាគស្ថិតិពិន្ទុ' : 'Score analytics'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* KPI 4: Examined Majors */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
-        >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#faf5ff',
-              color: '#7c3aed',
-              border: '1px solid #e9d5ff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <BookOpen size={22} />
+        <div className="admin-kpi-card">
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'ជំនាញមានការប្រឡង' : 'Active Majors'}</span>
+              <div className="admin-kpi-value">{availableMajors.length}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#7c3aed' }} />
+                <span>{isKhmer ? 'ដេប៉ាតឺម៉ង់បានបញ្ចូលពិន្ទុ' : 'Departments with records'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#faf5ff', color: '#7c3aed' }}>
+                {isKhmer ? 'ជំនាញ' : 'Majors'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}>
+                <BookOpen size={24} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'ជំនាញមានការប្រឡង' : 'Active Majors'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {availableMajors.length} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#7c3aed' }}>{isKhmer ? 'ជំនាញ' : 'Majors'}</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'តម្រងតាមជំនាញ' : 'Filter by major'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
       </div>
 
-      {/* 3. Filter Tabs & Live Search Strip */}
-      <div
-        style={{
-          background: '#ffffff',
-          borderRadius: '16px',
-          border: '1px solid #e2e8f0',
-          padding: '14px 18px',
-          marginBottom: '20px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px',
-        }}
-      >
-        {/* Major & Grade Filter Pills */}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-          <button
-            type="button"
-            onClick={() => setSelectedMajor('all')}
-            style={{
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              border: '1px solid',
-              borderColor: selectedMajor === 'all' ? '#1e73be' : '#e2e8f0',
-              backgroundColor: selectedMajor === 'all' ? '#eff6ff' : '#ffffff',
-              color: selectedMajor === 'all' ? '#1e73be' : '#64748b',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            {isKhmer ? 'គ្រប់ជំនាញ' : 'All Majors'} ({totalResults})
-          </button>
+      {/* 3. Filter Tabs Strip */}
+      <div className="admin-user-filter-bar">
+        <button
+          type="button"
+          className={`admin-user-filter-pill ${selectedMajor === 'all' ? 'active' : ''}`}
+          onClick={() => setSelectedMajor('all')}
+        >
+          <Award size={14} />
+          <span>{isKhmer ? 'គ្រប់ជំនាញ' : 'All Majors'}</span>
+          <span className="admin-user-filter-count">{totalResults}</span>
+        </button>
 
-          {availableMajors.slice(0, 4).map((major) => {
-            const count = results.filter((r) => r.courseName === major).length;
-            const shortName = major.split('(')[0].trim();
-            return (
-              <button
-                key={major}
-                type="button"
-                onClick={() => setSelectedMajor(major)}
-                style={{
-                  padding: '6px 12px',
-                  borderRadius: '9999px',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  border: '1px solid',
-                  borderColor: selectedMajor === major ? '#1e73be' : '#e2e8f0',
-                  backgroundColor: selectedMajor === major ? '#eff6ff' : '#ffffff',
-                  color: selectedMajor === major ? '#1e73be' : '#64748b',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                {shortName} ({count})
-              </button>
-            );
-          })}
-
-          {/* Grade Selector Dropdown */}
-          <select
-            value={selectedGrade}
-            onChange={(e) => setSelectedGrade(e.target.value)}
-            style={{
-              padding: '6px 12px',
-              borderRadius: '9999px',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              border: '1px solid #e2e8f0',
-              backgroundColor: '#ffffff',
-              color: selectedGrade !== 'all' ? '#1e73be' : '#64748b',
-              cursor: 'pointer',
-              outline: 'none',
-            }}
-          >
-            <option value="all">{isKhmer ? 'គ្រប់និទ្ទេស' : 'All Grades'}</option>
-            <option value="A">{isKhmer ? 'និទ្ទេស A' : 'Grade A'}</option>
-            <option value="B+">{isKhmer ? 'និទ្ទេស B+' : 'Grade B+'}</option>
-            <option value="B">{isKhmer ? 'និទ្ទេស B' : 'Grade B'}</option>
-            <option value="C">{isKhmer ? 'និទ្ទេស C' : 'Grade C'}</option>
-            <option value="F">{isKhmer ? 'ធ្លាក់ (F)' : 'Grade F'}</option>
-          </select>
-        </div>
-
-        {/* Live Search Input */}
-        <div style={{ position: 'relative', minWidth: '280px' }}>
-          <Search
-            size={16}
-            style={{
-              position: 'absolute',
-              left: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#94a3b8',
-            }}
-          />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={isKhmer ? 'ស្វែងរកឈ្មោះនិស្សិត, អត្តលេខ, មុខវិជ្ជា...' : 'Search student, ID, subject, exam...'}
-            style={{
-              width: '100%',
-              padding: '7px 32px 7px 36px',
-              borderRadius: '10px',
-              border: '1px solid #e2e8f0',
-              fontSize: '0.84rem',
-              outline: 'none',
-              transition: 'border-color 0.2s ease',
-            }}
-          />
-          {searchTerm && (
+        {availableMajors.map((major) => {
+          const count = results.filter((r) => r.courseName === major).length;
+          const shortName = major.split('(')[0].trim();
+          return (
             <button
-              onClick={() => setSearchTerm('')}
-              style={{
-                position: 'absolute',
-                right: '8px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'none',
-                border: 'none',
-                color: '#94a3b8',
-                cursor: 'pointer',
-                padding: '2px',
-              }}
+              key={major}
+              type="button"
+              className={`admin-user-filter-pill ${selectedMajor === major ? 'active' : ''}`}
+              onClick={() => setSelectedMajor(major)}
             >
-              <X size={14} />
+              <BookOpen size={14} />
+              <span>{shortName}</span>
+              <span className="admin-user-filter-count">{count}</span>
             </button>
-          )}
-        </div>
+          );
+        })}
+
+        {/* Grade Selector Dropdown Pill */}
+        <select
+          value={selectedGrade}
+          onChange={(e) => setSelectedGrade(e.target.value)}
+          className={`admin-user-filter-select ${selectedGrade !== 'all' ? 'active' : ''}`}
+        >
+          <option value="all">{isKhmer ? 'គ្រប់និទ្ទេស' : 'All Grades'}</option>
+          <option value="A">{isKhmer ? 'និទ្ទេស A' : 'Grade A'}</option>
+          <option value="B+">{isKhmer ? 'និទ្ទេស B+' : 'Grade B+'}</option>
+          <option value="B">{isKhmer ? 'និទ្ទេស B' : 'Grade B'}</option>
+          <option value="C">{isKhmer ? 'និទ្ទេស C' : 'Grade C'}</option>
+          <option value="F">{isKhmer ? 'ធ្លាក់ (F)' : 'Grade F'}</option>
+        </select>
       </div>
 
       {/* 4. DataTable */}
@@ -984,12 +1069,15 @@ export const AdminExamResultsPage = () => {
         columns={columns}
         data={filteredResults}
         loading={loading}
+        fixedLayout
+        renderMobileCard={renderMobileCard}
         title={isKhmer ? 'បញ្ជីលទ្ធផលប្រឡង & តារាងពិន្ទុ' : 'Examination Results Directory'}
         subtitle={
           isKhmer
             ? `បង្ហាញ ${filteredResults.length} ក្នុងចំណោមលទ្ធផលសរុប ${totalResults}`
             : `Showing ${filteredResults.length} of ${totalResults} exam records`
         }
+        searchPlaceholder={isKhmer ? 'ស្វែងរកឈ្មោះនិស្សិត, អត្តលេខ, មុខវិជ្ជា...' : 'Search student, ID, subject, exam...'}
       />
 
       {/* 5. Create / Edit Exam Result Modal */}
@@ -1024,7 +1112,7 @@ export const AdminExamResultsPage = () => {
             {isKhmer ? 'ផ្នែកទី ១៖ ព័ត៌មាននិស្សិត & ថ្នាក់សិក្សា' : 'Section 1: Student & Class Information'}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr 1fr', gap: '14px' }}>
+          <div className="admin-form-row-3">
             <div className="admin-form-group">
               <label className="admin-form-label">
                 {isKhmer ? 'អត្តលេខនិស្សិត (Student ID) *' : 'Student ID *'}
@@ -1087,7 +1175,7 @@ export const AdminExamResultsPage = () => {
             {isKhmer ? 'ផ្នែកទី ២៖ ជំនាញ & កម្មវិធីប្រឡង' : 'Section 2: Major & Examination Scope'}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: '14px' }}>
+          <div className="admin-form-row-4">
             <div className="admin-form-group">
               <label className="admin-form-label">
                 {isKhmer ? 'ជំនាញ / វគ្គសិក្សា *' : 'Major / Course *'}
@@ -1156,7 +1244,7 @@ export const AdminExamResultsPage = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 1fr', gap: '14px' }}>
+          <div className="admin-form-row-3">
             <div className="admin-form-group">
               <label className="admin-form-label">
                 {isKhmer ? 'ឈ្មោះការប្រឡង' : 'Exam Title'}
@@ -1217,10 +1305,8 @@ export const AdminExamResultsPage = () => {
           </div>
 
           <div
+            className="admin-form-row-4"
             style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr 1fr',
-              gap: '14px',
               background: '#f8fafc',
               padding: '16px',
               borderRadius: '14px',
@@ -1298,7 +1384,7 @@ export const AdminExamResultsPage = () => {
             {isKhmer ? 'ផ្នែកទី ៤៖ ឯកសារលទ្ធផល & ការផ្សព្វផ្សាយ' : 'Section 4: Attachments & Publishing'}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '14px', marginBottom: '14px' }}>
+          <div className="admin-form-row-2" style={{ marginBottom: '14px' }}>
             <div className="admin-form-group">
               <label className="admin-form-label">
                 {isKhmer ? 'ផ្ទុកឯកសារតារាងពិន្ទុឡើង (PDF ឬរូបភាព)' : 'Upload Score Sheet (PDF or Image)'}
@@ -1353,43 +1439,15 @@ export const AdminExamResultsPage = () => {
       {/* 6. Official Student Transcript Lightbox Modal */}
       {selectedTranscript && (
         <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 1050,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'rgba(7, 41, 77, 0.45)',
-            backdropFilter: 'blur(5px)',
-            padding: '20px',
-          }}
+          className="admin-transcript-overlay"
           onClick={() => setSelectedTranscript(null)}
         >
           <div
-            style={{
-              background: '#ffffff',
-              borderRadius: '24px',
-              width: '100%',
-              maxWidth: '740px',
-              maxHeight: '92vh',
-              overflowY: 'auto',
-              boxShadow: '0 20px 60px rgba(7, 41, 77, 0.2)',
-              border: '1px solid #e2e8f0',
-            }}
+            className="admin-transcript-modal"
             onClick={(e) => e.stopPropagation()}
           >
             {/* National Institutional Header */}
-            <div
-              style={{
-                background: 'linear-gradient(135deg, #07294D 0%, #1e73be 100%)',
-                padding: '26px 30px',
-                borderRadius: '24px 24px 0 0',
-                color: '#ffffff',
-                position: 'relative',
-                textAlign: 'center',
-              }}
-            >
+            <div className="admin-transcript-header">
               <button
                 onClick={() => setSelectedTranscript(null)}
                 style={{
@@ -1442,20 +1500,9 @@ export const AdminExamResultsPage = () => {
             </div>
 
             {/* Transcript Body */}
-            <div style={{ padding: '26px 30px' }}>
+            <div className="admin-transcript-body">
               {/* Student Identity Grid */}
-              <div
-                style={{
-                  background: '#f8fafc',
-                  borderRadius: '16px',
-                  border: '1px solid #e2e8f0',
-                  padding: '18px 20px',
-                  marginBottom: '20px',
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '14px',
-                }}
-              >
+              <div className="admin-transcript-identity">
                 <div>
                   <div style={{ fontSize: '0.74rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>
                     {isKhmer ? 'ឈ្មោះនិស្សិត' : 'Student Name'}
@@ -1512,14 +1559,7 @@ export const AdminExamResultsPage = () => {
               </div>
 
               {/* Score Highlights 3-Card Strip */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr 1fr',
-                  gap: '14px',
-                  marginBottom: '24px',
-                }}
-              >
+              <div className="admin-transcript-stats">
                 <div
                   style={{
                     background: '#ffffff',
@@ -1579,19 +1619,7 @@ export const AdminExamResultsPage = () => {
               </div>
 
               {/* Signatures & Certification Block */}
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  padding: '16px 20px',
-                  background: '#f8fafc',
-                  borderRadius: '14px',
-                  border: '1px dashed #cbd5e1',
-                  textAlign: 'center',
-                  fontSize: '0.82rem',
-                  color: '#64748b',
-                }}
-              >
+              <div className="admin-transcript-signatures">
                 <div>
                   <div style={{ fontWeight: 700, color: '#07294D' }}>
                     {isKhmer ? 'គណៈកម្មការប្រឡង' : 'Examination Board'}
@@ -1613,17 +1641,7 @@ export const AdminExamResultsPage = () => {
             </div>
 
             {/* Modal Actions Footer */}
-            <div
-              style={{
-                padding: '16px 30px',
-                background: '#f8fafc',
-                borderTop: '1px solid #e2e8f0',
-                borderRadius: '0 0 24px 24px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
+            <div className="admin-transcript-footer">
               <button
                 type="button"
                 onClick={() => window.print()}
@@ -1641,7 +1659,7 @@ export const AdminExamResultsPage = () => {
                 {isKhmer ? 'បោះពុម្ពតារាងពិន្ទុ' : 'Print Transcript'}
               </button>
 
-              <div style={{ display: 'flex', gap: '10px' }}>
+              <div className="admin-transcript-footer-actions" style={{ display: 'flex', gap: '10px' }}>
                 <button
                   type="button"
                   onClick={() => setSelectedTranscript(null)}

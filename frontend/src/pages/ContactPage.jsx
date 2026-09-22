@@ -269,7 +269,7 @@ export const ContactPage = () => {
       </section>
 
       {/* 3. MAIN CONTACT CONTENT AREA */}
-      <section style={{ background: '#f8fafc', padding: '50px 0 90px', borderBottom: '1px solid #e2e8f0' }}>
+      <section className="contact-main-content-area" style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
         <div className="container" style={{ maxWidth: '1140px' }}>
 
           {/* 3 Top Gateway Cards */}
@@ -302,6 +302,7 @@ export const ContactPage = () => {
                 <div style={{ marginTop: 'auto', width: '100%' }}>
                   <a
                     href="#google-map-section"
+                    className="inst-contact-map-btn"
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -398,6 +399,7 @@ export const ContactPage = () => {
                 <div style={{ width: '100%', marginBottom: '16px' }}>
                   <a
                     href="mailto:info@rpitssr.edu.kh"
+                    className="inst-contact-channel-link"
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -422,6 +424,7 @@ export const ContactPage = () => {
                     href="https://t.me/rpitssr"
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="inst-contact-channel-link"
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -446,6 +449,7 @@ export const ContactPage = () => {
                     href="https://www.rpitssr.edu.kh"
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="inst-contact-channel-link"
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -485,10 +489,10 @@ export const ContactPage = () => {
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#eff6ff', color: '#1e73be', padding: '4px 14px', borderRadius: '20px', fontSize: '12.5px', fontWeight: '700', marginBottom: '10px' }}>
                     <i className="fas fa-paper-plane"></i> {isKhmer ? 'ទម្រង់ផ្ញើសារផ្ទាល់' : 'Direct Consultation Form'}
                   </div>
-                  <h3 style={{ color: '#07294D', fontWeight: '800', fontSize: '1.65rem', marginBottom: '8px', lineHeight: '1.35' }}>
+                  <h3 className="inst-contact-form-title" style={{ color: '#07294D', fontWeight: '800', marginBottom: '8px', lineHeight: '1.35' }}>
                     {isKhmer ? 'ផ្ញើសារ ឬសំណួរមកកាន់យើងខ្ញុំ' : 'Send a Message or Consultation Inquiry'}
                   </h3>
-                  <p style={{ color: '#64748b', fontSize: '0.96rem', lineHeight: '1.75', margin: 0 }}>
+                  <p className="inst-contact-form-subtitle" style={{ color: '#64748b', lineHeight: '1.75', margin: 0 }}>
                     {isKhmer
                       ? 'មានចម្ងល់អំពីការចុះឈ្មោះចូលរៀន TVET អាហារូបករណ៍ ១.៥ លាននាក់ ឬកម្រិតសញ្ញាបត្រជាន់ខ្ពស់បច្ចេកទេស? សូមជ្រើសរើសប្រធានបទ និងបំពេញព័ត៌មានខាងក្រោម៖'
                       : 'Have questions regarding TVET admissions, 1.5M scholarships, or degree tracks? Select a topic below and our team will get in touch promptly:'}
@@ -666,11 +670,11 @@ export const ContactPage = () => {
                 
                 {/* Administrative Hours Card */}
                 <div
+                  className="inst-contact-hours-card"
                   style={{
                     background: '#ffffff',
                     borderRadius: '20px',
                     border: '1px solid #e2e8f0',
-                    padding: '30px',
                     boxShadow: '0 4px 18px rgba(7, 41, 77, 0.04)'
                   }}
                 >
@@ -705,10 +709,10 @@ export const ContactPage = () => {
 
                 {/* TVET Consultation Banner */}
                 <div
+                  className="inst-contact-promo-banner"
                   style={{
                     background: 'linear-gradient(135deg, #07294D 0%, #1e73be 100%)',
                     borderRadius: '20px',
-                    padding: '30px',
                     color: '#ffffff',
                     boxShadow: '0 8px 25px rgba(7, 41, 77, 0.15)',
                     position: 'relative',
@@ -749,11 +753,11 @@ export const ContactPage = () => {
 
                 {/* FAQ Quick Link Card */}
                 <div
+                  className="inst-contact-faq-card"
                   style={{
                     background: '#ffffff',
                     borderRadius: '20px',
                     border: '1px solid #e2e8f0',
-                    padding: '24px 28px',
                     boxShadow: '0 4px 18px rgba(7, 41, 77, 0.04)',
                     marginTop: 'auto'
                   }}
@@ -795,7 +799,7 @@ export const ContactPage = () => {
           </div>
 
           {/* 4. INTERACTIVE GOOGLE MAP SECTION */}
-          <div id="google-map-section" style={{ marginTop: '70px' }}>
+          <div id="google-map-section" className="inst-contact-map-section">
             <div className="row justify-content-center mb-40">
               <div className="col-lg-8 text-center">
                 <div className="section-title-2">

@@ -14,12 +14,13 @@ use App\Models\Notice;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class AdminSystemController extends Controller
 {
-    public function getSummary(): JsonResponse
+    public function getSummary(Request $request): JsonResponse
     {
         $dbHealth = 'healthy';
         try {
@@ -31,8 +32,8 @@ class AdminSystemController extends Controller
         $storageHealth = Storage::disk('public')->exists('.') ? 'healthy' : 'warning';
 
         $lastBackupRecord = Backup::orderBy('createdAt', 'desc')->first();
-        $lastBackup = $lastBackupRecord && $lastBackupRecord->createdAt 
-            ? $lastBackupRecord->createdAt->toIso8601String() 
+        $lastBackup = $lastBackupRecord && $lastBackupRecord->createdAt
+            ? $lastBackupRecord->createdAt->toIso8601String()
             : now()->subDay()->toIso8601String();
 
         $counts = [
@@ -53,6 +54,9 @@ class AdminSystemController extends Controller
         $recentExamResults = ExamResult::orderBy('id', 'desc')->take(5)->get();
         $recentUsers = User::orderBy('id', 'desc')->take(5)->get(['id', 'username', 'email', 'role', 'fullName', 'studentId', 'createdAt']);
 
+        $currentUser = $request->user();
+        $isSuperAdmin = $currentUser && $currentUser->isAdmin();
+
         return response()->json([
             'success' => true,
             'counts' => $counts,
@@ -66,8 +70,8 @@ class AdminSystemController extends Controller
                 'uptime' => 24,
                 'version' => '1.2.0',
                 'environment' => config('app.env', 'production'),
-                'phpVersion' => phpversion(),
-                'laravelVersion' => app()->version(),
+                'phpVersion' => $isSuperAdmin ? phpversion() : 'PHP 8.2 (Protected)',
+                'laravelVersion' => $isSuperAdmin ? app()->version() : 'Laravel 11 (Protected)',
             ],
             'systemHealth' => [
                 'database' => $dbHealth,

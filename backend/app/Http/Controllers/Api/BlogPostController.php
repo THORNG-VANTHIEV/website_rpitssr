@@ -14,13 +14,10 @@ class BlogPostController extends Controller
     {
         $query = BlogPost::with(['category', 'authorUser:id,username,fullName']);
 
-        if ($request->has('status') && !empty($request->status)) {
-            $query->where('status', $request->status);
-        } else {
-            $query->where('status', 'published');
-        }
+        // Security: Public API strictly serves published articles only
+        $query->where('status', 'published');
 
-        if ($request->has('categoryId') && !empty($request->categoryId)) {
+        if ($request->has('categoryId') && ! empty($request->categoryId)) {
             $query->where('categoryId', $request->categoryId);
         }
 
@@ -29,17 +26,17 @@ class BlogPostController extends Controller
             $query->where('featured', $isFeatured);
         }
 
-        if ($request->has('search') && !empty($request->search)) {
+        if ($request->has('search') && ! empty($request->search)) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%")
-                  ->orWhere('tags', 'like', "%{$search}%");
+                    ->orWhere('content', 'like', "%{$search}%")
+                    ->orWhere('tags', 'like', "%{$search}%");
             });
         }
 
         $page = (int) $request->input('page', 1);
-        $limit = (int) $request->input('limit', 10);
+        $limit = min(max((int) $request->input('limit', 10), 1), 50);
         $total = $query->count();
 
         $posts = $query->orderBy('createdAt', 'desc')
@@ -61,10 +58,26 @@ class BlogPostController extends Controller
 
     public function show($id): JsonResponse
     {
-        $query = BlogPost::with(['category', 'authorUser:id,username,fullName', 'comments.replies', 'facebookEmbed']);
+        // Security: Public readers can only view published posts and approved comments
+        $query = BlogPost::with([
+            'category',
+            'authorUser:id,username,fullName',
+            'comments' => function ($q) {
+                $q->where(function ($sub) {
+                    $sub->where('status', 'approved')->orWhereNull('status');
+                })->whereNull('parentCommentId')
+                    ->with(['replies' => function ($rq) {
+                        $rq->where(function ($rsub) {
+                            $rsub->where('status', 'approved')->orWhereNull('status');
+                        });
+                    }]);
+            },
+            'facebookEmbed',
+        ])->where('status', 'published');
+
         $post = is_numeric($id) ? $query->find($id) : $query->where('slug', $id)->first();
 
-        if (!$post) {
+        if (! $post) {
             return response()->json([
                 'success' => false,
                 'error' => 'Blog post not found',
@@ -81,11 +94,26 @@ class BlogPostController extends Controller
 
     public function bySlug($slug): JsonResponse
     {
-        $post = BlogPost::with(['category', 'authorUser:id,username,fullName', 'comments.replies', 'facebookEmbed'])
-            ->where('slug', $slug)
+        // Security: Public readers can only view published posts and approved comments
+        $post = BlogPost::with([
+            'category',
+            'authorUser:id,username,fullName',
+            'comments' => function ($q) {
+                $q->where(function ($sub) {
+                    $sub->where('status', 'approved')->orWhereNull('status');
+                })->whereNull('parentCommentId')
+                    ->with(['replies' => function ($rq) {
+                        $rq->where(function ($rsub) {
+                            $rsub->where('status', 'approved')->orWhereNull('status');
+                        });
+                    }]);
+            },
+            'facebookEmbed',
+        ])->where('slug', $slug)
+            ->where('status', 'published')
             ->first();
 
-        if (!$post) {
+        if (! $post) {
             return response()->json([
                 'success' => false,
                 'error' => 'Blog post not found',

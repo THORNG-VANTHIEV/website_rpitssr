@@ -74,6 +74,7 @@ export const AdminLayout = () => {
       title: isKhmer ? 'ការសិក្សា & អ្នកប្រើប្រាស់' : 'Academics & Users',
       icon: GraduationCap,
       items: [
+        { path: '/admin-panel/admissions', label: isKhmer ? 'ពាក្យសុំចុះឈ្មោះចូលរៀន' : 'Admissions', icon: GraduationCap },
         { path: '/admin-panel/users', label: isKhmer ? 'អ្នកប្រើប្រាស់' : 'Users', icon: Users },
         { path: '/admin-panel/teachers', label: isKhmer ? 'សាស្ត្រាចារ្យ & បុគ្គលិក' : 'Teachers', icon: GraduationCap },
         { path: '/admin-panel/courses', label: isKhmer ? 'វគ្គបណ្តុះបណ្តាល' : 'Courses', icon: BookOpen },
@@ -185,12 +186,7 @@ export const AdminLayout = () => {
       {/* Sidebar Overlay for Mobile */}
       {mobileOpen && (
         <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.5)',
-            zIndex: 999
-          }}
+          className="admin-sidebar-backdrop"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -198,8 +194,18 @@ export const AdminLayout = () => {
       {/* Admin Sidebar */}
       <aside className={`admin-sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
         <div className="admin-sidebar-header">
-          <img src="/images/logo.png" alt="RPITSSR Logo" className="admin-sidebar-logo" />
-          {!collapsed && <span className="admin-sidebar-title">RPITSSR ADMIN</span>}
+          <div className="admin-sidebar-brand">
+            <img src="/images/logo.png" alt="RPITSSR Logo" className="admin-sidebar-logo" />
+            {!collapsed && <span className="admin-sidebar-title">RPITSSR ADMIN</span>}
+          </div>
+          <button
+            type="button"
+            className="admin-sidebar-close-btn"
+            onClick={() => setMobileOpen(false)}
+            aria-label="Close Sidebar"
+          >
+            <X size={18} />
+          </button>
         </div>
 
         <nav className="admin-sidebar-nav">
@@ -360,7 +366,7 @@ export const AdminLayout = () => {
         </header>
 
         {/* Page Content Outlet */}
-        <main className="admin-content">
+        <main key={location.pathname} className="admin-content rpitssr-page-transition">
           <Outlet />
         </main>
       </div>

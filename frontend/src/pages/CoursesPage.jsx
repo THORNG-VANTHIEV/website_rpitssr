@@ -188,19 +188,60 @@ export const CoursesPage = () => {
                 : 'Empowering Cambodian youth with market-ready vocational skills, modern technological knowledge, and high employment opportunities under ISO 9001:2015 quality standards.'}
             </p>
 
-            {/* Trust Pills */}
-            <div className="courses-trust-pills">
-              <div className="courses-trust-pill">
-                <CheckCircle2 size={16} style={{ color: '#ffaf00' }} />
-                <span>{isKhmer ? 'អាហារូបករណ៍ ១០០% របស់រាជរដ្ឋាភិបាល' : '100% Gov Scholarships'}</span>
+            {/* Institutional Stats & Advantage Card */}
+            <div className="courses-hero-stats-card">
+              {/* Stat 1: Scholarships */}
+              <div className="courses-hero-stat-item">
+                <div className="courses-hero-stat-icon-wrap gold">
+                  <GraduationCap size={18} />
+                </div>
+                <div className="courses-hero-stat-details">
+                  <div className="courses-hero-stat-val gold">100%</div>
+                  <div className="courses-hero-stat-lbl">
+                    {isKhmer ? 'អាហារូបករណ៍ ១០០%' : '100% Scholarships'}
+                  </div>
+                  <div className="courses-hero-stat-sub">
+                    {isKhmer ? 'រាជរដ្ឋាភិបាល TVET 1.5M' : 'Gov Tuition Support'}
+                  </div>
+                </div>
               </div>
-              <div className="courses-trust-pill">
-                <CheckCircle2 size={16} style={{ color: '#38bdf8' }} />
-                <span>{isKhmer ? 'ឱកាសការងារខ្ពស់ជាង ៩៥% ក្រោយបញ្ចប់' : '95%+ Job Placement'}</span>
+
+              <div className="courses-hero-stat-divider" />
+
+              {/* Stat 2: Employment */}
+              <div className="courses-hero-stat-item">
+                <div className="courses-hero-stat-icon-wrap cyan">
+                  <Briefcase size={18} />
+                </div>
+                <div className="courses-hero-stat-details">
+                  <div className="courses-hero-stat-val cyan">95%+</div>
+                  <div className="courses-hero-stat-lbl">
+                    {isKhmer ? 'ឱកាសការងារខ្ពស់' : 'Job Placement'}
+                  </div>
+                  <div className="courses-hero-stat-sub">
+                    {isKhmer ? 'ទទួលបានការងារក្រោយចប់' : 'High Employment Rate'}
+                  </div>
+                </div>
               </div>
-              <div className="courses-trust-pill">
-                <CheckCircle2 size={16} style={{ color: '#4ade80' }} />
-                <span>{isKhmer ? 'ចុះកម្មសិក្សាផ្ទាល់នៅសហគ្រាសដៃគូ' : 'Enterprise Internship'}</span>
+
+              <div className="courses-hero-stat-divider" />
+
+              {/* Stat 3: Enterprise */}
+              <div className="courses-hero-stat-item">
+                <div className="courses-hero-stat-icon-wrap green">
+                  <Award size={18} />
+                </div>
+                <div className="courses-hero-stat-details">
+                  <div className="courses-hero-stat-val green">
+                    {isKhmer ? 'ដៃគូ' : 'Industry'}
+                  </div>
+                  <div className="courses-hero-stat-lbl">
+                    {isKhmer ? 'កម្មសិក្សាផ្ទាល់' : 'Enterprise Internships'}
+                  </div>
+                  <div className="courses-hero-stat-sub">
+                    {isKhmer ? 'សហគ្រាស & ក្រុមហ៊ុនធំៗ' : 'Hands-on Experience'}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -227,16 +268,18 @@ export const CoursesPage = () => {
             </div>
           </div>
 
-          <div className="row g-4">
+          <div className="row g-4 courses-env-grid">
             {/* Facility Card 1 */}
             <div className="col-lg-4 col-md-6">
               <div className="courses-env-card">
-                <div className="courses-env-icon-box blue">
-                  <Laptop size={26} />
+                <div className="courses-env-card-header">
+                  <div className="courses-env-icon-box blue">
+                    <Laptop size={24} />
+                  </div>
+                  <h3 className="courses-env-title">
+                    {isKhmer ? 'បន្ទប់ពិសោធន៍ & រោងជាងបច្ចេកវិទ្យាទំនើប' : 'Modern Practical Labs & Workshops'}
+                  </h3>
                 </div>
-                <h3 className="courses-env-title">
-                  {isKhmer ? 'បន្ទប់ពិសោធន៍ & រោងជាងបច្ចេកវិទ្យាទំនើប' : 'Modern Practical Labs & Workshops'}
-                </h3>
                 <p className="courses-env-desc">
                   {isKhmer
                     ? 'បំពាក់សម្ភារៈឧបករណ៍ពិសោធន៍ទំនើប និងបន្ទប់កុំព្យូទ័រស្តង់ដារ ១ និស្សិត : ១ កុំព្យូទ័រ/ឧបករណ៍អនុវត្តជាក់ស្តែង ស្របតាមបច្ចេកវិទ្យាឧស្សាហកម្ម ៤.០។'
@@ -248,12 +291,14 @@ export const CoursesPage = () => {
             {/* Facility Card 2 */}
             <div className="col-lg-4 col-md-6">
               <div className="courses-env-card">
-                <div className="courses-env-icon-box amber">
-                  <Briefcase size={26} />
+                <div className="courses-env-card-header">
+                  <div className="courses-env-icon-box amber">
+                    <Briefcase size={24} />
+                  </div>
+                  <h3 className="courses-env-title">
+                    {isKhmer ? 'កម្មសិក្សាការងារផ្ទាល់នៅសហគ្រាសដៃគូ' : 'Enterprise Internships & Placements'}
+                  </h3>
                 </div>
-                <h3 className="courses-env-title">
-                  {isKhmer ? 'កម្មសិក្សាការងារផ្ទាល់នៅសហគ្រាសដៃគូ' : 'Enterprise Internships & Placements'}
-                </h3>
                 <p className="courses-env-desc">
                   {isKhmer
                     ? 'សិស្ស-និស្សិតទទួលបានការចុះអនុវត្តការងារ និងកម្មសិក្សាផ្ទាល់នៅរោងចក្រ ក្រុមហ៊ុន សណ្ឋាគារ និងសហគ្រាសដៃគូធំៗ ដើម្បីពង្រឹងសមត្ថភាពការងារជាក់ស្តែង។'
@@ -265,12 +310,14 @@ export const CoursesPage = () => {
             {/* Facility Card 3 */}
             <div className="col-lg-4 col-md-6">
               <div className="courses-env-card">
-                <div className="courses-env-icon-box green">
-                  <Award size={26} />
+                <div className="courses-env-card-header">
+                  <div className="courses-env-icon-box green">
+                    <Award size={24} />
+                  </div>
+                  <h3 className="courses-env-title">
+                    {isKhmer ? 'សញ្ញាបត្រទទួលស្គាល់ជាតិ & ISO 9001:2015' : 'Nationally Certified & ISO Standards'}
+                  </h3>
                 </div>
-                <h3 className="courses-env-title">
-                  {isKhmer ? 'សញ្ញាបត្រទទួលស្គាល់ជាតិ & ISO 9001:2015' : 'Nationally Certified & ISO Standards'}
-                </h3>
                 <p className="courses-env-desc">
                   {isKhmer
                     ? 'ការបណ្តុះបណ្តាលធានាគុណភាពស្របតាមក្របខ័ណ្ឌគុណវុឌ្ឍិជាតិកម្ពុជា (CQF) ក្រោមឱវាទក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ និងស្តង់ដារអន្តរជាតិ។'
@@ -282,18 +329,20 @@ export const CoursesPage = () => {
 
           {/* Action Links */}
           <div className="courses-env-actions">
-            <Link to="/register" onClick={scrollToTop} className="footer-btn-primary" style={{ padding: '12px 30px' }}>
+            <Link to="/register" onClick={scrollToTop} className="footer-btn-primary courses-action-main" style={{ padding: '12px 30px' }}>
               <Edit3 size={17} />
               <span>{isKhmer ? 'ចុះឈ្មោះចូលរៀនឥឡូវនេះ' : 'Apply For Admission'}</span>
             </Link>
-            <Link to="/contact" onClick={scrollToTop} className="footer-btn-outline" style={{ padding: '12px 26px' }}>
-              <PhoneCall size={17} />
-              <span>{isKhmer ? 'ទំនាក់ទំនងប្រឹក្សាជំនាញ' : 'Consult with Advisors'}</span>
-            </Link>
-            <Link to="/downloads" onClick={scrollToTop} className="home-hero-btn-outline" style={{ padding: '11px 22px' }}>
-              <FileDown size={16} />
-              <span>{isKhmer ? 'មជ្ឈមណ្ឌលទាញយកឯកសារ' : 'Download Brochure'}</span>
-            </Link>
+            <div className="courses-action-sub-row">
+              <Link to="/contact" onClick={scrollToTop} className="footer-btn-outline courses-action-sub" style={{ padding: '12px 24px' }}>
+                <PhoneCall size={16} />
+                <span>{isKhmer ? 'ទំនាក់ទំនងប្រឹក្សា' : 'Consult Advisors'}</span>
+              </Link>
+              <Link to="/downloads" onClick={scrollToTop} className="home-hero-btn-outline courses-action-sub" style={{ padding: '11px 22px' }}>
+                <FileDown size={16} />
+                <span>{isKhmer ? 'មជ្ឈមណ្ឌលឯកសារ' : 'Brochures'}</span>
+              </Link>
+            </div>
           </div>
         </div>
       </section>

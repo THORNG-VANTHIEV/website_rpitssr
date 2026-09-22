@@ -27,7 +27,8 @@ import {
   Calendar,
   Zap,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  ArrowRight
 } from 'lucide-react';
 
 const QUICK_TAGS = [
@@ -49,9 +50,8 @@ export const AdminBannersPage = () => {
   const [editingBanner, setEditingBanner] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // Filter & Search State
+  // Filter & Sort State
   const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'active', 'inactive'
-  const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('order'); // 'order', 'date'
 
   // Live Ticker Simulator Controls
@@ -111,19 +111,17 @@ export const AdminBannersPage = () => {
     return { total, active, inactive, avgChars, avgDuration };
   }, [banners]);
 
-  // Filtered & Sorted Banners
+  // Filtered & Sorted Banners (AdminDataTable handles multi-field search)
   const filteredBanners = useMemo(() => {
     return banners
       .filter((b) => {
-        const text = (b.message || b.text || '').toLowerCase();
-        const matchesSearch = text.includes(searchTerm.toLowerCase());
         const matchesStatus =
           statusFilter === 'all'
             ? true
             : statusFilter === 'active'
             ? Boolean(b.is_active)
             : !Boolean(b.is_active);
-        return matchesSearch && matchesStatus;
+        return matchesStatus;
       })
       .sort((a, b) => {
         if (sortBy === 'order') {
@@ -131,7 +129,7 @@ export const AdminBannersPage = () => {
         }
         return new Date(b.createdAt || b.created_at || 0) - new Date(a.createdAt || a.created_at || 0);
       });
-  }, [banners, searchTerm, statusFilter, sortBy]);
+  }, [banners, statusFilter, sortBy]);
 
   // Active Banners for Ticker Simulator
   const activeBannersForTicker = useMemo(() => {
@@ -449,19 +447,118 @@ export const AdminBannersPage = () => {
     }
   ];
 
+  // Dedicated Mobile Card Renderer (< 768px)
+  const renderMobileCard = (row) => {
+    const text = row.message || row.text || '';
+    const isActive = Boolean(row.is_active);
+    return (
+      <div key={row.id} className="admin-user-mobile-card">
+        {/* Card Header: Order, Date & Live Status Toggle */}
+        <div className="admin-user-mobile-card-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <span className="admin-banner-order-badge" title={isKhmer ? 'លំដាប់លំដោយនៃការបង្ហាញ' : 'Display Order'}>
+              #{row.order_index ?? 0}
+            </span>
+            <span style={{ fontSize: '0.78rem', color: '#64748b', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <Calendar size={12} style={{ color: '#1e73be' }} />
+              {formatDate(row.createdAt || row.created_at)}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <label className="admin-toggle-switch" title={isActive ? (isKhmer ? 'ផ្អាកការផ្សាយ' : 'Pause') : (isKhmer ? 'បើកការផ្សាយ' : 'Activate')}>
+              <input
+                type="checkbox"
+                checked={isActive}
+                onChange={() => handleToggleActive(row)}
+              />
+              <span className="admin-toggle-slider"></span>
+            </label>
+            <span
+              style={{
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                color: isActive ? '#059669' : '#64748b'
+              }}
+            >
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: isActive ? '#10b981' : '#94a3b8' }}></span>
+              {isActive ? (isKhmer ? 'កំពុងរត់' : 'Active') : (isKhmer ? 'ផ្អាក' : 'Paused')}
+            </span>
+          </div>
+        </div>
+
+        {/* Card Body: Announcement Text & Quick Tags */}
+        <div style={{ margin: '10px 0 8px 0' }}>
+          <div
+            style={{
+              fontWeight: 600,
+              color: '#07294D',
+              lineHeight: 1.55,
+              fontSize: '0.90rem',
+              wordBreak: 'break-word',
+              marginBottom: '8px'
+            }}
+          >
+            <Megaphone size={14} style={{ color: '#ffaf00', display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
+            <span>{text}</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+            <span className="admin-banner-char-tag">
+              <Hash size={11} /> {text.length} {isKhmer ? 'តួអក្សរ' : 'chars'}
+            </span>
+            {text.includes('#TVET') && (
+              <span style={{ fontSize: '0.70rem', fontWeight: 700, padding: '1px 6px', borderRadius: '4px', background: '#eff6ff', color: '#1e73be', border: '1px solid #bfdbfe' }}>#TVET</span>
+            )}
+            {text.includes('អាហារូបករណ៍') && (
+              <span style={{ fontSize: '0.70rem', fontWeight: 700, padding: '1px 6px', borderRadius: '4px', background: '#fefce8', color: '#ca8a04', border: '1px solid #fef08a' }}>{isKhmer ? 'អាហារូបករណ៍' : 'Scholarship'}</span>
+            )}
+            {text.includes('ឥតគិតថ្លៃ') && (
+              <span style={{ fontSize: '0.70rem', fontWeight: 700, padding: '1px 6px', borderRadius: '4px', background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}>{isKhmer ? 'ឥតគិតថ្លៃ 100%' : '100% Free'}</span>
+            )}
+          </div>
+        </div>
+
+        {/* Card Footer: 3 Tactile Action Buttons */}
+        <div className="admin-user-card-actions" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', marginTop: '12px' }}>
+          <button
+            type="button"
+            onClick={() => setPreviewBanner(row)}
+            className="admin-btn admin-btn-outline admin-btn-sm"
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px', fontSize: '0.76rem', padding: '6px 8px' }}
+          >
+            <Eye size={13} />
+            <span>{isKhmer ? 'មើល' : 'Preview'}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => openEditModal(row)}
+            className="admin-btn admin-btn-outline admin-btn-sm"
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px', fontSize: '0.76rem', padding: '6px 8px' }}
+          >
+            <Edit2 size={13} />
+            <span>{isKhmer ? 'កែប្រែ' : 'Edit'}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => openDeleteModal(row)}
+            className="admin-btn admin-btn-danger admin-btn-sm"
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px', fontSize: '0.76rem', padding: '6px 8px' }}
+          >
+            <Trash2 size={13} />
+            <span>{isKhmer ? 'លុប' : 'Delete'}</span>
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={{ paddingBottom: '60px' }}>
       {/* 1. Header Banner & Trust Badge */}
-      <div
-        style={{
-          background: '#ffffff',
-          borderRadius: '20px',
-          border: '1px solid #e2e8f0',
-          padding: '24px 28px',
-          marginBottom: '24px',
-          boxShadow: '0 4px 18px rgba(7, 41, 77, 0.04)'
-        }}
-      >
+      <div className="admin-page-header admin-banners-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div
@@ -510,7 +607,7 @@ export const AdminBannersPage = () => {
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <div className="admin-banners-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <button
               onClick={fetchData}
               className="admin-btn admin-btn-outline"
@@ -627,300 +724,159 @@ export const AdminBannersPage = () => {
       </div>
 
       {/* 3. 4-Card Institutional KPI Metric Strip */}
-      <div className="row g-3 mb-24">
+      <div className="admin-kpi-grid admin-banners-kpis">
         {/* Metric 1: Total */}
-        <div className="col-12 col-sm-6 col-lg-3">
-          <div
-            style={{
-              background: '#ffffff',
-              borderRadius: '16px',
-              border: '1px solid #e2e8f0',
-              padding: '20px 22px',
-              boxShadow: '0 4px 18px rgba(7, 41, 77, 0.04)',
-              transition: 'all 0.2s',
-              height: '100%'
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748b', marginBottom: '4px' }}>
-                  {isKhmer ? 'សារបដាសរុប' : 'Total Banners'}
-                </div>
-                <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#07294D', lineHeight: 1.2 }}>
-                  {metrics.total}
-                </div>
-                <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '4px' }}>
-                  {isKhmer ? 'សារប្រកាសក្នុងប្រព័ន្ធ' : 'Registered announcements'}
-                </div>
+        <div
+          className="admin-kpi-card"
+          onClick={() => setStatusFilter('all')}
+          style={{ cursor: 'pointer' }}
+          role="button"
+          tabIndex={0}
+        >
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'សារបដាសរុប' : 'Total Banners'}</span>
+              <div className="admin-kpi-value">{metrics.total}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#1e73be' }} />
+                <span>{isKhmer ? 'សារប្រកាសក្នុងប្រព័ន្ធ' : 'Registered announcements'}</span>
               </div>
-              <div
-                style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '12px',
-                  backgroundColor: '#eff6ff',
-                  color: '#1e73be',
-                  border: '1px solid #dbeafe',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#eff6ff', color: '#1e73be' }}>
+                {isKhmer ? 'សារ' : 'Banners'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}>
                 <Layers size={22} />
               </div>
             </div>
           </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'មើលសារបដាទាំងអស់' : 'View all banners'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
+          </div>
         </div>
 
         {/* Metric 2: Active */}
-        <div className="col-12 col-sm-6 col-lg-3">
-          <div
-            style={{
-              background: '#ffffff',
-              borderRadius: '16px',
-              border: '1px solid #e2e8f0',
-              padding: '20px 22px',
-              boxShadow: '0 4px 18px rgba(7, 41, 77, 0.04)',
-              transition: 'all 0.2s',
-              height: '100%'
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748b', marginBottom: '4px' }}>
-                  {isKhmer ? 'កំពុងរត់ផ្សាយ' : 'Live Active'}
-                </div>
-                <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#059669', lineHeight: 1.2 }}>
-                  {metrics.active}
-                </div>
-                <div style={{ fontSize: '0.78rem', color: '#059669', marginTop: '4px', fontWeight: 600 }}>
-                  {isKhmer ? 'បង្ហាញលើគេហទំព័រភ្លាមៗ' : 'Broadcasting on header'}
-                </div>
+        <div
+          className="admin-kpi-card"
+          onClick={() => setStatusFilter('active')}
+          style={{ cursor: 'pointer' }}
+          role="button"
+          tabIndex={0}
+        >
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'កំពុងរត់ផ្សាយ' : 'Live Active'}</span>
+              <div className="admin-kpi-value" style={{ color: '#059669' }}>{metrics.active}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#059669' }} />
+                <span>{isKhmer ? 'បង្ហាញលើគេហទំព័រភ្លាមៗ' : 'Broadcasting on header'}</span>
               </div>
-              <div
-                style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '12px',
-                  backgroundColor: '#f0fdf4',
-                  color: '#059669',
-                  border: '1px solid #bbf7d0',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#f0fdf4', color: '#059669' }}>
+                {isKhmer ? 'ផ្សាយ' : 'Live'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}>
                 <CheckCircle2 size={22} />
               </div>
             </div>
           </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'ចម្រោះសារកំពុងផ្សាយ' : 'Filter active banners'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
+          </div>
         </div>
 
         {/* Metric 3: Inactive */}
-        <div className="col-12 col-sm-6 col-lg-3">
-          <div
-            style={{
-              background: '#ffffff',
-              borderRadius: '16px',
-              border: '1px solid #e2e8f0',
-              padding: '20px 22px',
-              boxShadow: '0 4px 18px rgba(7, 41, 77, 0.04)',
-              transition: 'all 0.2s',
-              height: '100%'
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748b', marginBottom: '4px' }}>
-                  {isKhmer ? 'ផ្អាកបណ្តោះអាសន្ន' : 'Archived / Paused'}
-                </div>
-                <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#ea580c', lineHeight: 1.2 }}>
-                  {metrics.inactive}
-                </div>
-                <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '4px' }}>
-                  {isKhmer ? 'មិនទាន់បង្ហាញជាសាធារណៈ' : 'Hidden from public'}
-                </div>
+        <div
+          className="admin-kpi-card"
+          onClick={() => setStatusFilter('inactive')}
+          style={{ cursor: 'pointer' }}
+          role="button"
+          tabIndex={0}
+        >
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'ផ្អាកបណ្តោះអាសន្ន' : 'Archived / Paused'}</span>
+              <div className="admin-kpi-value" style={{ color: '#ea580c' }}>{metrics.inactive}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#ea580c' }} />
+                <span>{isKhmer ? 'មិនទាន់បង្ហាញជាសាធារណៈ' : 'Hidden from public'}</span>
               </div>
-              <div
-                style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '12px',
-                  backgroundColor: '#fff7ed',
-                  color: '#ea580c',
-                  border: '1px solid #fed7aa',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#fff7ed', color: '#ea580c' }}>
+                {isKhmer ? 'ផ្អាក' : 'Paused'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa' }}>
                 <PauseCircle size={22} />
               </div>
             </div>
           </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'ចម្រោះសារផ្អាក' : 'Filter paused banners'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
+          </div>
         </div>
 
         {/* Metric 4: Speed & Chars */}
-        <div className="col-12 col-sm-6 col-lg-3">
-          <div
-            style={{
-              background: '#ffffff',
-              borderRadius: '16px',
-              border: '1px solid #e2e8f0',
-              padding: '20px 22px',
-              boxShadow: '0 4px 18px rgba(7, 41, 77, 0.04)',
-              transition: 'all 0.2s',
-              height: '100%'
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748b', marginBottom: '4px' }}>
-                  {isKhmer ? 'ប្រវែងមធ្យម & រយៈពេល' : 'Avg Length & Cycle'}
-                </div>
-                <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#7c3aed', lineHeight: 1.2 }}>
-                  ~{metrics.avgDuration}s
-                </div>
-                <div style={{ fontSize: '0.78rem', color: '#7c3aed', marginTop: '4px', fontWeight: 600 }}>
-                  {metrics.avgChars} {isKhmer ? 'តួអក្សរក្នុងមួយសារ' : 'chars/message avg'}
-                </div>
+        <div
+          className="admin-kpi-card"
+          onClick={() => setStatusFilter('all')}
+          style={{ cursor: 'pointer' }}
+          role="button"
+          tabIndex={0}
+        >
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'ប្រវែងមធ្យម & រយៈពេល' : 'Avg Length & Cycle'}</span>
+              <div className="admin-kpi-value" style={{ color: '#7c3aed' }}>~{metrics.avgDuration}s</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#7c3aed' }} />
+                <span>{metrics.avgChars} {isKhmer ? 'តួអក្សរក្នុងមួយសារ' : 'chars/message avg'}</span>
               </div>
-              <div
-                style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '12px',
-                  backgroundColor: '#faf5ff',
-                  color: '#7c3aed',
-                  border: '1px solid #e9d5ff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#faf5ff', color: '#7c3aed' }}>
+                {isKhmer ? 'ល្បឿន' : 'Speed'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}>
                 <Sparkles size={22} />
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* 4. Filter Toolbar & Search Bar */}
-      <div
-        style={{
-          background: '#ffffff',
-          borderRadius: '16px',
-          border: '1px solid #e2e8f0',
-          padding: '16px 20px',
-          marginBottom: '20px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '14px'
-        }}
-      >
-        {/* Status Filter Tabs */}
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-          {[
-            { id: 'all', labelKm: 'ទាំងអស់', labelEn: 'All Banners', count: metrics.total },
-            { id: 'active', labelKm: '🟢 កំពុងផ្សាយ', labelEn: '🟢 Active Live', count: metrics.active },
-            { id: 'inactive', labelKm: '⚪ ផ្អាកទុក', labelEn: '⚪ Paused', count: metrics.inactive }
-          ].map((tab) => {
-            const isSelected = statusFilter === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setStatusFilter(tab.id)}
-                style={{
-                  padding: '6px 14px',
-                  borderRadius: '20px',
-                  fontSize: '0.82rem',
-                  fontWeight: isSelected ? '700' : '600',
-                  border: isSelected ? '1px solid #1e73be' : '1px solid #e2e8f0',
-                  backgroundColor: isSelected ? '#eff6ff' : '#ffffff',
-                  color: isSelected ? '#1e73be' : '#64748b',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.15s'
-                }}
-              >
-                <span>{isKhmer ? tab.labelKm : tab.labelEn}</span>
-                <span
-                  style={{
-                    fontSize: '0.72rem',
-                    padding: '1px 6px',
-                    borderRadius: '10px',
-                    backgroundColor: isSelected ? '#1e73be' : '#f1f5f9',
-                    color: isSelected ? '#ffffff' : '#64748b',
-                    fontWeight: 700
-                  }}
-                >
-                  {tab.count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Search & Sort Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative', width: '260px' }}>
-            <Search
-              size={15}
-              style={{
-                position: 'absolute',
-                left: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#94a3b8'
-              }}
-            />
-            <input
-              type="text"
-              className="admin-form-control"
-              style={{ paddingLeft: '34px', paddingRight: searchTerm ? '32px' : '12px', height: '38px', fontSize: '0.85rem' }}
-              placeholder={isKhmer ? 'ស្វែងរកតាមខ្លឹមសារសារបដា...' : 'Search announcement text...'}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            {searchTerm && (
-              <button
-                type="button"
-                onClick={() => setSearchTerm('')}
-                style={{
-                  position: 'absolute',
-                  right: '10px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  color: '#94a3b8',
-                  cursor: 'pointer',
-                  padding: 0
-                }}
-              >
-                <X size={14} />
-              </button>
-            )}
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'ស្ថិតិប្រវែងសារ' : 'Length analytics'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
-
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="admin-form-control"
-            style={{ width: 'auto', height: '38px', fontSize: '0.85rem', fontWeight: 600, color: '#07294D' }}
-          >
-            <option value="order">{isKhmer ? 'តម្រៀបតាម៖ លំដាប់' : 'Sort: Display Order'}</option>
-            <option value="date">{isKhmer ? 'តម្រៀបតាម៖ កាលបរិច្ឆេទ' : 'Sort: Date Created'}</option>
-          </select>
         </div>
       </div>
 
-      {/* 5. Main DataTable */}
+      {/* 4. Status Filter Bar (Sleek Horizontal Scroll Pills) */}
+      <div className="admin-user-filter-bar">
+        {[
+          { id: 'all', labelKm: 'ទាំងអស់', labelEn: 'All Banners', count: metrics.total },
+          { id: 'active', labelKm: '🟢 កំពុងផ្សាយ', labelEn: '🟢 Active Live', count: metrics.active },
+          { id: 'inactive', labelKm: '⚪ ផ្អាកទុក', labelEn: '⚪ Paused', count: metrics.inactive }
+        ].map((tab) => {
+          const isSelected = statusFilter === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              className={`admin-user-filter-pill ${isSelected ? 'active' : ''}`}
+              onClick={() => setStatusFilter(tab.id)}
+            >
+              <span>{isKhmer ? tab.labelKm : tab.labelEn}</span>
+              <span className="admin-user-filter-count">{tab.count}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 5. Main DataTable & Mobile Cards View */}
       <AdminDataTable
         columns={columns}
         data={filteredBanners}
@@ -931,7 +887,30 @@ export const AdminBannersPage = () => {
             ? `បង្ហាញ ${filteredBanners.length} ក្នុងចំណោមសារសរុប ${banners.length}`
             : `Showing ${filteredBanners.length} of ${banners.length} announcements`
         }
-        hideSearch={true}
+        onAdd={openAddModal}
+        addLabel={isKhmer ? 'បន្ថែមសារបដាថ្មី' : 'New Banner Announcement'}
+        onRefresh={fetchData}
+        searchPlaceholder={isKhmer ? 'ស្វែងរកតាមខ្លឹមសារសារបដា...' : 'Search announcement text...'}
+        renderMobileCard={renderMobileCard}
+        customHeaderActions={
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            style={{
+              padding: '7px 12px',
+              borderRadius: '8px',
+              border: '1px solid #e2e8f0',
+              fontSize: '0.82rem',
+              background: '#ffffff',
+              color: '#07294D',
+              outline: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="order">{isKhmer ? 'តម្រៀប ៖ លំដាប់' : 'Sort: Display Order'}</option>
+            <option value="date">{isKhmer ? 'តម្រៀប ៖ កាលបរិច្ឆេទ' : 'Sort: Date Created'}</option>
+          </select>
+        }
       />
 
       {/* 6. Preview Lightbox Modal */}

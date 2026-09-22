@@ -88,6 +88,12 @@ const SAMPLE_GALLERY = [
   }
 ];
 
+// Khmer numeral conversion helper
+const toKhmerNumber = (num) => {
+  const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+  return String(num).replace(/[0-9]/g, (digit) => khmerDigits[parseInt(digit, 10)]);
+};
+
 // Helper for authentic Cambodian date formatting
 const formatKhmerDate = (dateStr, isKhmer) => {
   if (!dateStr) return isKhmer ? 'ថ្មីៗ' : 'Recent';
@@ -102,10 +108,6 @@ const formatKhmerDate = (dateStr, isKhmer) => {
     'មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា',
     'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'
   ];
-  const toKhmerNumber = (num) => {
-    const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
-    return num.toString().split('').map(char => khmerDigits[char] || char).join('');
-  };
 
   const day = toKhmerNumber(d.getDate());
   const month = khmerMonths[d.getMonth()];
@@ -380,7 +382,7 @@ export const GalleryPage = () => {
                 </div>
                 <div>
                   <div className="fw-bold" style={{ color: '#07294D', fontSize: '1.35rem', lineHeight: 1.2 }}>
-                    {isKhmer ? `${images.length}+` : `${images.length}+`}
+                    {isKhmer ? `${toKhmerNumber(images.length)}+` : `${images.length}+`}
                   </div>
                   <div className="text-muted small fw-medium">
                     {isKhmer ? 'រូបភាពផ្លូវការសរុប' : 'Total Photos'}

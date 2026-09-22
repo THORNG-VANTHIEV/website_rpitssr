@@ -31,7 +31,8 @@ import {
   Briefcase,
   Shield,
   Clock,
-  GraduationCap
+  GraduationCap,
+  ArrowRight
 } from 'lucide-react';
 
 export const AdminCourseCategoriesPage = () => {
@@ -352,10 +353,164 @@ export const AdminCourseCategoriesPage = () => {
     },
   ];
 
+  // Mobile Card Renderer (< 768px viewports)
+  const renderMobileCard = (row) => {
+    const meta = getCategoryMeta(row.name);
+    const IconComponent = meta.icon;
+    const isActive = (row.status || 'active') === 'active';
+    const count = row.courses_count || row.courses?.length || 0;
+
+    return (
+      <div className="admin-user-mobile-card">
+        {/* Top: Icon Box, Name, Slug & Status Badge */}
+        <div className="admin-user-mobile-card-top">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+            <div
+              className="admin-cat-icon-box"
+              style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: '12px',
+                backgroundColor: meta.bg,
+                color: meta.color,
+                border: `1px solid ${meta.border}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <IconComponent size={20} />
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div
+                style={{
+                  fontWeight: '700',
+                  color: '#07294D',
+                  fontSize: '0.92rem',
+                  lineHeight: 1.3,
+                  wordBreak: 'break-word',
+                }}
+              >
+                {row.name}
+              </div>
+              <div
+                style={{
+                  fontSize: '0.76rem',
+                  color: '#64748b',
+                  marginTop: '2px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                }}
+              >
+                <span className="admin-cat-slug-pill" style={{ padding: '1px 6px', fontSize: '0.72rem' }}>
+                  #{row.slug || row.name.toLowerCase().replace(/\s+/g, '-')}
+                </span>
+                <span style={{ fontSize: '0.72rem' }}>• {meta.label}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Status Badge */}
+          <div style={{ flexShrink: 0 }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '3px 8px',
+                borderRadius: '9999px',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                background: isActive ? '#f0fdf4' : '#f8fafc',
+                color: isActive ? '#166534' : '#64748b',
+                border: `1px solid ${isActive ? '#bbf7d0' : '#e2e8f0'}`,
+              }}
+            >
+              <span
+                style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  backgroundColor: isActive ? '#22c55e' : '#94a3b8',
+                }}
+              />
+              <span>{isActive ? (isKhmer ? 'សកម្ម' : 'Active') : (isKhmer ? 'ផ្អាក' : 'Inactive')}</span>
+            </span>
+          </div>
+        </div>
+
+        {/* Details Block: Linked Courses Count & Description */}
+        <div className="admin-user-mobile-card-details">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: row.description ? '6px' : '0' }}>
+            <span className={`admin-cat-count-badge ${count > 0 ? 'has-courses' : 'empty-courses'}`} style={{ fontSize: '0.75rem', padding: '3px 9px' }}>
+              <BookOpen size={12} />
+              <span>{count} {isKhmer ? 'វគ្គសិក្សាភ្ជាប់រួច' : (count === 1 ? 'Course' : 'Courses')}</span>
+            </span>
+
+            <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
+              {isKhmer ? 'លំដាប់បង្ហាញ៖' : 'Order:'} <strong>{row.order || 0}</strong>
+            </span>
+          </div>
+
+          {row.description && (
+            <div
+              style={{
+                fontSize: '0.76rem',
+                color: '#64748b',
+                paddingTop: '6px',
+                borderTop: '1px dashed #e2e8f0',
+                lineHeight: 1.4,
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
+              {row.description}
+            </div>
+          )}
+        </div>
+
+        {/* Action Buttons Bar */}
+        <div className="admin-user-mobile-card-actions">
+          <button
+            onClick={() => openPreviewModal(row)}
+            className="admin-user-mobile-action-btn view"
+            title={isKhmer ? 'មើលព័ត៌មានលម្អិត' : 'Quick Preview'}
+          >
+            <Eye size={13} />
+            <span>{isKhmer ? 'ព័ត៌មាន' : 'Preview'}</span>
+          </button>
+
+          <button
+            onClick={() => openEditModal(row)}
+            className="admin-user-mobile-action-btn edit"
+            title={isKhmer ? 'កែសម្រួល' : 'Edit Category'}
+          >
+            <Edit2 size={13} />
+            <span>{isKhmer ? 'កែសម្រួល' : 'Edit'}</span>
+          </button>
+
+          <button
+            onClick={() => openDeleteModal(row)}
+            className="admin-user-mobile-action-btn delete"
+            title={isKhmer ? 'លុប' : 'Delete Category'}
+          >
+            <Trash2 size={13} />
+            <span>{isKhmer ? 'លុប' : 'Delete'}</span>
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div>
+    <div style={{ maxWidth: '1440px', margin: '0 auto', paddingBottom: '40px' }}>
       {/* 1. Header Banner with Trust Badge */}
       <div
+        className="admin-cat-header"
         style={{
           background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
           borderRadius: '20px',
@@ -387,15 +542,16 @@ export const AdminCourseCategoriesPage = () => {
             }}
           >
             <FolderTree size={14} />
-            {isKhmer ? 'ការគ្រប់គ្រងប្រភេទជំនាញ & ដេប៉ាតឺម៉ង់' : 'Course Categories & Academic Divisions'}
+            <span>{isKhmer ? 'ការគ្រប់គ្រងប្រភេទជំនាញ & ដេប៉ាតឺម៉ង់' : 'Course Categories & Academic Divisions'}</span>
           </div>
           <h1
             style={{
-              fontSize: '1.6rem',
+              fontSize: '1.65rem',
               fontWeight: 800,
               color: '#07294D',
               margin: '0 0 6px 0',
               lineHeight: 1.2,
+              letterSpacing: '-0.3px',
             }}
           >
             {isKhmer ? 'ប្រភេទវគ្គសិក្សា & ជំនាញបណ្តុះបណ្តាល' : 'Course Categories & Divisions'}
@@ -407,22 +563,15 @@ export const AdminCourseCategoriesPage = () => {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div className="admin-cat-header-actions" style={{ display: 'flex', gap: '10px' }}>
           <button
             onClick={fetchData}
             disabled={loading}
             className="admin-btn admin-btn-outline"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              borderRadius: '12px',
-              padding: '9px 16px',
-              fontWeight: 600,
-            }}
+            title={isKhmer ? 'ធ្វើបច្ចុប្បន្នភាព' : 'Refresh'}
           >
             <RotateCw size={15} className={loading ? 'fa-spin' : ''} />
-            {isKhmer ? 'ធ្វើបច្ចុប្បន្នភាព' : 'Refresh'}
+            <span>{isKhmer ? 'ធ្វើបច្ចុប្បន្នភាព' : 'Refresh'}</span>
           </button>
           <button
             onClick={openAddModal}
@@ -431,317 +580,155 @@ export const AdminCourseCategoriesPage = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              borderRadius: '12px',
-              padding: '9px 18px',
-              fontWeight: 600,
               background: 'linear-gradient(135deg, #07294D 0%, #1e73be 100%)',
               border: 'none',
               boxShadow: '0 4px 12px rgba(7, 41, 77, 0.15)',
             }}
           >
             <Plus size={16} />
-            {isKhmer ? 'បន្ថែមប្រភេទថ្មី' : 'Add Category'}
+            <span>{isKhmer ? 'បន្ថែមប្រភេទថ្មី' : 'Add Category'}</span>
           </button>
         </div>
       </div>
 
       {/* 2. 4-Card Institutional KPI Metrics Strip */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '16px',
-          marginBottom: '24px',
-        }}
-      >
+      <div className="admin-kpi-grid admin-cat-kpis">
         {/* KPI 1: Total Categories */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
-        >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#eff6ff',
-              color: '#1e73be',
-              border: '1px solid #dbeafe',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <FolderTree size={22} />
+        <div className="admin-kpi-card">
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'ប្រភេទជំនាញសរុប' : 'Total Categories'}</span>
+              <div className="admin-kpi-value">{totalCategories}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#1e73be' }} />
+                <span>{isKhmer ? 'ដេប៉ាតឺម៉ង់ និងផ្នែកជំនាញ' : 'Academic divisions'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#eff6ff', color: '#1e73be' }}>
+                {isKhmer ? 'សរុប' : 'Total'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}>
+                <FolderTree size={24} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'ប្រភេទជំនាញសរុប' : 'Total Categories'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {totalCategories} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#1e73be' }}>{isKhmer ? 'ផ្នែក' : 'Divisions'}</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'គ្រប់គ្រងដេប៉ាតឺម៉ង់' : 'Manage divisions'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* KPI 2: Linked Courses */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
-        >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#faf5ff',
-              color: '#7c3aed',
-              border: '1px solid #e9d5ff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <BookOpen size={22} />
+        <div className="admin-kpi-card">
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'វគ្គសិក្សាភ្ជាប់រួច' : 'Linked Courses'}</span>
+              <div className="admin-kpi-value">{totalCourses}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#7c3aed' }} />
+                <span>{isKhmer ? 'កម្មវិធីបណ្តុះបណ្តាលសកម្ម' : 'Active accredited courses'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#faf5ff', color: '#7c3aed' }}>
+                {isKhmer ? 'វគ្គសិក្សា' : 'Courses'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}>
+                <BookOpen size={24} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'វគ្គសិក្សាភ្ជាប់រួច' : 'Linked Courses'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {totalCourses} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#7c3aed' }}>{isKhmer ? 'វគ្គសិក្សា' : 'Courses'}</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'កម្មវិធីសិក្សា' : 'Curriculums'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
-        {/* KPI 3: Active Sectors */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
-        >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#f0fdf4',
-              color: '#059669',
-              border: '1px solid #bbf7d0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <CheckCircle2 size={22} />
+        {/* KPI 3: Active Status */}
+        <div className="admin-kpi-card">
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'ស្ថានភាពសកម្ម' : 'Active Status'}</span>
+              <div className="admin-kpi-value">{activeCategories}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#059669' }} />
+                <span>{isKhmer ? 'ដំណើរការជាប្រក្រតី' : 'Operational sectors'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#f0fdf4', color: '#059669' }}>
+                {isKhmer ? 'សកម្ម' : 'Active'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}>
+                <CheckCircle2 size={24} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'ស្ថានភាពសកម្ម' : 'Active Status'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {activeCategories} / {totalCategories} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#059669' }}>(100%)</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'ស្ថានភាពដំណើរការ' : 'Sector status'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
-        {/* KPI 4: Categories with Courses */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
-        >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#fff7ed',
-              color: '#ea580c',
-              border: '1px solid #fed7aa',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <Layers size={22} />
+        {/* KPI 4: Active Sectors with courses */}
+        <div className="admin-kpi-card">
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'ជំនាញមានកម្មវិធីសិក្សា' : 'Active Curriculums'}</span>
+              <div className="admin-kpi-value">{categoriesWithCourses}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#ea580c' }} />
+                <span>{isKhmer ? 'មានវគ្គសិក្សាកំពុងបង្រៀន' : 'With enrolled programs'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#fff7ed', color: '#ea580c' }}>
+                {isKhmer ? 'ជំនាញ' : 'Sectors'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa' }}>
+                <Layers size={24} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'ជំនាញមានកម្មវិធីសិក្សា' : 'Active Curriculums'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {categoriesWithCourses} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#ea580c' }}>{isKhmer ? 'ជំនាញសកម្ម' : 'Sectors'}</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'រចនាសម្ព័ន្ធកម្មវិធី' : 'Program structure'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
       </div>
 
-      {/* 3. Filter Tabs & Search Strip */}
-      <div
-        style={{
-          background: '#ffffff',
-          borderRadius: '16px',
-          border: '1px solid #e2e8f0',
-          padding: '14px 18px',
-          marginBottom: '20px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px',
-        }}
-      >
-        {/* Course Association Filter Tabs */}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <button
-            type="button"
-            onClick={() => setCourseFilter('all')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              border: '1px solid',
-              borderColor: courseFilter === 'all' ? '#1e73be' : '#e2e8f0',
-              backgroundColor: courseFilter === 'all' ? '#eff6ff' : '#ffffff',
-              color: courseFilter === 'all' ? '#1e73be' : '#64748b',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            {isKhmer ? 'ទាំងអស់' : 'All Categories'} ({totalCategories})
-          </button>
+      {/* 3. Filter Tabs Strip */}
+      <div className="admin-user-filter-bar">
+        <button
+          type="button"
+          className={`admin-user-filter-pill ${courseFilter === 'all' ? 'active' : ''}`}
+          onClick={() => setCourseFilter('all')}
+        >
+          <FolderTree size={14} />
+          <span>{isKhmer ? 'ទាំងអស់' : 'All Categories'}</span>
+          <span className="admin-user-filter-count">{totalCategories}</span>
+        </button>
 
-          <button
-            type="button"
-            onClick={() => setCourseFilter('with_courses')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              border: '1px solid',
-              borderColor: courseFilter === 'with_courses' ? '#1e73be' : '#e2e8f0',
-              backgroundColor: courseFilter === 'with_courses' ? '#eff6ff' : '#ffffff',
-              color: courseFilter === 'with_courses' ? '#1e73be' : '#64748b',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            <CheckCircle2 size={13} />
-            {isKhmer ? 'មានវគ្គសិក្សា' : 'With Courses'} ({categoriesWithCourses})
-          </button>
+        <button
+          type="button"
+          className={`admin-user-filter-pill ${courseFilter === 'with_courses' ? 'active' : ''}`}
+          onClick={() => setCourseFilter('with_courses')}
+        >
+          <CheckCircle2 size={14} />
+          <span>{isKhmer ? 'មានវគ្គសិក្សា' : 'With Courses'}</span>
+          <span className="admin-user-filter-count">{categoriesWithCourses}</span>
+        </button>
 
-          <button
-            type="button"
-            onClick={() => setCourseFilter('empty')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              border: '1px solid',
-              borderColor: courseFilter === 'empty' ? '#1e73be' : '#e2e8f0',
-              backgroundColor: courseFilter === 'empty' ? '#eff6ff' : '#ffffff',
-              color: courseFilter === 'empty' ? '#1e73be' : '#64748b',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            {isKhmer ? 'គ្មានវគ្គសិក្សា' : 'Empty Categories'} ({totalCategories - categoriesWithCourses})
-          </button>
-        </div>
-
-        {/* Live Search Input */}
-        <div style={{ position: 'relative', minWidth: '260px' }}>
-          <Search
-            size={16}
-            style={{
-              position: 'absolute',
-              left: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#94a3b8',
-            }}
-          />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={isKhmer ? 'ស្វែងរកឈ្មោះប្រភេទ ឬ Slug...' : 'Search categories or slug...'}
-            style={{
-              width: '100%',
-              padding: '7px 32px 7px 36px',
-              borderRadius: '10px',
-              border: '1px solid #e2e8f0',
-              fontSize: '0.84rem',
-              outline: 'none',
-              transition: 'border-color 0.2s ease',
-            }}
-          />
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm('')}
-              style={{
-                position: 'absolute',
-                right: '8px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'none',
-                border: 'none',
-                color: '#94a3b8',
-                cursor: 'pointer',
-                padding: '2px',
-              }}
-            >
-              <X size={14} />
-            </button>
-          )}
-        </div>
+        <button
+          type="button"
+          className={`admin-user-filter-pill ${courseFilter === 'empty' ? 'active' : ''}`}
+          onClick={() => setCourseFilter('empty')}
+        >
+          <Layers size={14} />
+          <span>{isKhmer ? 'គ្មានវគ្គសិក្សា' : 'Empty Categories'}</span>
+          <span className="admin-user-filter-count">{totalCategories - categoriesWithCourses}</span>
+        </button>
       </div>
 
       {/* 4. DataTable */}
@@ -755,6 +742,11 @@ export const AdminCourseCategoriesPage = () => {
             ? `បង្ហាញ ${filteredCategories.length} ក្នុងចំណោមប្រភេទសរុប ${totalCategories}`
             : `Showing ${filteredCategories.length} of ${totalCategories} categories`
         }
+        onAdd={openAddModal}
+        addLabel={isKhmer ? 'បន្ថែមប្រភេទថ្មី' : 'Add Category'}
+        onRefresh={fetchData}
+        searchPlaceholder={isKhmer ? 'ស្វែងរកប្រភេទជំនាញ...' : 'Search course categories...'}
+        renderMobileCard={renderMobileCard}
       />
 
       {/* 5. Create / Edit Category Modal */}

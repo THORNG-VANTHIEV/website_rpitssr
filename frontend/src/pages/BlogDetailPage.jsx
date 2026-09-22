@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import { PageBanner } from '../components/common/PageBanner';
 import { useLanguage } from '../context/LanguageContext';
 import client from '../api/client';
@@ -182,7 +183,7 @@ export const BlogDetailPage = () => {
                         )}
                       </div>
 
-                      {/* Post Body Content */}
+                      {/* Post Body Content (Sanitized against XSS) */}
                       <div
                         className="blog-text-content"
                         style={{
@@ -192,7 +193,9 @@ export const BlogDetailPage = () => {
                           marginBottom: '32px',
                           wordBreak: 'break-word',
                         }}
-                        dangerouslySetInnerHTML={{ __html: post.content || post.body || post.summary }}
+                        dangerouslySetInnerHTML={{
+                          __html: DOMPurify.sanitize(post.content || post.body || post.summary || ''),
+                        }}
                       />
 
                       <hr style={{ margin: '28px 0', borderColor: '#e2e8f0' }} />

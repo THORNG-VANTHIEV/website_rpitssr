@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import api from '../../api/client';
+import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { AdminDataTable } from '../../components/admin/AdminDataTable';
 import { AdminModal } from '../../components/admin/AdminModal';
@@ -11,6 +12,7 @@ import {
   ShieldAlert,
   User,
   Plus,
+  ArrowRight,
   RefreshCw,
   Edit2,
   Trash2,
@@ -28,11 +30,14 @@ import {
   Layers,
   Check,
   X,
-  AlertTriangle
+  AlertTriangle,
+  Clock
 } from 'lucide-react';
 
 export const AdminUsersPage = () => {
   const { currentLanguage } = useLanguage();
+  const { user: currentUser, clearSession } = useAuth();
+  const canManageUsers = currentUser?.role === 'admin';
   const isKhmer = currentLanguage === 'km';
 
   const [users, setUsers] = useState([]);
@@ -106,12 +111,16 @@ export const AdminUsersPage = () => {
     const students = users.filter((u) => u.role === 'student').length;
     const teachers = users.filter((u) => u.role === 'teacher').length;
     const admins = users.filter((u) => u.role === 'admin' || u.role === 'sub_admin').length;
-    return { total, students, teachers, admins };
+    const pending = users.filter((u) => u.status === 'pending').length;
+    return { total, students, teachers, admins, pending };
   }, [users]);
 
   // Compute filtered users by selected role tab
   const filteredUsers = useMemo(() => {
     if (selectedRole === 'all') return users;
+    if (selectedRole === 'pending') {
+      return users.filter((u) => u.status === 'pending');
+    }
     if (selectedRole === 'admin') {
       return users.filter((u) => u.role === 'admin' || u.role === 'sub_admin');
     }
@@ -152,6 +161,7 @@ export const AdminUsersPage = () => {
       fullName: '',
       password: '',
       role: 'student',
+      status: 'active',
       studentId: '',
       className: '',
       academicYear: '2025-2026',
@@ -170,6 +180,7 @@ export const AdminUsersPage = () => {
       fullName: u.fullName || '',
       password: '',
       role: u.role || 'student',
+      status: u.status || 'active',
       studentId: u.studentId || '',
       className: u.className || '',
       academicYear: u.academicYear || '2025-2026',
@@ -208,6 +219,7 @@ export const AdminUsersPage = () => {
       email: formData.email.trim(),
       fullName: formData.fullName?.trim() || null,
       role: formData.role || 'student',
+      status: formData.status || 'active',
       studentId: formData.studentId?.trim() || null,
       className: formData.className?.trim() || null,
       academicYear: formData.academicYear?.trim() || null,
@@ -216,13 +228,13 @@ export const AdminUsersPage = () => {
 
     const pwd = formData.password?.trim();
     if (pwd) {
-      if (pwd.length < 6) {
-        showToast(isKhmer ? 'ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ ៦ តួអក្សរ' : 'Password must be at least 6 characters long', 'error');
+      if (pwd.length < 8) {
+        showToast(isKhmer ? 'ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ ៨ តួអក្សរ' : 'Password must be at least 8 characters long', 'error');
         return;
       }
       payload.password = pwd;
     } else if (!editingUser) {
-      showToast(isKhmer ? 'សូមបញ្ចូលពាក្យសម្ងាត់យ៉ាងតិច ៦ តួអក្សរ' : 'Password is required when creating a new user', 'error');
+      showToast(isKhmer ? 'សូមបញ្ចូលពាក្យសម្ងាត់យ៉ាងតិច ៨ តួអក្សរ' : 'Password is required when creating a new user', 'error');
       return;
     }
 
@@ -230,6 +242,10 @@ export const AdminUsersPage = () => {
     try {
       if (editingUser) {
         await api.put(`/admin/users/${editingUser.id}`, payload);
+        if (editingUser.id === currentUser?.id && (payload.password || payload.role !== currentUser.role)) {
+          clearSession();
+          return;
+        }
         showToast(isKhmer ? 'បានធ្វើបច្ចុប្បន្នភាពគណនីដោយជោគជ័យ!' : 'User account updated successfully!');
       } else {
         await api.post('/admin/users', payload);
@@ -255,8 +271,8 @@ export const AdminUsersPage = () => {
 
   const handleResetPasswordSubmit = async (e) => {
     e.preventDefault();
-    if (!resetPassword || resetPassword.length < 6) {
-      showToast(isKhmer ? 'ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ ៦ តួអក្សរ' : 'Password must be at least 6 characters long', 'error');
+    if (!resetPassword || resetPassword.length < 8) {
+      showToast(isKhmer ? 'ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ ៨ តួអក្សរ' : 'Password must be at least 8 characters long', 'error');
       return;
     }
     if (resetPassword !== resetConfirmPassword) {
@@ -269,6 +285,10 @@ export const AdminUsersPage = () => {
       await api.put(`/admin/users/${resetUser.id}`, {
         password: resetPassword,
       });
+      if (resetUser.id === currentUser?.id) {
+        clearSession();
+        return;
+      }
       showToast(
         isKhmer
           ? `បានកំណត់ពាក្យសម្ងាត់ថ្មីសម្រាប់ ${resetUser.fullName || resetUser.username} ដោយជោគជ័យ!`
@@ -280,6 +300,37 @@ export const AdminUsersPage = () => {
       showToast(isKhmer ? 'បរាជ័យក្នុងការកំណត់ពាក្យសម្ងាត់ថ្មី' : 'Failed to reset password', 'error');
     } finally {
       setResetting(false);
+    }
+  };
+
+  const handleApproveUser = async (u) => {
+    try {
+      await api.put(`/admin/users/${u.id}/approve`);
+      showToast(
+        isKhmer
+          ? `បានអនុម័តគណនីនិស្សិត "${u.fullName || u.username}" ជោគជ័យ!`
+          : `Student account "${u.fullName || u.username}" approved successfully!`
+      );
+      fetchData();
+    } catch (err) {
+      console.error('Approve user error:', err);
+      showToast(isKhmer ? 'បរាជ័យក្នុងការអនុម័តគណនី' : 'Failed to approve user', 'error');
+    }
+  };
+
+  const handleRejectUser = async (u) => {
+    try {
+      await api.put(`/admin/users/${u.id}/reject`);
+      showToast(
+        isKhmer
+          ? `បានបដិសេធគណនី "${u.fullName || u.username}"!`
+          : `User account "${u.fullName || u.username}" rejected!`,
+        'error'
+      );
+      fetchData();
+    } catch (err) {
+      console.error('Reject user error:', err);
+      showToast(isKhmer ? 'បរាជ័យក្នុងការបដិសេធគណនី' : 'Failed to reject user', 'error');
     }
   };
 
@@ -435,6 +486,48 @@ export const AdminUsersPage = () => {
     {
       header: isKhmer ? 'ស្ថានភាព' : 'Status',
       render: (row) => {
+        if (row.status === 'pending') {
+          return (
+            <span
+              className="admin-badge"
+              style={{
+                background: '#fef3c7',
+                color: '#b45309',
+                border: '1px solid #fde68a',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                fontWeight: '700',
+                padding: '4px 10px',
+                borderRadius: '8px',
+              }}
+            >
+              <Clock size={12} />
+              {isKhmer ? 'រង់ចាំអនុម័ត' : 'Pending'}
+            </span>
+          );
+        }
+        if (row.status === 'rejected') {
+          return (
+            <span
+              className="admin-badge"
+              style={{
+                background: '#fef2f2',
+                color: '#b91c1c',
+                border: '1px solid #fecaca',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                fontWeight: '700',
+                padding: '4px 10px',
+                borderRadius: '8px',
+              }}
+            >
+              <X size={12} />
+              {isKhmer ? 'បដិសេធ' : 'Rejected'}
+            </span>
+          );
+        }
         const isActive = row.isActive !== false;
         return (
           <span
@@ -458,8 +551,36 @@ export const AdminUsersPage = () => {
     {
       header: isKhmer ? 'សកម្មភាព' : 'Actions',
       align: 'right',
-      render: (row) => (
+      render: (row) => canManageUsers ? (
         <div className="admin-action-btn-group">
+          {row.status === 'pending' && (
+            <>
+              <button
+                onClick={() => handleApproveUser(row)}
+                className="admin-icon-btn success"
+                style={{
+                  background: '#f0fdf4',
+                  color: '#16a34a',
+                  border: '1px solid #bbf7d0',
+                }}
+                title={isKhmer ? 'អនុម័តគណនី (Approve)' : 'Approve Account'}
+              >
+                <Check size={14} style={{ strokeWidth: 2.5 }} />
+              </button>
+              <button
+                onClick={() => handleRejectUser(row)}
+                className="admin-icon-btn danger"
+                style={{
+                  background: '#fef2f2',
+                  color: '#dc2626',
+                  border: '1px solid #fecaca',
+                }}
+                title={isKhmer ? 'បដិសេធគណនី (Reject)' : 'Reject Account'}
+              >
+                <X size={14} style={{ strokeWidth: 2.5 }} />
+              </button>
+            </>
+          )}
           <button
             onClick={() => openEditModal(row)}
             className="admin-icon-btn primary"
@@ -482,9 +603,185 @@ export const AdminUsersPage = () => {
             <Trash2 size={14} />
           </button>
         </div>
-      ),
+      ) : <span style={{ color: '#64748b' }}>{isKhmer ? 'មើលបានតែប៉ុណ្ណោះ' : 'Read only'}</span>,
     },
   ];
+
+  // Mobile Card Renderer for Screens < 768px
+  const renderMobileCard = (row) => {
+    const role = row.role || 'student';
+    const roleClass =
+      role === 'admin'
+        ? 'role-admin'
+        : role === 'sub_admin'
+        ? 'role-sub_admin'
+        : role === 'teacher'
+        ? 'role-teacher'
+        : 'role-student';
+
+    const isActive = row.isActive !== false;
+
+    return (
+      <div className="admin-user-mobile-card">
+        {/* Top Row: User Avatar, Name, Username & Role Badge */}
+        <div className="admin-user-mobile-card-top">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+            <div className={`admin-user-avatar ${roleClass}`}>
+              {getUserInitials(row)}
+              <span
+                className="admin-user-avatar-role-dot"
+                style={{
+                  background:
+                    role === 'admin'
+                      ? '#dc2626'
+                      : role === 'sub_admin'
+                      ? '#4338ca'
+                      : role === 'teacher'
+                      ? '#d97706'
+                      : '#1e73be',
+                }}
+              />
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontWeight: '700', color: '#07294D', fontSize: '0.92rem', lineHeight: 1.25 }}>
+                {row.fullName || row.username}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px', color: '#64748b', fontSize: '0.78rem' }}>
+                <span className="admin-username-code" style={{ padding: '1px 6px', fontSize: '0.74rem' }}>
+                  @{row.username}
+                </span>
+                {row.studentId && (
+                  <span style={{ fontSize: '0.75rem', color: '#1e73be', fontWeight: '600' }}>
+                    • {row.studentId}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Role Badge */}
+          <div style={{ flexShrink: 0 }}>
+            {role === 'admin' && (
+              <span className="admin-badge admin-badge-danger" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', padding: '3px 8px' }}>
+                <ShieldAlert size={12} />
+                <span>{isKhmer ? 'Admin' : 'Admin'}</span>
+              </span>
+            )}
+            {role === 'sub_admin' && (
+              <span className="admin-badge admin-badge-info" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', padding: '3px 8px' }}>
+                <Shield size={12} />
+                <span>Sub Admin</span>
+              </span>
+            )}
+            {role === 'teacher' && (
+              <span className="admin-badge admin-badge-warning" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', padding: '3px 8px' }}>
+                <GraduationCap size={12} />
+                <span>{isKhmer ? 'សាស្ត្រាចារ្យ' : 'Teacher'}</span>
+              </span>
+            )}
+            {role === 'student' && (
+              <span className="admin-badge admin-badge-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', padding: '3px 8px' }}>
+                <User size={12} />
+                <span>{isKhmer ? 'និស្សិត' : 'Student'}</span>
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Details Block: Email, Class & Created Date */}
+        <div className="admin-user-mobile-card-details">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.80rem', color: '#475569' }}>
+            <Mail size={13} style={{ color: '#1e73be', flexShrink: 0 }} />
+            <span style={{ wordBreak: 'break-all' }}>{row.email}</span>
+          </div>
+
+          {row.className && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#64748b', marginTop: '4px' }}>
+              <BookOpen size={13} style={{ color: '#059669', flexShrink: 0 }} />
+              <span>{row.className} {row.semester ? `(ឆមាស ${row.semester})` : ''} {row.academicYear ? `• ${row.academicYear}` : ''}</span>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed #e2e8f0', fontSize: '0.75rem' }}>
+            <span style={{ color: '#94a3b8', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <Calendar size={12} />
+              {formatDate(row.createdAt)}
+            </span>
+            <span className="admin-health-status-badge healthy" style={{ padding: '2px 8px', fontSize: '0.70rem' }}>
+              <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#16a34a' }} />
+              {isKhmer ? (isActive ? 'សកម្ម' : 'អសកម្ម') : (isActive ? 'Active' : 'Disabled')}
+            </span>
+          </div>
+        </div>
+
+        {/* Action Buttons Bar */}
+        {canManageUsers && (
+          <div className="admin-user-mobile-card-actions">
+            {row.status === 'pending' && (
+              <>
+                <button
+                  onClick={() => handleApproveUser(row)}
+                  className="admin-user-mobile-action-btn"
+                  style={{
+                    background: '#f0fdf4',
+                    color: '#16a34a',
+                    border: '1px solid #bbf7d0',
+                    fontWeight: '700',
+                  }}
+                  title={isKhmer ? 'អនុម័ត' : 'Approve'}
+                >
+                  <Check size={13} style={{ strokeWidth: 2.5 }} />
+                  <span>{isKhmer ? 'អនុម័ត' : 'Approve'}</span>
+                </button>
+
+                <button
+                  onClick={() => handleRejectUser(row)}
+                  className="admin-user-mobile-action-btn"
+                  style={{
+                    background: '#fef2f2',
+                    color: '#dc2626',
+                    border: '1px solid #fecaca',
+                    fontWeight: '700',
+                  }}
+                  title={isKhmer ? 'បដិសេធ' : 'Reject'}
+                >
+                  <X size={13} style={{ strokeWidth: 2.5 }} />
+                  <span>{isKhmer ? 'បដិសេធ' : 'Reject'}</span>
+                </button>
+              </>
+            )}
+
+            <button
+              onClick={() => openEditModal(row)}
+              className="admin-user-mobile-action-btn edit"
+              title={isKhmer ? 'កែសម្រួល' : 'Edit'}
+            >
+              <Edit2 size={13} />
+              <span>{isKhmer ? 'កែសម្រួល' : 'Edit'}</span>
+            </button>
+
+            <button
+              onClick={() => openResetPasswordModal(row)}
+              className="admin-user-mobile-action-btn reset"
+              title={isKhmer ? 'ប្តូរពាក្យសម្ងាត់' : 'Reset Password'}
+            >
+              <KeyRound size={13} />
+              <span>{isKhmer ? 'ពាក្យសម្ងាត់' : 'Password'}</span>
+            </button>
+
+            <button
+              onClick={() => openDeleteModal(row)}
+              className="admin-user-mobile-action-btn delete"
+              title={isKhmer ? 'លុប' : 'Delete'}
+            >
+              <Trash2 size={13} />
+              <span>{isKhmer ? 'លុប' : 'Delete'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div style={{ maxWidth: '1440px', margin: '0 auto', paddingBottom: '40px' }}>
@@ -530,16 +827,7 @@ export const AdminUsersPage = () => {
       )}
 
       {/* Header Banner */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '16px',
-          marginBottom: '24px',
-        }}
-      >
+      <div className="admin-users-header">
         <div>
           <div
             style={{
@@ -577,7 +865,7 @@ export const AdminUsersPage = () => {
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="admin-users-header-actions">
           <button
             onClick={fetchData}
             className="admin-btn admin-btn-outline"
@@ -588,7 +876,7 @@ export const AdminUsersPage = () => {
             <span>{isKhmer ? 'ផ្ទុកឡើងវិញ' : 'Refresh'}</span>
           </button>
 
-          <button
+          {canManageUsers && <button
             onClick={openAddModal}
             className="admin-btn admin-btn-primary"
             style={{
@@ -600,84 +888,113 @@ export const AdminUsersPage = () => {
           >
             <Plus size={16} />
             <span>{isKhmer ? 'បង្កើតគណនីថ្មី' : 'Add New User'}</span>
-          </button>
+          </button>}
         </div>
       </div>
 
       {/* 4-Card Institutional KPI Metric Strip */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap: '16px',
-          marginBottom: '24px',
-        }}
-      >
+      <div className="admin-kpi-grid admin-user-kpis">
         {/* Total Users */}
         <div className="admin-kpi-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div className="admin-kpi-icon-badge" style={{ background: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}>
-              <Users size={22} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'គណនីសរុប' : 'Total Accounts'}</span>
+              <div className="admin-kpi-value">{metrics.total}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#1e73be' }} />
+                <span>{isKhmer ? 'គណនីទាំងអស់ក្នុងប្រព័ន្ធ' : 'All registered system accounts'}</span>
+              </div>
             </div>
-            <span className="admin-kpi-tag" style={{ background: '#eff6ff', color: '#1e73be' }}>
-              {isKhmer ? 'សរុប' : 'Total'}
-            </span>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#eff6ff', color: '#1e73be' }}>
+                {isKhmer ? 'សរុប' : 'Total'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}>
+                <Users size={24} />
+              </div>
+            </div>
           </div>
-          <div className="admin-kpi-value">{metrics.total}</div>
-          <div className="admin-kpi-title">{isKhmer ? 'គណនីសរុប' : 'Total Accounts'}</div>
-          <div className="admin-kpi-subtitle">
-            <span>{isKhmer ? 'គណនីទាំងអស់ក្នុងប្រព័ន្ធ' : 'All registered system accounts'}</span>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'គ្រប់គ្រងអ្នកប្រើប្រាស់' : 'Manage accounts'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* Student Accounts */}
         <div className="admin-kpi-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div className="admin-kpi-icon-badge" style={{ background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}>
-              <GraduationCap size={22} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'គណនីនិស្សិត' : 'Student Accounts'}</span>
+              <div className="admin-kpi-value">{metrics.students}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#059669' }} />
+                <span>{isKhmer ? 'និស្សិតកំពុងសិក្សា' : 'Enrolled student portals'}</span>
+              </div>
             </div>
-            <span className="admin-kpi-tag" style={{ background: '#f0fdf4', color: '#059669' }}>
-              {isKhmer ? 'និស្សិត' : 'Students'}
-            </span>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#f0fdf4', color: '#059669' }}>
+                {isKhmer ? 'និស្សិត' : 'Students'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}>
+                <GraduationCap size={24} />
+              </div>
+            </div>
           </div>
-          <div className="admin-kpi-value">{metrics.students}</div>
-          <div className="admin-kpi-title">{isKhmer ? 'គណនីនិស្សិត' : 'Student Accounts'}</div>
-          <div className="admin-kpi-subtitle">
-            <span>{isKhmer ? 'និស្សិតកំពុងសិក្សា' : 'Enrolled student portals'}</span>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'គណនីនិស្សិតសកម្ម' : 'Active student profiles'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* Teachers / Faculty */}
         <div className="admin-kpi-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div className="admin-kpi-icon-badge" style={{ background: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa' }}>
-              <UserCheck size={22} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'សាស្ត្រាចារ្យ & គ្រូ' : 'Faculty & Teachers'}</span>
+              <div className="admin-kpi-value">{metrics.teachers}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#ea580c' }} />
+                <span>{isKhmer ? 'បុគ្គលិកបង្រៀន' : 'Teaching staff instructors'}</span>
+              </div>
             </div>
-            <span className="admin-kpi-tag" style={{ background: '#fff7ed', color: '#ea580c' }}>
-              {isKhmer ? 'គ្រូ' : 'Faculty'}
-            </span>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#fff7ed', color: '#ea580c' }}>
+                {isKhmer ? 'គ្រូ' : 'Faculty'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa' }}>
+                <UserCheck size={24} />
+              </div>
+            </div>
           </div>
-          <div className="admin-kpi-value">{metrics.teachers}</div>
-          <div className="admin-kpi-title">{isKhmer ? 'សាស្ត្រាចារ្យ & គ្រូ' : 'Faculty & Teachers'}</div>
-          <div className="admin-kpi-subtitle">
-            <span>{isKhmer ? 'បុគ្គលិកបង្រៀន' : 'Teaching staff instructors'}</span>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'គ្រូបង្រៀន & ជំនាញ' : 'Instructors & faculty'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* Administrators */}
         <div className="admin-kpi-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div className="admin-kpi-icon-badge" style={{ background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}>
-              <Shield size={22} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'អ្នកគ្រប់គ្រងប្រព័ន្ធ' : 'System Administrators'}</span>
+              <div className="admin-kpi-value">{metrics.admins}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#7c3aed' }} />
+                <span>{isKhmer ? 'សិទ្ធិកម្រិតខ្ពស់' : 'Elevated admin privileges'}</span>
+              </div>
             </div>
-            <span className="admin-kpi-tag" style={{ background: '#faf5ff', color: '#7c3aed' }}>
-              {isKhmer ? 'រដ្ឋបាល' : 'Admin'}
-            </span>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#faf5ff', color: '#7c3aed' }}>
+                {isKhmer ? 'រដ្ឋបាល' : 'Admin'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}>
+                <Shield size={24} />
+              </div>
+            </div>
           </div>
-          <div className="admin-kpi-value">{metrics.admins}</div>
-          <div className="admin-kpi-title">{isKhmer ? 'អ្នកគ្រប់គ្រងប្រព័ន្ធ' : 'System Administrators'}</div>
-          <div className="admin-kpi-subtitle">
-            <span>{isKhmer ? 'សិទ្ធិកម្រិតខ្ពស់' : 'Elevated admin privileges'}</span>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'សិទ្ធិអភិបាលប្រព័ន្ធ' : 'Privilege management'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
       </div>
@@ -691,6 +1008,32 @@ export const AdminUsersPage = () => {
           <Users size={15} />
           <span>{isKhmer ? 'ទាំងអស់' : 'All Users'}</span>
           <span className="admin-user-filter-count">{metrics.total}</span>
+        </button>
+
+        <button
+          className={`admin-user-filter-pill ${selectedRole === 'pending' ? 'active' : ''}`}
+          onClick={() => setSelectedRole('pending')}
+          style={
+            metrics.pending > 0
+              ? {
+                  border: '1px solid #fde68a',
+                  background: selectedRole === 'pending' ? undefined : '#fffbeb',
+                }
+              : {}
+          }
+        >
+          <Clock size={15} style={{ color: '#d97706' }} />
+          <span>{isKhmer ? 'រង់ចាំការអនុម័ត' : 'Pending Approvals'}</span>
+          <span
+            className="admin-user-filter-count"
+            style={
+              metrics.pending > 0
+                ? { background: '#f59e0b', color: '#ffffff', fontWeight: '800' }
+                : {}
+            }
+          >
+            {metrics.pending}
+          </span>
         </button>
 
         <button
@@ -736,6 +1079,7 @@ export const AdminUsersPage = () => {
         addLabel={isKhmer ? 'បង្កើតគណនីថ្មី' : 'Add New User'}
         onRefresh={fetchData}
         searchPlaceholder={isKhmer ? 'ស្វែងរកតាមឈ្មោះ, ឈ្មោះគណនី, ឬអ៊ីមែល...' : 'Search users by name, username, or email...'}
+        renderMobileCard={renderMobileCard}
       />
 
       {/* =========================================================
@@ -847,6 +1191,22 @@ export const AdminUsersPage = () => {
           </span>
         </div>
 
+        {/* Account Status */}
+        <div className="admin-form-group">
+          <label className="admin-form-label">
+            {isKhmer ? 'ស្ថានភាពគណនី (Account Status)' : 'Account Status'}
+          </label>
+          <select
+            className="admin-form-control"
+            value={formData.status}
+            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+          >
+            <option value="active">{isKhmer ? '✓ សកម្ម (Active - អាចចូលប្រើប្រាស់បាន)' : '✓ Active (Permitted to sign in)'}</option>
+            <option value="pending">{isKhmer ? '⏳ រង់ចាំការអនុម័ត (Pending Admin Approval)' : '⏳ Pending Admin Approval'}</option>
+            <option value="rejected">{isKhmer ? '✕ បដិសេធ (Rejected - មិនអនុញ្ញាត)' : '✕ Rejected (Blocked)'}</option>
+          </select>
+        </div>
+
         {/* Section 3: Academic Information (for student) */}
         {formData.role === 'student' && (
           <>
@@ -940,7 +1300,7 @@ export const AdminUsersPage = () => {
               required={!editingUser}
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              placeholder={editingUser ? (isKhmer ? 'ទុកនៅទំនេរបើមិនផ្លាស់ប្តូរ' : 'Leave blank to keep current password') : (isKhmer ? 'យ៉ាងហោចណាស់ ៦ តួអក្សរ' : 'At least 6 characters')}
+              placeholder={editingUser ? (isKhmer ? 'ទុកនៅទំនេរបើមិនផ្លាស់ប្តូរ' : 'Leave blank to keep current password') : (isKhmer ? 'យ៉ាងហោចណាស់ ៨ តួអក្សរ' : 'At least 8 characters')}
               style={{ paddingRight: '40px' }}
             />
             <button
@@ -954,8 +1314,8 @@ export const AdminUsersPage = () => {
           </div>
           <span style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px', display: 'block' }}>
             {editingUser
-              ? (isKhmer ? 'បំពេញតែពេលដែលលោកអ្នកចង់ផ្លាស់ប្តូរពាក្យសម្ងាត់ឱ្យគណនីនេះ (យ៉ាងតិច ៦ តួអក្សរ)' : 'Only fill if resetting password (min 6 characters)')
-              : (isKhmer ? 'ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ ៦ តួអក្សរ' : 'Minimum 6 characters required')}
+              ? (isKhmer ? 'បំពេញតែពេលដែលលោកអ្នកចង់ផ្លាស់ប្តូរពាក្យសម្ងាត់ឱ្យគណនីនេះ (យ៉ាងតិច ៨ តួអក្សរ)' : 'Only fill if resetting password (min 8 characters)')
+              : (isKhmer ? 'ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ ៨ តួអក្សរ' : 'Minimum 8 characters required')}
           </span>
         </div>
 
@@ -1039,7 +1399,7 @@ export const AdminUsersPage = () => {
                   required
                   value={resetPassword}
                   onChange={(e) => setResetPassword(e.target.value)}
-                  placeholder={isKhmer ? 'យ៉ាងហោចណាស់ ៦ តួអក្សរ' : 'At least 6 characters'}
+                  placeholder={isKhmer ? 'យ៉ាងហោចណាស់ ៨ តួអក្សរ' : 'At least 8 characters'}
                   style={{ paddingRight: '40px' }}
                 />
                 <button

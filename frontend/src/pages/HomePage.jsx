@@ -104,6 +104,7 @@ export const HomePage = () => {
   const [events, setEvents] = useState([]);
   const [categories, setCategories] = useState([]);
   const [videos, setVideos] = useState(promotionalVideos);
+  const [showAllVideos, setShowAllVideos] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const [loading, setLoading] = useState(true);
 
@@ -218,7 +219,7 @@ export const HomePage = () => {
                 <span>{isKhmer ? 'ស្វែងយល់ពីជំនាញ' : 'Explore Programs'}</span>
                 <ArrowRight size={16} />
               </Link>
-              <Link to="/contact" className="home-hero-btn-secondary" onClick={scrollToTop}>
+              <Link to="/apply" className="home-hero-btn-secondary" onClick={scrollToTop}>
                 <span>{isKhmer ? 'ចុះឈ្មោះចូលរៀន' : 'Enroll Now'}</span>
               </Link>
               <Link to="/downloads" className="home-hero-btn-outline" onClick={scrollToTop}>
@@ -312,23 +313,23 @@ export const HomePage = () => {
               </span>
             </Link>
 
-            {/* Gateway 4: Contact / Admissions */}
-            <Link to="/contact" className="home-gateway-card" onClick={scrollToTop}>
+            {/* Gateway 4: Online Admissions */}
+            <Link to="/apply" className="home-gateway-card" onClick={scrollToTop}>
               <div>
                 <div className="home-gateway-icon-wrap" style={{ background: '#fdf2f8', color: '#db2777' }}>
-                  <Phone size={24} />
+                  <GraduationCap size={24} />
                 </div>
                 <h3 className="home-gateway-title">
-                  {isKhmer ? 'ទំនាក់ទំនង & ចុះឈ្មោះ' : 'Admissions & Inquiries'}
+                  {isKhmer ? 'ចុះឈ្មោះចូលរៀនអនឡាញ' : 'Online Admission'}
                 </h3>
                 <p className="home-gateway-desc">
                   {isKhmer
-                    ? 'ប្រឹក្សាផ្តល់ព័ត៌មានចុះឈ្មោះចូលរៀន ទីតាំងវិទ្យាស្ថាន និងបណ្តាញទំនាក់ទំនង'
-                    : 'Admissions counseling, campus location map, and direct support.'}
+                    ? 'ដាក់ពាក្យស្នើសុំចូលរៀនតាមអនឡាញ និងតាមដានស្ថានភាពពាក្យសុំបានភ្លាមៗ'
+                    : 'Submit admission application online and track your status anytime.'}
                 </p>
               </div>
               <span className="home-gateway-action" style={{ color: '#db2777' }}>
-                <span>{isKhmer ? 'ទាក់ទងមកយើង' : 'Contact Us'}</span>
+                <span>{isKhmer ? 'ដាក់ពាក្យចូលរៀន' : 'Apply Online'}</span>
                 <ArrowRight size={15} />
               </span>
             </Link>
@@ -345,7 +346,7 @@ export const HomePage = () => {
                 <span className="video-section-badge" style={{ display: 'inline-flex', marginBottom: '10px' }}>
                   <Sparkles size={14} /> {isKhmer ? 'ស្ថិតិ & សមិទ្ធផល' : 'Facts & Figures'}
                 </span>
-                <h2 className="title" style={{ fontSize: '2rem', fontWeight: 800, color: '#07294D' }}>
+                <h2 className="title" style={{ fontSize: 'clamp(1.35rem, 3.8vw, 2rem)', fontWeight: 800, color: '#07294D', lineHeight: 1.4, wordBreak: 'keep-all' }}>
                   {isKhmer ? 'ស្ថិតិ និងសមិទ្ធផលសំខាន់ៗរបស់វិទ្យាស្ថាន' : 'Key Facts & Figures at a Glance'}
                 </h2>
                 <span className="line" style={{ margin: '12px auto' }}></span>
@@ -358,10 +359,10 @@ export const HomePage = () => {
             </div>
           </div>
 
-          <div className="row g-4 justify-content-center">
+          <div className="row g-3 g-lg-4 justify-content-center home-stats-row">
             {/* Stat 1: Students */}
-            <div className="col-lg-3 col-sm-6">
-              <div className="home-stat-card">
+            <div className="col-6 col-lg-3 col-sm-6">
+              <div className="home-stat-card stat-blue">
                 <div
                   className="home-stat-icon-wrap"
                   style={{ backgroundColor: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}
@@ -389,8 +390,8 @@ export const HomePage = () => {
             </div>
 
             {/* Stat 2: Faculties */}
-            <div className="col-lg-3 col-sm-6">
-              <div className="home-stat-card">
+            <div className="col-6 col-lg-3 col-sm-6">
+              <div className="home-stat-card stat-orange">
                 <div
                   className="home-stat-icon-wrap"
                   style={{ backgroundColor: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa' }}
@@ -418,8 +419,8 @@ export const HomePage = () => {
             </div>
 
             {/* Stat 3: Programs / Courses */}
-            <div className="col-lg-3 col-sm-6">
-              <div className="home-stat-card">
+            <div className="col-6 col-lg-3 col-sm-6">
+              <div className="home-stat-card stat-purple">
                 <div
                   className="home-stat-icon-wrap"
                   style={{ backgroundColor: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}
@@ -447,8 +448,8 @@ export const HomePage = () => {
             </div>
 
             {/* Stat 4: Awards Win */}
-            <div className="col-lg-3 col-sm-6">
-              <div className="home-stat-card">
+            <div className="col-6 col-lg-3 col-sm-6">
+              <div className="home-stat-card stat-gold">
                 <div
                   className="home-stat-icon-wrap"
                   style={{ backgroundColor: '#fefce8', color: '#ca8a04', border: '1px solid #fef08a' }}
@@ -487,7 +488,7 @@ export const HomePage = () => {
                 <span className="video-section-badge" style={{ display: 'inline-flex', marginBottom: '10px' }}>
                   <GraduationCap size={14} /> {isKhmer ? 'ជំនាញ & វគ្គសិក្សា' : 'Academic Programs'}
                 </span>
-                <h2 className="title" style={{ fontSize: '2rem', fontWeight: 800, color: '#07294D' }}>
+                <h2 className="title" style={{ fontSize: 'clamp(1.35rem, 3.8vw, 2rem)', fontWeight: 800, color: '#07294D', lineHeight: 1.4, wordBreak: 'keep-all' }}>
                   {t('home.topCourses')}
                 </h2>
                 <span className="line" style={{ margin: '12px auto' }}></span>
@@ -499,10 +500,10 @@ export const HomePage = () => {
           </div>
 
           <div className="courses-wrapper">
-            <div className="row">
+            <div className="row g-2 g-md-4">
               {loading ? (
                 Array.from({ length: 4 }).map((_, s) => (
-                  <div key={s} className="col-lg-3 col-sm-6 courses-col">
+                  <div key={s} className="col-6 col-lg-3 col-sm-6 courses-col">
                     <div className="single-courses mt-30 text-center py-5">
                       <i className="fas fa-spinner fa-spin fa-2x text-primary"></i>
                     </div>
@@ -510,7 +511,7 @@ export const HomePage = () => {
                 ))
               ) : courses.length > 0 ? (
                 courses.map((course) => (
-                  <div key={course.id} className="col-lg-3 col-sm-6 courses-col">
+                  <div key={course.id} className="col-6 col-lg-3 col-sm-6 courses-col">
                     <CourseCard course={course} />
                   </div>
                 ))
@@ -543,7 +544,7 @@ export const HomePage = () => {
                 <span className="video-section-badge" style={{ display: 'inline-flex', marginBottom: '10px' }}>
                   <Award size={14} /> {isKhmer ? 'ឧត្តមភាពវិទ្យាស្ថាន' : 'Why RPITSSR'}
                 </span>
-                <h2 className="title" style={{ fontSize: '2rem', fontWeight: 800, color: '#07294D' }}>
+                <h2 className="title" style={{ fontSize: 'clamp(1.35rem, 3.8vw, 2rem)', fontWeight: 800, color: '#07294D', lineHeight: 1.4, wordBreak: 'keep-all' }}>
                   {isKhmer ? 'ហេតុអ្វីជ្រើសរើសសិក្សានៅ RPITSSR?' : 'Why Choose RPITSSR?'}
                 </h2>
                 <span className="line" style={{ margin: '12px auto' }}></span>
@@ -621,15 +622,19 @@ export const HomePage = () => {
       </section>
 
       {/* 5. Promotional Videos & Media Showcase */}
-      <section className="modern-video-showcase-area">
+      <section className="modern-video-showcase-area" id="promotional-videos-section">
         <div className="container">
           <div className="video-section-header">
             <span className="video-section-badge">
-              <i className="fas fa-play-circle"></i> វីដេអូ & សកម្មភាពថ្មីៗ
+              <i className="fas fa-play-circle"></i> {isKhmer ? 'វីដេអូ & សកម្មភាពថ្មីៗ' : 'Videos & Media'}
             </span>
-            <h2 className="video-section-title">វីដេអូផ្សព្វផ្សាយ និងសកម្មភាពបណ្តុះបណ្តាល</h2>
+            <h2 className="video-section-title">
+              {isKhmer ? 'វីដេអូផ្សព្វផ្សាយ និងសកម្មភាពបណ្តុះបណ្តាល' : 'Promotional Videos & Activities'}
+            </h2>
             <p className="video-section-desc">
-              ទស្សនាទិដ្ឋភាពទូទៅ បរិយាកាសសិក្សា និងសកម្មភាពអនុវត្តជំនាញជាក់ស្តែងរបស់និស្សិតនៃវិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប
+              {isKhmer
+                ? 'ទស្សនាទិដ្ឋភាពទូទៅ បរិយាកាសសិក្សា និងសកម្មភាពអនុវត្តជំនាញជាក់ស្តែងរបស់និស្សិតនៃវិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប'
+                : 'Explore campus life, modern workshops, and real-world technical skill training at RPITSSR'}
             </p>
           </div>
 
@@ -650,6 +655,49 @@ export const HomePage = () => {
               </div>
             </div>
           </div>
+
+          {/* Expanded Video Grid (Remaining Videos) */}
+          {showAllVideos && videos.length > 4 && (
+            <div className="expanded-videos-grid">
+              <div className="row g-4">
+                {videos.slice(4).map((vid) => (
+                  <div key={vid.id || vid.youtubeId} className="col-lg-4 col-md-6 col-12">
+                    <YouTubeVideoCard video={vid} variant="grid" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Show More / Show Less Toggle Button */}
+          {videos.length > 4 && (
+            <div className="video-show-more-wrap">
+              <button
+                type="button"
+                className="video-toggle-btn"
+                onClick={() => {
+                  if (showAllVideos) {
+                    const sectionEl = document.getElementById('promotional-videos-section');
+                    if (sectionEl) {
+                      sectionEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }
+                  setShowAllVideos(!showAllVideos);
+                }}
+              >
+                <span>
+                  {showAllVideos
+                    ? (isKhmer ? 'បង្រួមវីដេអូវិញ' : 'Show Less')
+                    : (isKhmer ? '🎬 មើលវីដេអូផ្សព្វផ្សាយបន្ថែមទៀត' : '🎬 Show More Promotional Videos')}
+                </span>
+                <span className="toggle-count-badge">
+                  {showAllVideos
+                    ? (isKhmer ? '↑ បង្រួម' : '↑ Less')
+                    : `+${videos.length - 4} ${isKhmer ? 'វីដេអូ' : 'Videos'}`}
+                </span>
+              </button>
+            </div>
+          )}
         </div>
       </section>
 

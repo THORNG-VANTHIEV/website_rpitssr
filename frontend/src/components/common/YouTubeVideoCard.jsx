@@ -9,7 +9,7 @@ export const getYouTubeId = (url) => {
   return match ? match[1] : '';
 };
 
-export const YouTubeVideoCard = ({ video, featured = false }) => {
+export const YouTubeVideoCard = ({ video, featured = false, variant = 'default' }) => {
   const [imgError, setImgError] = useState(false);
   const rawUrl = video.videoUrl || video.youtubeUrl || video.url || '';
   const videoId = getYouTubeId(video.youtubeId || rawUrl);
@@ -24,7 +24,7 @@ export const YouTubeVideoCard = ({ video, featured = false }) => {
       : `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
   }
   if (!thumbnailUrl) {
-    thumbnailUrl = '/images/videos/fb_reel_1639279004473101.jpg';
+    thumbnailUrl = '/images/gallery/school.jpg';
   }
 
   if (featured) {
@@ -109,6 +109,81 @@ export const YouTubeVideoCard = ({ video, featured = false }) => {
                 <i className="fas fa-external-link-alt ml-2"></i>
               </div>
             )}
+          </div>
+        </div>
+      </a>
+    );
+  }
+
+  if (variant === 'grid') {
+    return (
+      <a
+        href={targetUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="grid-video-card-link"
+      >
+        <div className="modern-grid-video-card">
+          <div className="grid-thumb-container">
+            <img
+              src={thumbnailUrl}
+              alt={video.title}
+              onError={() => setImgError(true)}
+              className="grid-thumb-img"
+              loading="lazy"
+            />
+            <div className="video-thumb-overlay"></div>
+
+            {/* Category Tag */}
+            {video.category && (
+              <span className="video-category-badge">
+                <i className="fas fa-tag"></i> {video.category}
+              </span>
+            )}
+
+            {/* Duration Badge */}
+            {video.duration && (
+              <span className="video-duration-badge">
+                <i className="far fa-clock"></i> {video.duration}
+              </span>
+            )}
+
+            {/* Center Play Button */}
+            <div className="center-play-button-wrapper grid-play">
+              <div className="play-ripple-circle"></div>
+              <div className={`play-button-circle ${isFb ? 'facebook-play' : ''}`}>
+                <i className="fas fa-play"></i>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid-video-info">
+            <div className="video-meta-row" style={{ marginBottom: '8px' }}>
+              {isFb ? (
+                <span className="facebook-source-tag" style={{ fontSize: '0.8rem' }}>
+                  <i className="fab fa-facebook"></i> Facebook
+                </span>
+              ) : (
+                <span className="youtube-source-tag" style={{ fontSize: '0.8rem' }}>
+                  <i className="fab fa-youtube"></i> YouTube
+                </span>
+              )}
+              {video.publishedDate && (
+                <span className="video-date" style={{ fontSize: '0.78rem' }}>
+                  <i className="far fa-calendar-alt"></i> {video.publishedDate}
+                </span>
+              )}
+            </div>
+
+            <h4 className="grid-video-title">{video.title}</h4>
+            {video.description && (
+              <p className="grid-video-desc">{video.description}</p>
+            )}
+
+            <div className={`grid-video-action ${isFb ? 'facebook-action' : 'youtube-action'}`}>
+              <span>{isFb ? 'ទស្សនាលើ Facebook' : 'ទស្សនាលើ YouTube'}</span>
+              <i className="fas fa-arrow-right"></i>
+            </div>
           </div>
         </div>
       </a>

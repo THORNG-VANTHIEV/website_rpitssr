@@ -40,9 +40,19 @@ export const authService = {
     } catch (e) {
       // Ignore network errors on logout
     } finally {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      this.clearSession();
     }
+  },
+
+  async logoutAll() {
+    await api.post('/auth/logout-all');
+    this.clearSession();
+  },
+
+  clearSession() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.dispatchEvent(new Event('auth:logout'));
   },
 
   getCurrentUser() {

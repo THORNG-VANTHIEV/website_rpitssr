@@ -24,7 +24,8 @@ import {
   AlertTriangle,
   ExternalLink,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  ArrowRight
 } from 'lucide-react';
 
 export const AdminNoticesPage = () => {
@@ -46,8 +47,7 @@ export const AdminNoticesPage = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Filter & Search State
-  const [searchTerm, setSearchTerm] = useState('');
+  // Filter State
   const [selectedFilter, setSelectedFilter] = useState('all');
 
   const [formData, setFormData] = useState({
@@ -137,27 +137,14 @@ export const AdminNoticesPage = () => {
     (n) => (n.category || '').toLowerCase() === 'internship' || (n.category || '').includes('កម្មសិក្សា')
   ).length;
 
-  // Filtered Notices
+  // Filtered Notices (Searching is handled by AdminDataTable)
   const filteredNotices = useMemo(() => {
     return notices.filter((n) => {
-      const matchSearch =
-        searchTerm === '' ||
-        n.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        n.content?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        n.category?.toLowerCase().includes(searchTerm.toLowerCase());
-
-      let matchFilter = true;
-      if (selectedFilter === 'all') {
-        matchFilter = true;
-      } else if (selectedFilter === 'pinned') {
-        matchFilter = Boolean(n.isPinned);
-      } else {
-        matchFilter = (n.category || '').trim().toLowerCase() === selectedFilter.toLowerCase();
-      }
-
-      return matchSearch && matchFilter;
+      if (selectedFilter === 'all') return true;
+      if (selectedFilter === 'pinned') return Boolean(n.isPinned);
+      return (n.category || '').trim().toLowerCase() === selectedFilter.toLowerCase();
     });
-  }, [notices, searchTerm, selectedFilter]);
+  }, [notices, selectedFilter]);
 
   const handleTogglePin = async (notice) => {
     try {
@@ -467,10 +454,164 @@ export const AdminNoticesPage = () => {
     },
   ];
 
+  // Mobile Card Renderer (< 768px viewports)
+  const renderMobileCard = (row) => {
+    const meta = getCategoryMeta(row.category);
+    const IconComp = meta.icon;
+    const d = row.date || row.publishDate;
+
+    return (
+      <div className="admin-user-mobile-card">
+        {/* Top Header: Category Tag & Pinned Badge */}
+        <div className="admin-user-mobile-card-top">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '3px 10px',
+                borderRadius: '9999px',
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                background: meta.bg,
+                color: meta.color,
+                border: `1px solid ${meta.border}`,
+              }}
+            >
+              <IconComp size={12} />
+              <span>{meta.label}</span>
+            </span>
+
+            {row.isPinned ? (
+              <span className="admin-notice-pinned-badge" style={{ padding: '3px 8px', fontSize: '0.72rem' }}>
+                <Pin size={11} fill="#b45309" />
+                <span>{isKhmer ? 'បានខ្ទាស់' : 'Pinned'}</span>
+              </span>
+            ) : null}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', color: '#64748b' }}>
+            <Calendar size={13} />
+            <span>{d ? new Date(d).toLocaleDateString('km-KH') : (isKhmer ? 'មិនកំណត់' : 'N/A')}</span>
+          </div>
+        </div>
+
+        {/* Content Body */}
+        <div style={{ padding: '12px 14px 10px' }}>
+          <div
+            style={{
+              fontWeight: 800,
+              fontSize: '0.94rem',
+              color: '#07294D',
+              lineHeight: 1.35,
+              marginBottom: '6px',
+              cursor: 'pointer',
+            }}
+            onClick={() => openPreview(row)}
+          >
+            {row.title}
+          </div>
+
+          {row.content && (
+            <p
+              style={{
+                fontSize: '0.82rem',
+                color: '#64748b',
+                lineHeight: 1.5,
+                margin: '0 0 10px',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
+              {row.content}
+            </p>
+          )}
+
+          {/* Attachment link if available */}
+          {row.fileUrl && (
+            <div style={{ marginTop: '6px' }}>
+              <a
+                href={row.fileUrl}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '4px 10px',
+                  borderRadius: '6px',
+                  fontSize: '0.76rem',
+                  fontWeight: 700,
+                  background: '#eff6ff',
+                  color: '#1e73be',
+                  border: '1px solid #dbeafe',
+                  textDecoration: 'none',
+                }}
+              >
+                <FileText size={13} />
+                <span>{isKhmer ? 'ទាញយកឯកសារភ្ជាប់ (PDF)' : 'Download PDF Attachment'}</span>
+                <ExternalLink size={11} />
+              </a>
+            </div>
+          )}
+        </div>
+
+        {/* Tactile Touch Action Buttons */}
+        <div className="admin-user-mobile-card-actions">
+          <button
+            type="button"
+            onClick={() => openPreview(row)}
+            className="admin-user-mobile-action-btn view"
+            title={isKhmer ? 'អានសេចក្តីជូនដំណឹង' : 'Read Notice'}
+          >
+            <Eye size={13} />
+            <span>{isKhmer ? 'អាន' : 'Read'}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTogglePin(row)}
+            className="admin-user-mobile-action-btn"
+            style={{
+              background: row.isPinned ? '#fefce8' : '#ffffff',
+              color: row.isPinned ? '#ca8a04' : '#64748b',
+              borderColor: row.isPinned ? '#fef08a' : '#e2e8f0',
+            }}
+            title={row.isPinned ? (isKhmer ? 'ដោះការខ្ទាស់' : 'Unpin') : (isKhmer ? 'ខ្ទាស់' : 'Pin')}
+          >
+            <Pin size={13} fill={row.isPinned ? '#ca8a04' : 'none'} />
+            <span>{row.isPinned ? (isKhmer ? 'ដោះខ្ទាស់' : 'Unpin') : (isKhmer ? 'ខ្ទាស់' : 'Pin')}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => openEditModal(row)}
+            className="admin-user-mobile-action-btn edit"
+            title={isKhmer ? 'កែសម្រួល' : 'Edit Notice'}
+          >
+            <Edit2 size={13} />
+            <span>{isKhmer ? 'កែប្រែ' : 'Edit'}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => openDeleteModal(row)}
+            className="admin-user-mobile-action-btn delete"
+            title={isKhmer ? 'លុប' : 'Delete Notice'}
+          >
+            <Trash2 size={13} />
+            <span>{isKhmer ? 'លុប' : 'Delete'}</span>
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div>
       {/* 1. Institutional Header Banner */}
       <div
+        className="admin-page-header admin-notices-header"
         style={{
           background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
           borderRadius: '20px',
@@ -522,7 +663,7 @@ export const AdminNoticesPage = () => {
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="admin-notices-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button
             onClick={fetchData}
             disabled={loading}
@@ -561,306 +702,196 @@ export const AdminNoticesPage = () => {
       </div>
 
       {/* 2. 4-Card Institutional KPI Metric Strip */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '16px',
-          marginBottom: '24px',
-        }}
-      >
+      <div className="admin-kpi-grid admin-notices-kpis">
         {/* KPI 1: Total Notices */}
         <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
+          className="admin-kpi-card"
+          onClick={() => setSelectedFilter('all')}
+          style={{ cursor: 'pointer' }}
         >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#eff6ff',
-              color: '#1e73be',
-              border: '1px solid #dbeafe',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <Bell size={22} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">
+                {isKhmer ? 'សេចក្តីជូនដំណឹងសរុប' : 'Total Notices'}
+              </span>
+              <div className="admin-kpi-value">{totalNotices}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#1e73be' }} />
+                <span>{isKhmer ? 'សេចក្តីប្រកាស & សារាចរ' : 'Announcements & circulars'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#eff6ff', color: '#1e73be' }}>
+                {isKhmer ? 'សរុប' : 'Total'}
+              </span>
+              <div
+                className="admin-kpi-icon-badge"
+                style={{ background: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}
+              >
+                <Bell size={22} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'សេចក្តីជូនដំណឹងសរុប' : 'Total Notices'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {totalNotices} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#1e73be' }}>{isKhmer ? 'ដំណឹង' : 'Announcements'}</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'មើលដំណឹងទាំងអស់' : 'View all notices'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* KPI 2: Pinned Announcements */}
         <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
+          className="admin-kpi-card"
+          onClick={() => setSelectedFilter('pinned')}
+          style={{ cursor: 'pointer' }}
         >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#fefce8',
-              color: '#ca8a04',
-              border: '1px solid #fef08a',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <Pin size={22} fill="#ca8a04" />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">
+                {isKhmer ? 'បានខ្ទាស់សំខាន់' : 'Pinned Notices'}
+              </span>
+              <div className="admin-kpi-value" style={{ color: '#ca8a04' }}>
+                {pinnedNotices}
+              </div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#ca8a04' }} />
+                <span>{isKhmer ? 'បង្ហាញលើគេបង្អស់' : 'Top priority notices'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#fefce8', color: '#ca8a04' }}>
+                {isKhmer ? 'បានខ្ទាស់' : 'Pinned'}
+              </span>
+              <div
+                className="admin-kpi-icon-badge"
+                style={{ background: '#fefce8', color: '#ca8a04', border: '1px solid #fef08a' }}
+              >
+                <Pin size={22} fill="#ca8a04" />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'បានខ្ទាស់សំខាន់' : 'Pinned to Top'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {pinnedNotices} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#ca8a04' }}>{isKhmer ? 'ដំណឹង' : 'Pinned'}</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'ត្រងយកដំណឹងខ្ទាស់' : 'Filter pinned notices'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* KPI 3: Scholarships & Subsidies */}
         <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
+          className="admin-kpi-card"
+          onClick={() => setSelectedFilter('scholarship')}
+          style={{ cursor: 'pointer' }}
         >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#faf5ff',
-              color: '#7c3aed',
-              border: '1px solid #e9d5ff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <Award size={22} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">
+                {isKhmer ? 'អាហារូបករណ៍ & ឧបត្ថម្ភ' : 'Scholarships & Grants'}
+              </span>
+              <div className="admin-kpi-value" style={{ color: '#7c3aed' }}>
+                {scholarshipNotices}
+              </div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#7c3aed' }} />
+                <span>{isKhmer ? 'អាហារូបករណ៍ ១០០% TVET' : '100% TVET Scholarships'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#faf5ff', color: '#7c3aed' }}>
+                {isKhmer ? 'អាហារូបករណ៍' : 'Scholarship'}
+              </span>
+              <div
+                className="admin-kpi-icon-badge"
+                style={{ background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}
+              >
+                <Award size={22} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'អាហារូបករណ៍ & ឧបត្ថម្ភ' : 'Scholarships & Subsidies'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {scholarshipNotices} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#7c3aed' }}>{isKhmer ? 'ដំណឹង' : 'Notices'}</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'ត្រងយកអាហារូបករណ៍' : 'Filter scholarships'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* KPI 4: Internships & Industry */}
         <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
+          className="admin-kpi-card"
+          onClick={() => setSelectedFilter('internship')}
+          style={{ cursor: 'pointer' }}
         >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#f0fdf4',
-              color: '#059669',
-              border: '1px solid #bbf7d0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <Briefcase size={22} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'កម្មសិក្សា & សហគ្រាស' : 'Internships & Careers'}
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">
+                {isKhmer ? 'កម្មសិក្សា & សហគ្រាស' : 'Internships & Careers'}
+              </span>
+              <div className="admin-kpi-value" style={{ color: '#059669' }}>
+                {internshipNotices}
+              </div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#059669' }} />
+                <span>{isKhmer ? 'ឱកាសការងារ និងចុះកម្មសិក្សា' : 'Career & internship drives'}</span>
+              </div>
             </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {internshipNotices} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#059669' }}>{isKhmer ? 'ដំណឹង' : 'Notices'}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Category Filter Tabs & Live Search */}
-      <div
-        style={{
-          background: '#ffffff',
-          borderRadius: '16px',
-          border: '1px solid #e2e8f0',
-          padding: '14px 18px',
-          marginBottom: '20px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px',
-        }}
-      >
-        {/* Dynamic Category Tabs */}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <button
-            type="button"
-            onClick={() => setSelectedFilter('all')}
-            style={{
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              border: '1px solid',
-              borderColor: selectedFilter === 'all' ? '#1e73be' : '#e2e8f0',
-              backgroundColor: selectedFilter === 'all' ? '#eff6ff' : '#ffffff',
-              color: selectedFilter === 'all' ? '#1e73be' : '#64748b',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            {isKhmer ? 'ទាំងអស់' : 'All Notices'} ({totalNotices})
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setSelectedFilter('pinned')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              border: '1px solid',
-              borderColor: selectedFilter === 'pinned' ? '#ca8a04' : '#e2e8f0',
-              backgroundColor: selectedFilter === 'pinned' ? '#fefce8' : '#ffffff',
-              color: selectedFilter === 'pinned' ? '#ca8a04' : '#64748b',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            <Pin size={13} fill={selectedFilter === 'pinned' ? '#ca8a04' : 'none'} />
-            {isKhmer ? 'បានខ្ទាស់' : 'Pinned'} ({pinnedNotices})
-          </button>
-
-          {uniqueCategories.map((cat) => {
-            const count = notices.filter((n) => (n.category || '').trim().toLowerCase() === cat.toLowerCase()).length;
-            const meta = getCategoryMeta(cat);
-            const isSelected = selectedFilter === cat;
-            return (
-              <button
-                type="button"
-                key={cat}
-                onClick={() => setSelectedFilter(cat)}
-                style={{
-                  padding: '6px 14px',
-                  borderRadius: '9999px',
-                  fontSize: '0.82rem',
-                  fontWeight: isSelected ? 700 : 600,
-                  border: '1px solid',
-                  borderColor: isSelected ? '#1e73be' : '#e2e8f0',
-                  backgroundColor: isSelected ? '#eff6ff' : '#ffffff',
-                  color: isSelected ? '#1e73be' : '#64748b',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                }}
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#f0fdf4', color: '#059669' }}>
+                {isKhmer ? 'កម្មសិក្សា' : 'Internship'}
+              </span>
+              <div
+                className="admin-kpi-icon-badge"
+                style={{ background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}
               >
-                {meta.label} ({count})
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Live Search */}
-        <div style={{ position: 'relative', minWidth: '260px' }}>
-          <Search
-            size={16}
-            style={{
-              position: 'absolute',
-              left: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#94a3b8',
-            }}
-          />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={isKhmer ? 'ស្វែងរកចំណងជើង ឬខ្លឹមសារ...' : 'Search notices or content...'}
-            style={{
-              width: '100%',
-              padding: '7px 32px 7px 36px',
-              borderRadius: '10px',
-              border: '1px solid #e2e8f0',
-              fontSize: '0.84rem',
-              outline: 'none',
-            }}
-          />
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm('')}
-              style={{
-                position: 'absolute',
-                right: '8px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'none',
-                border: 'none',
-                color: '#94a3b8',
-                cursor: 'pointer',
-                padding: '2px',
-              }}
-            >
-              <X size={14} />
-            </button>
-          )}
+                <Briefcase size={22} />
+              </div>
+            </div>
+          </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'ត្រងយកកម្មសិក្សា' : 'Filter internships'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
+          </div>
         </div>
       </div>
 
-      {/* 4. Rich Institutional DataTable */}
+      {/* 3. Category Filter Bar (Sleek Horizontal Scroll Pills) */}
+      <div className="admin-user-filter-bar">
+        <button
+          type="button"
+          className={`admin-user-filter-pill ${selectedFilter === 'all' ? 'active' : ''}`}
+          onClick={() => setSelectedFilter('all')}
+        >
+          <span>{isKhmer ? 'ទាំងអស់' : 'All Notices'}</span>
+          <span className="admin-user-filter-count">{totalNotices}</span>
+        </button>
+
+        <button
+          type="button"
+          className={`admin-user-filter-pill ${selectedFilter === 'pinned' ? 'active' : ''}`}
+          onClick={() => setSelectedFilter('pinned')}
+        >
+          <Pin size={12} fill={selectedFilter === 'pinned' ? '#ffffff' : 'none'} />
+          <span>{isKhmer ? 'បានខ្ទាស់' : 'Pinned'}</span>
+          <span className="admin-user-filter-count">{pinnedNotices}</span>
+        </button>
+
+        {uniqueCategories.map((cat) => {
+          const count = notices.filter(
+            (n) => (n.category || '').trim().toLowerCase() === cat.toLowerCase()
+          ).length;
+          const meta = getCategoryMeta(cat);
+          const isSelected = selectedFilter === cat;
+          return (
+            <button
+              type="button"
+              key={cat}
+              className={`admin-user-filter-pill ${isSelected ? 'active' : ''}`}
+              onClick={() => setSelectedFilter(cat)}
+            >
+              <span>{meta.label}</span>
+              <span className="admin-user-filter-count">{count}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 4. Rich Institutional DataTable & Mobile Cards */}
       <AdminDataTable
         columns={columns}
         data={filteredNotices}
@@ -871,6 +902,11 @@ export const AdminNoticesPage = () => {
             ? `បង្ហាញ ${filteredNotices.length} ក្នុងចំណោមសេចក្តីជូនដំណឹងសរុប ${totalNotices}`
             : `Showing ${filteredNotices.length} of ${totalNotices} notices`
         }
+        onAdd={openAddModal}
+        addLabel={isKhmer ? 'បន្ថែមសេចក្តីជូនដំណឹងថ្មី' : 'Add Notice'}
+        onRefresh={fetchData}
+        searchPlaceholder={isKhmer ? 'ស្វែងរកសេចក្តីជូនដំណឹង ឬខ្លឹមសារ...' : 'Search notices or content...'}
+        renderMobileCard={renderMobileCard}
       />
 
       {/* 5. Interactive Notice Reader Lightbox Modal */}

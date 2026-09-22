@@ -15,6 +15,7 @@ import {
   HardDrive,
   Plus,
   ArrowUpRight,
+  ArrowRight,
   Bell,
   Award,
   FileDown,
@@ -236,9 +237,9 @@ export const AdminDashboardPage = () => {
           1. EXECUTIVE WELCOME BANNER
           ========================================================================= */}
       <div className="admin-dash-welcome">
-        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
-          <div>
-            <div className="d-flex align-items-center gap-2 mb-2">
+        <div className="admin-dash-welcome-inner">
+          <div className="admin-dash-welcome-text">
+            <div className="admin-dash-status-badges mb-2">
               <span className="admin-dash-role-badge">
                 <ShieldCheck size={14} />
                 {isKhmer ? 'គណៈគ្រប់គ្រងស្ថាប័ន RPITSSR' : 'Executive Administrator'}
@@ -248,53 +249,53 @@ export const AdminDashboardPage = () => {
               </span>
             </div>
 
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#07294D', margin: '0 0 6px', letterSpacing: '-0.3px' }}>
+            <h1 className="admin-dash-welcome-title">
               {isKhmer
                 ? `សូមស្វាគមន៍, ${user?.fullName || user?.name || 'ថ្នាក់ដឹកនាំស្ថាប័ន'}`
                 : `Welcome back, ${user?.fullName || user?.name || 'Administrator'}`}
             </h1>
 
-            <p style={{ color: '#64748b', margin: 0, fontSize: '0.92rem' }}>
+            <p className="admin-dash-welcome-subtitle">
               {isKhmer
                 ? 'ផ្ទាំងគ្រប់គ្រងទិន្នន័យ ស្ថិតិអប់រំ និងការត្រួតពិនិត្យហេដ្ឋារចនាសម្ព័ន្ធបច្ចេកវិទ្យាព័ត៌មានវិទ្យាស្ថាន។'
                 : 'Unified operational command, academic performance analytics, and system health status for RPITSSR.'}
             </p>
           </div>
 
-          <div className="d-flex align-items-center flex-wrap gap-2">
+          <div className="admin-dash-actions-group">
             <div className="admin-dash-date-chip">
-              <Calendar size={15} color="#1e73be" />
+              <Calendar size={14} color="#1e73be" />
               <span>{getTodayDateString()}</span>
             </div>
 
-            <button
-              type="button"
-              className="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2 rounded-3 px-3 py-2"
-              onClick={loadSummary}
-              disabled={refreshing}
-              title={isKhmer ? 'ផ្ទុកទិន្នន័យឡើងវិញ' : 'Refresh Dashboard'}
-              style={{ fontSize: '0.84rem', fontWeight: 600 }}
-            >
-              <RefreshCw size={14} className={refreshing ? 'spin' : ''} />
-              <span>{isKhmer ? 'ធ្វើបច្ចុប្បន្នភាព' : 'Refresh'}</span>
-            </button>
+            <div className="admin-dash-action-buttons">
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm admin-dash-action-btn"
+                onClick={loadSummary}
+                disabled={refreshing}
+                title={isKhmer ? 'ផ្ទុកទិន្នន័យឡើងវិញ' : 'Refresh Dashboard'}
+              >
+                <RefreshCw size={14} className={refreshing ? 'spin' : ''} />
+                <span>{isKhmer ? 'ធ្វើបច្ចុប្បន្នភាព' : 'Refresh'}</span>
+              </button>
 
-            <Link
-              to="/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-primary btn-sm d-inline-flex align-items-center gap-2 rounded-3 px-3 py-2"
-              style={{ background: '#07294D', borderColor: '#07294D', fontSize: '0.84rem', fontWeight: 600 }}
-            >
-              <ExternalLink size={14} />
-              <span>{isKhmer ? 'គេហទំព័រផ្ទាល់' : 'Live Website'}</span>
-            </Link>
+              <Link
+                to="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary btn-sm admin-dash-action-btn admin-dash-btn-live"
+              >
+                <ExternalLink size={14} />
+                <span>{isKhmer ? 'គេហទំព័រផ្ទាល់' : 'Live Website'}</span>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
 
       {/* =========================================================================
-          2. 8-CARD KPI METRICS GRID
+          2. 8-CARD KPI METRICS GRID (Balanced Split Layout)
           ========================================================================= */}
       <div className="admin-kpi-grid">
         {stats.map((item) => {
@@ -302,8 +303,27 @@ export const AdminDashboardPage = () => {
           const displayVal = loading ? '...' : isKhmer ? toKhmerNumber(item.value) : item.value;
           return (
             <Link key={item.id} to={item.link} className="admin-kpi-card">
-              <div>
-                <div className="admin-kpi-header">
+              <div className="admin-kpi-main-row">
+                {/* Left Stack: Category Label, Value & Context Pill */}
+                <div className="admin-kpi-left-stack">
+                  <span className="admin-kpi-category-label">
+                    {isKhmer ? item.labelKm : item.labelEn}
+                  </span>
+                  <div className="admin-kpi-value">{displayVal}</div>
+                  <div className="admin-kpi-context-pill">
+                    <span className="admin-kpi-dot" style={{ backgroundColor: item.color }} />
+                    <span>{isKhmer ? item.subKm : item.subEn}</span>
+                  </div>
+                </div>
+
+                {/* Right Stack: Tag & Soft Pastel Icon Badge */}
+                <div className="admin-kpi-right-stack">
+                  <span
+                    className="admin-kpi-tag"
+                    style={{ background: item.tagBg, color: item.tagColor }}
+                  >
+                    {item.tag}
+                  </span>
                   <div
                     className="admin-kpi-icon-badge"
                     style={{
@@ -314,23 +334,13 @@ export const AdminDashboardPage = () => {
                   >
                     <IconComponent size={24} />
                   </div>
-                  <span
-                    className="admin-kpi-tag"
-                    style={{ background: item.tagBg, color: item.tagColor }}
-                  >
-                    {item.tag}
-                  </span>
-                </div>
-
-                <div className="admin-kpi-value">{displayVal}</div>
-                <div className="admin-kpi-title">
-                  {isKhmer ? item.labelKm : item.labelEn}
                 </div>
               </div>
 
-              <div className="admin-kpi-subtitle">
-                <span>{isKhmer ? item.subKm : item.subEn}</span>
-                <ChevronRight size={14} color="#94a3b8" />
+              {/* Bottom Footer Action */}
+              <div className="admin-kpi-footer-action">
+                <span>{isKhmer ? 'គ្រប់គ្រងទិន្នន័យ' : 'Manage section'}</span>
+                <ArrowRight size={14} className="admin-kpi-action-arrow" />
               </div>
             </Link>
           );
@@ -356,33 +366,35 @@ export const AdminDashboardPage = () => {
               </div>
 
               {/* Feed Tabs */}
-              <div className="d-flex align-items-center gap-1 bg-light p-1 rounded-3">
-                <button
-                  type="button"
-                  className={`admin-feed-tab-btn ${activeFeedTab === 'notices' ? 'active' : ''}`}
-                  onClick={() => setActiveFeedTab('notices')}
-                >
-                  <Bell size={13} />
-                  <span>{isKhmer ? 'ដំណឹង' : 'Notices'}</span>
-                </button>
+              <div className="admin-feed-tabs-container">
+                <div className="admin-feed-tabs">
+                  <button
+                    type="button"
+                    className={`admin-feed-tab-btn ${activeFeedTab === 'notices' ? 'active' : ''}`}
+                    onClick={() => setActiveFeedTab('notices')}
+                  >
+                    <Bell size={13} />
+                    <span>{isKhmer ? 'ដំណឹង' : 'Notices'}</span>
+                  </button>
 
-                <button
-                  type="button"
-                  className={`admin-feed-tab-btn ${activeFeedTab === 'examResults' ? 'active' : ''}`}
-                  onClick={() => setActiveFeedTab('examResults')}
-                >
-                  <Award size={13} />
-                  <span>{isKhmer ? 'លទ្ធផល' : 'Results'}</span>
-                </button>
+                  <button
+                    type="button"
+                    className={`admin-feed-tab-btn ${activeFeedTab === 'examResults' ? 'active' : ''}`}
+                    onClick={() => setActiveFeedTab('examResults')}
+                  >
+                    <Award size={13} />
+                    <span>{isKhmer ? 'លទ្ធផល' : 'Results'}</span>
+                  </button>
 
-                <button
-                  type="button"
-                  className={`admin-feed-tab-btn ${activeFeedTab === 'users' ? 'active' : ''}`}
-                  onClick={() => setActiveFeedTab('users')}
-                >
-                  <Users size={13} />
-                  <span>{isKhmer ? 'និស្សិត' : 'Users'}</span>
-                </button>
+                  <button
+                    type="button"
+                    className={`admin-feed-tab-btn ${activeFeedTab === 'users' ? 'active' : ''}`}
+                    onClick={() => setActiveFeedTab('users')}
+                  >
+                    <Users size={13} />
+                    <span>{isKhmer ? 'និស្សិត' : 'Users'}</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -544,102 +556,90 @@ export const AdminDashboardPage = () => {
               </h3>
             </div>
             <div className="admin-card-body p-3">
-              <div className="row g-3">
-                <div className="col-md-6">
-                  <Link to="/admin-panel/notices" className="admin-action-tile">
-                    <div className="admin-action-tile-icon" style={{ background: '#fefce8', color: '#d97706', border: '1px solid #fef08a' }}>
-                      <Bell size={20} />
+              <div className="admin-shortcuts-grid">
+                <Link to="/admin-panel/notices" className="admin-action-tile">
+                  <div className="admin-action-tile-icon" style={{ background: '#fefce8', color: '#d97706', border: '1px solid #fef08a' }}>
+                    <Bell size={20} />
+                  </div>
+                  <div className="admin-action-tile-body">
+                    <div className="admin-action-tile-title">
+                      {isKhmer ? 'សេចក្តីជូនដំណឹង' : 'Post Announcement'}
                     </div>
-                    <div>
-                      <div className="admin-action-tile-title">
-                        {isKhmer ? 'សេចក្តីជូនដំណឹង' : 'Post Announcement'}
-                      </div>
-                      <div className="admin-action-tile-desc">
-                        {isKhmer ? 'បង្កើត និងផ្សាយដំណឹងផ្លូវការ' : 'Publish official notices'}
-                      </div>
+                    <div className="admin-action-tile-desc">
+                      {isKhmer ? 'បង្កើត និងផ្សាយដំណឹងផ្លូវការ' : 'Publish official notices'}
                     </div>
-                  </Link>
-                </div>
+                  </div>
+                </Link>
 
-                <div className="col-md-6">
-                  <Link to="/admin-panel/exam-results" className="admin-action-tile">
-                    <div className="admin-action-tile-icon" style={{ background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}>
-                      <Award size={20} />
+                <Link to="/admin-panel/exam-results" className="admin-action-tile">
+                  <div className="admin-action-tile-icon" style={{ background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}>
+                    <Award size={20} />
+                  </div>
+                  <div className="admin-action-tile-body">
+                    <div className="admin-action-tile-title">
+                      {isKhmer ? 'បញ្ចូលលទ្ធផលប្រឡង' : 'Upload Exam Result'}
                     </div>
-                    <div>
-                      <div className="admin-action-tile-title">
-                        {isKhmer ? 'បញ្ចូលលទ្ធផលប្រឡង' : 'Upload Exam Result'}
-                      </div>
-                      <div className="admin-action-tile-desc">
-                        {isKhmer ? 'តារាងពិន្ទុ & និទ្ទេសនិស្សិត' : 'Semester grade transcripts'}
-                      </div>
+                    <div className="admin-action-tile-desc">
+                      {isKhmer ? 'តារាងពិន្ទុ & និទ្ទេសនិស្សិត' : 'Semester grade transcripts'}
                     </div>
-                  </Link>
-                </div>
+                  </div>
+                </Link>
 
-                <div className="col-md-6">
-                  <Link to="/admin-panel/courses" className="admin-action-tile">
-                    <div className="admin-action-tile-icon" style={{ background: '#e0e7ff', color: '#07294D', border: '1px solid #c7d2fe' }}>
-                      <BookOpen size={20} />
+                <Link to="/admin-panel/courses" className="admin-action-tile">
+                  <div className="admin-action-tile-icon" style={{ background: '#e0e7ff', color: '#07294D', border: '1px solid #c7d2fe' }}>
+                    <BookOpen size={20} />
+                  </div>
+                  <div className="admin-action-tile-body">
+                    <div className="admin-action-tile-title">
+                      {isKhmer ? 'វគ្គបណ្តុះបណ្តាល' : 'Manage Courses'}
                     </div>
-                    <div>
-                      <div className="admin-action-tile-title">
-                        {isKhmer ? 'វគ្គបណ្តុះបណ្តាល' : 'Manage Courses'}
-                      </div>
-                      <div className="admin-action-tile-desc">
-                        {isKhmer ? 'កែសម្រួលជំនាញ & កម្មវិធីសិក្សា' : 'Vocational & degree majors'}
-                      </div>
+                    <div className="admin-action-tile-desc">
+                      {isKhmer ? 'កែសម្រួលជំនាញ & កម្មវិធីសិក្សា' : 'Vocational & degree majors'}
                     </div>
-                  </Link>
-                </div>
+                  </div>
+                </Link>
 
-                <div className="col-md-6">
-                  <Link to="/admin-panel/teachers" className="admin-action-tile">
-                    <div className="admin-action-tile-icon" style={{ background: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa' }}>
-                      <GraduationCap size={20} />
+                <Link to="/admin-panel/teachers" className="admin-action-tile">
+                  <div className="admin-action-tile-icon" style={{ background: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa' }}>
+                    <GraduationCap size={20} />
+                  </div>
+                  <div className="admin-action-tile-body">
+                    <div className="admin-action-tile-title">
+                      {isKhmer ? 'សាស្ត្រាចារ្យ & បុគ្គលិក' : 'Faculty & Staff'}
                     </div>
-                    <div>
-                      <div className="admin-action-tile-title">
-                        {isKhmer ? 'សាស្ត្រាចារ្យ & បុគ្គលិក' : 'Faculty & Staff'}
-                      </div>
-                      <div className="admin-action-tile-desc">
-                        {isKhmer ? 'គ្រប់គ្រងគ្រូបច្ចេកទេស' : 'Directory of instructors'}
-                      </div>
+                    <div className="admin-action-tile-desc">
+                      {isKhmer ? 'គ្រប់គ្រងគ្រូបច្ចេកទេស' : 'Directory of instructors'}
                     </div>
-                  </Link>
-                </div>
+                  </div>
+                </Link>
 
-                <div className="col-md-6">
-                  <Link to="/admin-panel/downloads" className="admin-action-tile">
-                    <div className="admin-action-tile-icon" style={{ background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}>
-                      <FileDown size={20} />
+                <Link to="/admin-panel/downloads" className="admin-action-tile">
+                  <div className="admin-action-tile-icon" style={{ background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}>
+                    <FileDown size={20} />
+                  </div>
+                  <div className="admin-action-tile-body">
+                    <div className="admin-action-tile-title">
+                      {isKhmer ? 'មជ្ឈមណ្ឌលឯកសារ' : 'Document Center'}
                     </div>
-                    <div>
-                      <div className="admin-action-tile-title">
-                        {isKhmer ? 'មជ្ឈមណ្ឌលឯកសារ' : 'Document Center'}
-                      </div>
-                      <div className="admin-action-tile-desc">
-                        {isKhmer ? 'ទម្រង់បែបបទ TVET 1.5M & PDF' : 'Upload application forms'}
-                      </div>
+                    <div className="admin-action-tile-desc">
+                      {isKhmer ? 'ទម្រង់បែបបទ TVET 1.5M & PDF' : 'Upload application forms'}
                     </div>
-                  </Link>
-                </div>
+                  </div>
+                </Link>
 
-                <div className="col-md-6">
-                  <Link to="/admin-panel/settings" className="admin-action-tile">
-                    <div className="admin-action-tile-icon" style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0' }}>
-                      <Sliders size={20} />
+                <Link to="/admin-panel/settings" className="admin-action-tile">
+                  <div className="admin-action-tile-icon" style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0' }}>
+                    <Sliders size={20} />
+                  </div>
+                  <div className="admin-action-tile-body">
+                    <div className="admin-action-tile-title">
+                      {isKhmer ? 'ការកំណត់ស្ថាប័ន' : 'Institute Settings'}
                     </div>
-                    <div>
-                      <div className="admin-action-tile-title">
-                        {isKhmer ? 'ការកំណត់ស្ថាប័ន' : 'Institute Settings'}
-                      </div>
-                      <div className="admin-action-tile-desc">
-                        {isKhmer ? 'ព័ត៌មានទូទៅ & ប្រព័ន្ធ' : 'Configuration & metadata'}
-                      </div>
+                    <div className="admin-action-tile-desc">
+                      {isKhmer ? 'ព័ត៌មានទូទៅ & ប្រព័ន្ធ' : 'Configuration & metadata'}
                     </div>
-                  </Link>
-                </div>
+                  </div>
+                </Link>
               </div>
             </div>
           </div>

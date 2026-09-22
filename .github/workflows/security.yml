@@ -1,0 +1,72 @@
+name: Security checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  forbidden-files:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Block sensitive repository artifacts
+        shell: bash
+        run: |
+          forbidden_files="$(git ls-files -- \
+            '*.sql' '*.sql.gz' '*.sqlite' '*.db' '*.pem' '*.key' '*.p12' '*.pfx' \
+            '*.zip' '*.tar' '*.tar.gz' '*.bak' '*.backup' \
+            '.env' '**/.env' '.env.*' '**/.env.*' \
+            ':(exclude).env.example' ':(exclude)**/.env.example')"
+          if [[ -n "${forbidden_files}" ]]; then
+            printf 'Sensitive files must not be tracked:\n%s\n' "${forbidden_files}" >&2
+            exit 1
+          fi
+      - name: Require the exposed database dump to be removed from history
+        shell: bash
+        run: |
+          if git log --all --format=%H -- rpitssr_db.sql | grep -q .; then
+            echo 'rpitssr_db.sql remains in Git history. Complete the approved history rewrite before merging.' >&2
+            exit 1
+          fi
+      - name: Scan repository history for secrets
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v6
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, sqlite3
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: composer audit --locked --no-interaction
+      - run: php artisan test --compact
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm audit --omit=dev

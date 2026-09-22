@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
-import { Clock, ChevronRight, Edit3, Award } from 'lucide-react';
+import { Clock, ChevronRight, Edit3, Award, BookOpen } from 'lucide-react';
 
 export const CourseCard = ({ course }) => {
   const { t, currentLanguage, language } = useLanguage();
@@ -59,6 +59,12 @@ export const CourseCard = ({ course }) => {
           </Link>
         </h4>
 
+        {course.description && (
+          <p className="courses-desc-snippet">
+            {course.description}
+          </p>
+        )}
+
         <div className="duration-fee">
           <div className="duration">
             <Clock size={13} className="course-meta-icon" />
@@ -74,13 +80,13 @@ export const CourseCard = ({ course }) => {
         </div>
 
         <div className="courses-link">
+          <Link className="more" to={`/courses-details/${course.id}`} onClick={() => window.scrollTo(0, 0)}>
+            <BookOpen size={13} />
+            <span>{isKhmer ? 'មើលលម្អិត' : 'Details'}</span>
+          </Link>
           <Link className="apply" to="/register" onClick={() => window.scrollTo(0, 0)}>
             <Edit3 size={13} />
             <span>{isKhmer ? 'ដាក់ពាក្យ' : 'Apply'}</span>
-          </Link>
-          <Link className="more" to={`/courses-details/${course.id}`} onClick={() => window.scrollTo(0, 0)}>
-            <span>{isKhmer ? 'អានបន្ថែម' : 'Details'}</span>
-            <ChevronRight size={14} />
           </Link>
         </div>
       </div>

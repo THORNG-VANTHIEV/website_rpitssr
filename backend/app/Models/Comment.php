@@ -13,8 +13,17 @@ class Comment extends BaseModel
         'title',
         'time',
         'content',
+        'status',
         'blogPostId',
         'parentCommentId',
+    ];
+
+    /**
+     * The attributes that should be hidden for public serialization (PII Protection).
+     */
+    protected $hidden = [
+        'email',
+        'phone',
     ];
 
     public function post()

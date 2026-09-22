@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\BookBorrowing;
 use App\Models\ExamResult;
 use App\Models\Notice;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class StudentPortalController extends Controller
@@ -42,7 +44,7 @@ class StudentPortalController extends Controller
                     'fullName' => $user->fullName ?: $user->username,
                     'email' => $user->email,
                     'role' => $user->role,
-                    'studentId' => $user->studentId ?: ('STU-' . str_pad($user->id, 4, '0', STR_PAD_LEFT)),
+                    'studentId' => $user->studentId ?: ('STU-'.str_pad($user->id, 4, '0', STR_PAD_LEFT)),
                     'className' => $user->className ?: 'Information Technology (IT)',
                     'semester' => $user->semester ?: 'Semester 1',
                     'academicYear' => $user->academicYear ?: '2025-2026',
@@ -51,7 +53,7 @@ class StudentPortalController extends Controller
                 'stats' => [
                     'totalExams' => $totalExams,
                     'avgPercentage' => $avgPercentage,
-                    'activeLoans' => count(array_filter($borrowings, fn($b) => $b['status'] === 'borrowed' || $b['status'] === 'overdue')),
+                    'activeLoans' => count(array_filter($borrowings, fn ($b) => $b['status'] === 'borrowed' || $b['status'] === 'overdue')),
                     'academicStatus' => 'Enrolled (សកម្ម)',
                 ],
                 'recentResults' => $examResults->take(3),
@@ -114,23 +116,21 @@ class StudentPortalController extends Controller
         $validated = $request->validate([
             'fullName' => 'nullable|string|max:255',
             'className' => 'nullable|string|max:100',
-            'studentId' => 'nullable|string|max:50',
             'currentPassword' => 'nullable|string',
-            'newPassword' => 'nullable|string|min:6',
+            'newPassword' => 'nullable|string|min:8',
         ]);
 
-        if (!empty($validated['fullName'])) {
+        if (! empty($validated['fullName'])) {
             $user->fullName = $validated['fullName'];
         }
-        if (!empty($validated['className'])) {
+        if (! empty($validated['className'])) {
             $user->className = $validated['className'];
         }
-        if (!empty($validated['studentId'])) {
-            $user->studentId = $validated['studentId'];
-        }
+        // Note: Official Student IDs are strictly issued and managed by Institute Administration/Registrar.
+        // Students cannot self-assign or modify their studentId to prevent unauthorized identity switching.
 
         // Change password if requested
-        if (!empty($validated['newPassword'])) {
+        if (! empty($validated['newPassword'])) {
             if (empty($validated['currentPassword'])) {
                 return response()->json([
                     'success' => false,
@@ -138,7 +138,7 @@ class StudentPortalController extends Controller
                 ], 422);
             }
 
-            if (!Hash::check($validated['currentPassword'], $user->password)) {
+            if (! Hash::check($validated['currentPassword'], $user->password)) {
                 return response()->json([
                     'success' => false,
                     'error' => 'Current password does not match our records.',
@@ -148,84 +148,69 @@ class StudentPortalController extends Controller
             $user->password = Hash::make($validated['newPassword']);
         }
 
-        $user->save();
+        $passwordChanged = $user->isDirty('password');
+
+        DB::transaction(function () use ($user): void {
+            $user->save();
+        });
 
         return response()->json([
             'success' => true,
-            'message' => 'Profile updated successfully',
+            'message' => $passwordChanged ? 'Password updated. Please sign in again.' : 'Profile updated successfully',
+            'requiresReauthentication' => $passwordChanged,
             'data' => $user,
         ], 200);
     }
 
     /**
      * Helper to filter exam results by student
+     * Enforces strict Student ID isolation: a student can ONLY view results matching their official studentId.
      */
     private function filterByStudent($query, User $user): void
     {
-        $query->where(function ($q) use ($user) {
-            $hasCondition = false;
-
-            if (!empty($user->studentId)) {
-                $q->where('studentId', $user->studentId);
-                $hasCondition = true;
-            }
-
-            if (!empty($user->fullName)) {
-                if ($hasCondition) {
-                    $q->orWhere('studentName', 'like', "%{$user->fullName}%");
-                } else {
-                    $q->where('studentName', 'like', "%{$user->fullName}%");
-                    $hasCondition = true;
-                }
-            }
-
-            if (!empty($user->username)) {
-                if ($hasCondition) {
-                    $q->orWhere('studentName', 'like', "%{$user->username}%");
-                } else {
-                    $q->where('studentName', 'like', "%{$user->username}%");
-                    $hasCondition = true;
-                }
-            }
-
-            // If user has no specific studentId or name, fallback to sample records so dashboard is never blank
-            if (!$hasCondition) {
-                $q->whereRaw('1 = 1');
-            }
-        });
+        // Security: Strict student ID binding.
+        // A student can ONLY access records matching their official studentId assigned by the institute.
+        // Changing URL parameters has zero effect because queries are locked to the authenticated user's ID.
+        if (! empty($user->studentId)) {
+            $query->where('studentId', $user->studentId);
+        } else {
+            // If student has no official student ID assigned by administration, return empty results.
+            $query->whereRaw('0 = 1');
+        }
     }
 
     /**
-     * Helper to retrieve student library records
+     * Helper to retrieve student library records safely from database
      */
     private function getStudentBorrowings(User $user): array
     {
-        $id = $user->studentId ?: ('STU-' . str_pad($user->id, 4, '0', STR_PAD_LEFT));
-        $name = $user->fullName ?: $user->username;
+        $borrowings = BookBorrowing::with(['book.category'])
+            ->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id);
 
-        return [
-            [
-                'id' => 201,
-                'bookTitle' => 'Introduction to Web Technologies & Modern JavaScript',
-                'category' => 'Information Technology',
-                'borrowDate' => '2026-03-01',
-                'dueDate' => '2026-03-25',
-                'status' => 'borrowed',
-                'shelf' => 'Section A-12',
-                'studentId' => $id,
-                'studentName' => $name,
-            ],
-            [
-                'id' => 202,
-                'bookTitle' => 'Electrical Circuits & Wiring Standards Manual',
-                'category' => 'Electricity & Electronics',
-                'borrowDate' => '2026-02-10',
-                'dueDate' => '2026-02-28',
-                'status' => 'returned',
-                'shelf' => 'Section B-04',
-                'studentId' => $id,
-                'studentName' => $name,
-            ],
-        ];
+                if (! empty($user->studentId)) {
+                    $q->orWhere(function ($legacyQuery) use ($user) {
+                        $legacyQuery->whereNull('user_id')
+                            ->where('student_id', $user->studentId);
+                    });
+                }
+            })
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return $borrowings->map(function ($b) use ($user) {
+            return [
+                'id' => $b->id,
+                'bookTitle' => $b->book?->title_km ?: ($b->book?->title_en ?: 'N/A'),
+                'category' => $b->book?->category?->name_km ?: ($b->book?->category?->name_en ?: 'ទូទៅ'),
+                'borrowDate' => $b->borrow_date?->format('Y-m-d') ?: (string) $b->borrow_date,
+                'dueDate' => $b->due_date?->format('Y-m-d') ?: (string) $b->due_date,
+                'returnDate' => $b->return_date?->format('Y-m-d') ?: (string) $b->return_date,
+                'status' => $b->status,
+                'shelf' => $b->book?->shelf_location ?: 'N/A',
+                'studentId' => $user->studentId ?: ('STU-'.str_pad($user->id, 4, '0', STR_PAD_LEFT)),
+                'studentName' => $user->fullName ?: $user->username,
+            ];
+        })->toArray();
     }
 }

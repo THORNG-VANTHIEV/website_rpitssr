@@ -557,7 +557,7 @@ export const DownloadPage = () => {
                 <Award size={24} />
               </div>
               <div>
-                <div className="download-metric-num" style={{ fontSize: '1.45rem' }}>
+                <div className="download-metric-num download-metric-num-special">
                   TVET 1.5M
                 </div>
                 <div className="download-metric-label">
@@ -628,7 +628,7 @@ export const DownloadPage = () => {
             <div className="download-search-wrapper mx-auto position-relative" style={{ maxWidth: '100%' }}>
               <Search
                 size={18}
-                className="position-absolute"
+                className="download-search-icon position-absolute"
                 style={{ left: '20px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}
               />
               <input
@@ -715,20 +715,20 @@ export const DownloadPage = () => {
               </button>
             </div>
           ) : (
-            <div className="row g-4">
+            <div className="row g-3 g-lg-4 download-docs-row">
               {paginatedDocs.map((doc) => {
                 const badge = getFileTypeBadge(doc.fileType);
                 const BadgeIcon = badge.icon;
 
                 return (
                   <div className="col-12 col-md-6 col-lg-4" key={doc.id}>
-                    <div className="download-doc-card bg-white p-4 rounded-4 border shadow-sm h-100 d-flex flex-column justify-content-between position-relative">
+                    <div className="download-doc-card bg-white border shadow-sm h-100 d-flex flex-column justify-content-between position-relative">
                       {/* Top Badges */}
-                      <div>
-                        <div className="d-flex align-items-center justify-content-between mb-3">
+                      <div className="doc-card-body">
+                        <div className="doc-card-top-row d-flex align-items-center justify-content-between">
                           <span
-                            className="badge d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill"
-                            style={{ backgroundColor: badge.bg, color: badge.color, border: `1px solid ${badge.border}`, fontWeight: '700', fontSize: '0.78rem' }}
+                            className="badge doc-badge-type d-inline-flex align-items-center gap-1 px-2.5 py-1 rounded-pill"
+                            style={{ backgroundColor: badge.bg, color: badge.color, border: `1px solid ${badge.border}` }}
                           >
                             <BadgeIcon size={12} />
                             <span>{badge.label}</span>
@@ -736,11 +736,11 @@ export const DownloadPage = () => {
 
                           <div className="d-flex align-items-center gap-1">
                             {doc.isPopular && (
-                              <span className="badge bg-warning text-dark rounded-pill px-2.5 py-1" style={{ fontSize: '0.72rem', fontWeight: '700' }}>
+                              <span className="badge bg-warning text-dark rounded-pill px-2 py-0.5 doc-badge-popular">
                                 🔥 {isKhmer ? 'ពេញនិយម' : 'POPULAR'}
                               </span>
                             )}
-                            <span className="badge bg-light text-secondary rounded-pill px-2 py-1" style={{ fontSize: '0.72rem', fontFamily: 'monospace' }}>
+                            <span className="badge bg-light text-secondary rounded-pill px-2 py-0.5 doc-badge-code">
                               {doc.code}
                             </span>
                           </div>
@@ -748,26 +748,25 @@ export const DownloadPage = () => {
 
                         {/* Title */}
                         <h4
-                          className="doc-title-text fw-bold mb-2"
-                          style={{ color: '#07294D', fontSize: '1.05rem', lineHeight: '1.45', cursor: 'pointer' }}
+                          className="doc-title-text fw-bold"
                           onClick={() => setSelectedDoc(doc)}
                         >
                           {isKhmer ? doc.titleKm : doc.titleEn}
                         </h4>
 
                         {/* Subtitle in other language */}
-                        <div className="text-muted small mb-3" style={{ fontSize: '0.8rem', fontStyle: 'italic' }}>
+                        <div className="doc-subtitle-text text-muted">
                           {isKhmer ? doc.titleEn : doc.titleKm}
                         </div>
 
                         {/* Excerpt */}
-                        <p className="text-muted small mb-3" style={{ lineHeight: '1.65', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        <p className="doc-desc-text text-muted">
                           {isKhmer ? doc.descriptionKm : doc.descriptionEn}
                         </p>
 
                         {/* Checklist Preview if applicable */}
                         {doc.requiredDocsKm && (
-                          <div className="p-2 px-3 rounded-3 mb-3" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', fontSize: '0.76rem' }}>
+                          <div className="doc-req-box">
                             <div className="fw-bold text-dark mb-1 d-flex align-items-center gap-1">
                               <ClipboardCheck size={12} color="#059669" />
                               <span>{isKhmer ? 'ឯកសារភ្ជាប់តម្រូវ ៖' : 'Required:'}</span>
@@ -780,8 +779,8 @@ export const DownloadPage = () => {
                       </div>
 
                       {/* Card Bottom Meta & Actions */}
-                      <div className="pt-3 border-top mt-auto">
-                        <div className="d-flex align-items-center justify-content-between text-muted small mb-3" style={{ fontSize: '0.76rem' }}>
+                      <div className="doc-card-footer mt-auto">
+                        <div className="doc-meta-row d-flex align-items-center justify-content-between text-muted">
                           <span className="d-inline-flex align-items-center gap-1">
                             <HardDrive size={12} />
                             {doc.fileSize}
@@ -796,7 +795,7 @@ export const DownloadPage = () => {
                           </span>
                         </div>
 
-                        <div className="d-flex gap-2">
+                        <div className="doc-actions-row d-flex gap-2">
                           <button
                             type="button"
                             className="download-btn-primary flex-fill"

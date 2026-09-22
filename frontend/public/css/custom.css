@@ -1,4 +1,4 @@
-/* Global Font Family - Koh Santepheap */
+/* Global Font Family - Kantumruy Pro, Inter, and Outfit */
 body,
 h1, h2, h3, h4, h5, h6,
 p, span, div, a, li, td, th,
@@ -9,12 +9,12 @@ input, textarea, select, option,
 .table, .modal, .alert,
 .content-title, .page-title,
 .banner-content h2, .section-title {
-    font-family: 'Koh Santepheap', serif !important;
+    font-family: 'Kantumruy Pro', 'Inter', system-ui, -apple-system, sans-serif !important;
 }
 
 /* Ensure font loads properly for all text elements - EXCEPT icons */
 * {
-    font-family: 'Koh Santepheap', serif !important;
+    font-family: 'Kantumruy Pro', 'Inter', system-ui, -apple-system, sans-serif !important;
 }
 
 /* Preserve FontAwesome font for icon elements - CRITICAL FIX */
@@ -737,7 +737,7 @@ body {
 .admin-sidebar,
 .admin-content,
 .admin-header {
-    font-family: 'Koh Santepheap', serif !important;
+    font-family: 'Kantumruy Pro', 'Inter', system-ui, -apple-system, sans-serif !important;
 }
 
 /* Blog image styles */

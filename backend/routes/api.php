@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\AdminAdmissionController;
 use App\Http\Controllers\Api\Admin\AdminBlogPostController;
 use App\Http\Controllers\Api\Admin\AdminBookController;
 use App\Http\Controllers\Api\Admin\AdminCategoryController;
@@ -18,20 +19,22 @@ use App\Http\Controllers\Api\Admin\AdminTeacherController;
 use App\Http\Controllers\Api\Admin\AdminToolController;
 use App\Http\Controllers\Api\Admin\AdminUploadController;
 use App\Http\Controllers\Api\Admin\AdminUserController;
+use App\Http\Controllers\Api\AdmissionController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BlogPostController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\EventController;
-use App\Http\Controllers\Api\ExamResultController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\GalleryController;
 use App\Http\Controllers\Api\NoticeController;
 use App\Http\Controllers\Api\PromotionController;
+use App\Http\Controllers\Api\PublicBookController;
 use App\Http\Controllers\Api\ScrollingBannerController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\StudentPortalController;
 use App\Http\Controllers\Api\TeacherController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -47,89 +50,102 @@ Route::get('/health', function () {
         'timestamp' => now()->toIso8601String(),
         'service' => 'RPITSSR Laravel REST API',
     ], 200);
+})->middleware('throttle:health');
+
+// Authentication (Rate-limited to protect against brute-force and credential stuffing)
+Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:registration');
+Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
+
+// Public Content APIs
+Route::middleware('throttle:public-content')->group(function () {
+    // Courses & Categories
+    Route::get('/courses', [CourseController::class, 'index']);
+    Route::get('/courses/{id}', [CourseController::class, 'show']);
+    Route::get('/course-categories', [CourseController::class, 'categories']);
+
+    // Blog Posts & Categories
+    Route::get('/blog-posts', [BlogPostController::class, 'index']);
+    Route::get('/blog-posts/{id}', [BlogPostController::class, 'show']);
+    Route::get('/blog-posts/slug/{slug}', [BlogPostController::class, 'bySlug']);
+    Route::get('/blog-categories', [BlogPostController::class, 'categories']);
+
+    // Events & Categories
+    Route::get('/events', [EventController::class, 'index']);
+    Route::get('/events/{id}', [EventController::class, 'show']);
+    Route::get('/event-categories', [EventController::class, 'categories']);
+    Route::get('/event-categories/active', [EventController::class, 'categories']);
+
+    // Teachers
+    Route::get('/teachers', [TeacherController::class, 'index']);
+    Route::get('/teachers/{id}', [TeacherController::class, 'show']);
+
+    // Notices
+    Route::get('/notices', [NoticeController::class, 'index']);
+    Route::get('/notices/{id}', [NoticeController::class, 'show']);
+
+    // FAQs
+    Route::get('/faqs', [FaqController::class, 'index']);
+    Route::get('/faqs/{id}', [FaqController::class, 'show']);
+
+    // Gallery
+    Route::get('/gallery-images', [GalleryController::class, 'index']);
+    Route::get('/gallery-images/{id}', [GalleryController::class, 'show']);
+    Route::get('/gallery', [GalleryController::class, 'index']);
+
+    // Scrolling Banners
+    Route::get('/scrolling-banners', [ScrollingBannerController::class, 'index']);
+
+    // Settings
+    Route::get('/settings/public', [SettingsController::class, 'publicSettings']);
+    Route::get('/settings', [SettingsController::class, 'publicSettings']);
+    Route::get('/youtube-videos', [SettingsController::class, 'youtubeVideos']);
+
+    // Promotions
+    Route::get('/promotions', [PromotionController::class, 'index']);
+
+    // Online Admissions
+    Route::post('/admissions/apply', [AdmissionController::class, 'apply']);
+    Route::get('/admissions/track/{trackingCode}', [AdmissionController::class, 'track']);
+    Route::get('/admissions/options', [AdmissionController::class, 'options']);
+
+    // Documents / Downloads
+    Route::get('/documents', [DocumentController::class, 'index']);
+    Route::get('/documents/{id}', [DocumentController::class, 'show']);
+    Route::post('/documents/{id}/download', [DocumentController::class, 'incrementDownload'])
+        ->middleware('throttle:download');
+
+    // Public Library Catalog
+    Route::get('/books', [PublicBookController::class, 'index']);
+    Route::get('/books/{id}', [PublicBookController::class, 'show']);
+    Route::get('/book-categories', [PublicBookController::class, 'categories']);
 });
 
-// Authentication
-Route::post('/auth/register', [AuthController::class, 'register']);
-Route::post('/auth/login', [AuthController::class, 'login']);
+// Public Contact Form (Protected against spam & bot flooding)
+Route::post('/contact', function (Request $request) {
+    $request->validate([
+        'name' => 'nullable|string|max:150',
+        'email' => 'nullable|email|max:150',
+        'phone' => 'nullable|string|max:50',
+        'subject' => 'nullable|string|max:200',
+        'message' => 'nullable|string|max:2000',
+    ]);
 
-// Courses & Categories
-Route::get('/courses', [CourseController::class, 'index']);
-Route::get('/courses/{id}', [CourseController::class, 'show']);
-Route::get('/course-categories', [CourseController::class, 'categories']);
-
-// Blog Posts & Categories
-Route::get('/blog-posts', [BlogPostController::class, 'index']);
-Route::get('/blog-posts/{id}', [BlogPostController::class, 'show']);
-Route::get('/blog-posts/slug/{slug}', [BlogPostController::class, 'bySlug']);
-Route::get('/blog-categories', [BlogPostController::class, 'categories']);
-
-// Events & Categories
-Route::get('/events', [EventController::class, 'index']);
-Route::get('/events/{id}', [EventController::class, 'show']);
-Route::get('/event-categories', [EventController::class, 'categories']);
-Route::get('/event-categories/active', [EventController::class, 'categories']);
-
-// Teachers
-Route::get('/teachers', [TeacherController::class, 'index']);
-Route::get('/teachers/{id}', [TeacherController::class, 'show']);
-
-// Notices
-Route::get('/notices', [NoticeController::class, 'index']);
-Route::get('/notices/{id}', [NoticeController::class, 'show']);
-
-// FAQs
-Route::get('/faqs', [FaqController::class, 'index']);
-Route::get('/faqs/{id}', [FaqController::class, 'show']);
-
-// Gallery
-Route::get('/gallery-images', [GalleryController::class, 'index']);
-Route::get('/gallery-images/{id}', [GalleryController::class, 'show']);
-Route::get('/gallery', [GalleryController::class, 'index']);
-
-// Scrolling Banners
-Route::get('/scrolling-banners', [ScrollingBannerController::class, 'index']);
-
-// Settings
-Route::get('/settings/public', [SettingsController::class, 'publicSettings']);
-Route::get('/settings', [SettingsController::class, 'publicSettings']);
-Route::get('/youtube-videos', [SettingsController::class, 'youtubeVideos']);
-
-// Exam Results
-Route::get('/exam-results', [ExamResultController::class, 'index']);
-Route::get('/exam-results/filters', [ExamResultController::class, 'filters']);
-Route::get('/exam-results/{id}', [ExamResultController::class, 'show']);
-
-// Promotions
-Route::get('/promotions/active', [PromotionController::class, 'active']);
-
-// Documents / Downloads
-Route::get('/documents', [DocumentController::class, 'index']);
-Route::get('/documents/{id}', [DocumentController::class, 'show']);
-Route::post('/documents/{id}/download', [DocumentController::class, 'incrementDownload']);
-
-// Public Library Catalog
-Route::get('/books', [AdminBookController::class, 'getBooks']);
-Route::get('/books/{id}', [AdminBookController::class, 'getBook']);
-Route::get('/book-categories', [AdminBookController::class, 'getCategories']);
-
-// Public Contact Form
-Route::post('/contact', function (\Illuminate\Http\Request $request) {
     return response()->json([
         'success' => true,
-        'message' => 'Thank you for your message. We have received it and will contact you shortly.'
+        'message' => 'Thank you for your message. We have received it and will contact you shortly.',
     ], 200);
-});
+})->middleware('throttle:contact');
 
 /*
 |--------------------------------------------------------------------------
 | Protected User Routes (auth:sanctum)
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:authenticated'])->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::get('/auth/verify', [AuthController::class, 'verify']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::post('/auth/logout-all', [AuthController::class, 'logoutAll']);
 
     // Student Portal Routes (accessible to any authenticated student)
     Route::prefix('student')->group(function () {
@@ -146,7 +162,7 @@ Route::middleware('auth:sanctum')->group(function () {
 | Admin Routes (auth:sanctum + admin)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth:sanctum', 'admin', 'throttle:admin'])->prefix('admin')->group(function () {
     // Admin verification
     Route::get('/verify', [AuthController::class, 'adminVerify']);
 
@@ -223,6 +239,7 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
 
     // Promotional Videos CRUD & Toggle
     Route::get('/promotional-videos', [AdminPromotionalVideoController::class, 'index']);
+    Route::post('/promotional-videos/upload-thumbnail', [AdminPromotionalVideoController::class, 'uploadThumbnail']);
     Route::get('/promotional-videos/{id}', [AdminPromotionalVideoController::class, 'show']);
     Route::post('/promotional-videos', [AdminPromotionalVideoController::class, 'store']);
     Route::put('/promotional-videos/{id}', [AdminPromotionalVideoController::class, 'update']);
@@ -239,13 +256,24 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     // Users CRUD
     Route::get('/users', [AdminUserController::class, 'index']);
     Route::get('/users/{id}', [AdminUserController::class, 'show']);
-    Route::post('/users', [AdminUserController::class, 'store']);
-    Route::put('/users/{id}', [AdminUserController::class, 'update']);
-    Route::delete('/users/{id}', [AdminUserController::class, 'destroy']);
+    Route::middleware('super_admin')->group(function () {
+        Route::post('/users', [AdminUserController::class, 'store']);
+        Route::put('/users/{id}', [AdminUserController::class, 'update']);
+        Route::put('/users/{id}/approve', [AdminUserController::class, 'approve']);
+        Route::put('/users/{id}/reject', [AdminUserController::class, 'reject']);
+        Route::delete('/users/{id}', [AdminUserController::class, 'destroy']);
+    });
+
+    // Admissions Applications Management
+    Route::get('/admissions', [AdminAdmissionController::class, 'index']);
+    Route::get('/admissions/{id}', [AdminAdmissionController::class, 'show']);
+    Route::put('/admissions/{id}/status', [AdminAdmissionController::class, 'updateStatus']);
+    Route::post('/admissions/{id}/enroll', [AdminAdmissionController::class, 'enroll']);
+    Route::delete('/admissions/{id}', [AdminAdmissionController::class, 'destroy']);
 
     // Settings
     Route::get('/settings', [AdminSettingsController::class, 'getSettings']);
-    Route::put('/settings', [AdminSettingsController::class, 'updateSettings']);
+    Route::put('/settings', [AdminSettingsController::class, 'updateSettings'])->middleware('super_admin');
 
     // Documents CRUD
     Route::get('/documents', [AdminDocumentController::class, 'index']);
@@ -268,6 +296,7 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::post('/blog-categories', [AdminCategoryController::class, 'storeBlogCategory']);
     Route::put('/blog-categories/{id}', [AdminCategoryController::class, 'updateBlogCategory']);
     Route::delete('/blog-categories/{id}', [AdminCategoryController::class, 'destroyBlogCategory']);
+    Route::post('/blog-categories/{id}/toggle', [AdminCategoryController::class, 'toggleBlogCategoryStatus']);
 
     // Event Categories CRUD
     Route::get('/event-categories', [AdminCategoryController::class, 'getEventCategories']);
@@ -287,10 +316,13 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::put('/comments/{id}', [AdminToolController::class, 'updateComment']);
     Route::delete('/comments/{id}', [AdminToolController::class, 'deleteComment']);
 
-    // Backups
-    Route::get('/backups', [AdminToolController::class, 'getBackups']);
-    Route::post('/backups', [AdminToolController::class, 'createBackup']);
-    Route::delete('/backups/{id}', [AdminToolController::class, 'deleteBackup']);
+    // Backups (Strictly Super Admin)
+    Route::middleware('super_admin')->group(function () {
+        Route::get('/backups', [AdminToolController::class, 'getBackups']);
+        Route::post('/backups', [AdminToolController::class, 'createBackup']);
+        Route::get('/backups/{id}/download', [AdminToolController::class, 'downloadBackup']);
+        Route::delete('/backups/{id}', [AdminToolController::class, 'deleteBackup']);
+    });
 
     // Library & Books Management CRUD
     Route::get('/books', [AdminBookController::class, 'getBooks']);
@@ -308,12 +340,15 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::get('/borrowings', [AdminBookController::class, 'getBorrowings']);
     Route::post('/borrowings', [AdminBookController::class, 'storeBorrowing']);
     Route::post('/borrowings/{id}/return', [AdminBookController::class, 'returnBorrowing']);
+    Route::delete('/borrowings/{id}', [AdminBookController::class, 'deleteBorrowing']);
 
     // System Logs
     Route::get('/logs', [AdminToolController::class, 'getLogs']);
-    Route::post('/logs/clear', [AdminToolController::class, 'clearLogs']);
+    Route::post('/logs/clear', [AdminToolController::class, 'clearLogs'])->middleware('super_admin');
 
-    // Reports & Plugins
+    // Reports & Plugins (Plugin configuration strictly Super Admin)
     Route::get('/reports', [AdminToolController::class, 'getReports']);
     Route::get('/plugins', [AdminToolController::class, 'getPlugins']);
+    Route::post('/plugins/{id}/toggle', [AdminToolController::class, 'togglePlugin'])->middleware('super_admin');
+    Route::put('/plugins/{id}/config', [AdminToolController::class, 'updatePluginConfig'])->middleware('super_admin');
 });

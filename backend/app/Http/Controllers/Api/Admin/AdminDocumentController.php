@@ -23,9 +23,9 @@ class AdminDocumentController extends Controller
             $search = trim($request->input('search'));
             $query->where(function ($q) use ($search) {
                 $q->where('title_km', 'like', "%{$search}%")
-                  ->orWhere('title_en', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%")
-                  ->orWhere('description_km', 'like', "%{$search}%");
+                    ->orWhere('title_en', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('description_km', 'like', "%{$search}%");
             });
         }
 
@@ -54,8 +54,8 @@ class AdminDocumentController extends Controller
 
         $limit = (int) $request->input('limit', 50);
         $documents = $query->orderBy('order', 'asc')
-                           ->orderBy('id', 'desc')
-                           ->paginate($limit);
+            ->orderBy('id', 'desc')
+            ->paginate($limit);
 
         return response()->json([
             'success' => true,
@@ -77,7 +77,7 @@ class AdminDocumentController extends Controller
     {
         $document = Document::find($id);
 
-        if (!$document) {
+        if (! $document) {
             return response()->json(['success' => false, 'error' => 'Document not found'], 404);
         }
 
@@ -137,7 +137,7 @@ class AdminDocumentController extends Controller
     {
         $document = Document::find($id);
 
-        if (!$document) {
+        if (! $document) {
             return response()->json(['success' => false, 'error' => 'Document not found'], 404);
         }
 
@@ -193,7 +193,7 @@ class AdminDocumentController extends Controller
     {
         $document = Document::find($id);
 
-        if (!$document) {
+        if (! $document) {
             return response()->json(['success' => false, 'error' => 'Document not found'], 404);
         }
 
@@ -220,11 +220,11 @@ class AdminDocumentController extends Controller
     {
         $document = Document::find($id);
 
-        if (!$document) {
+        if (! $document) {
             return response()->json(['success' => false, 'error' => 'Document not found'], 404);
         }
 
-        $document->is_popular = !$document->is_popular;
+        $document->is_popular = ! $document->is_popular;
         $document->save();
 
         return response()->json([
@@ -241,11 +241,11 @@ class AdminDocumentController extends Controller
     {
         $document = Document::find($id);
 
-        if (!$document) {
+        if (! $document) {
             return response()->json(['success' => false, 'error' => 'Document not found'], 404);
         }
 
-        $document->is_active = !$document->is_active;
+        $document->is_active = ! $document->is_active;
         $document->save();
 
         return response()->json([
@@ -282,20 +282,22 @@ class AdminDocumentController extends Controller
     protected function handleFileUpload($file): array
     {
         $originalName = $file->getClientOriginalName();
-        $extension = strtolower($file->getClientOriginalExtension() ?: 'pdf');
+        $allowedExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip'];
+        $rawExt = strtolower($file->extension() ?: $file->guessExtension() ?: pathinfo($originalName, PATHINFO_EXTENSION));
+        $extension = in_array($rawExt, $allowedExtensions, true) ? $rawExt : 'pdf';
         $rawBytes = $file->getSize();
 
         // Calculate human readable file size
         if ($rawBytes >= 1048576) {
-            $formattedSize = number_format($rawBytes / 1048576, 1) . ' MB';
+            $formattedSize = number_format($rawBytes / 1048576, 1).' MB';
         } elseif ($rawBytes >= 1024) {
-            $formattedSize = number_format($rawBytes / 1024, 0) . ' KB';
+            $formattedSize = number_format($rawBytes / 1024, 0).' KB';
         } else {
-            $formattedSize = $rawBytes . ' B';
+            $formattedSize = $rawBytes.' B';
         }
 
-        $safeName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME));
-        $uniqueFileName = $safeName . '_' . time() . '.' . $extension;
+        $safeName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME)) ?: 'document';
+        $uniqueFileName = $safeName.'_'.Str::random(12).'_'.time().'.'.$extension;
 
         Storage::disk('public')->putFileAs('uploads/documents', $file, $uniqueFileName);
 
@@ -317,17 +319,18 @@ class AdminDocumentController extends Controller
         }
 
         if (is_array($value)) {
-            return array_values(array_filter($value, fn($item) => !empty(trim((string)$item))));
+            return array_values(array_filter($value, fn ($item) => ! empty(trim((string) $item))));
         }
 
         if (is_string($value)) {
             $decoded = json_decode($value, true);
             if (is_array($decoded)) {
-                return array_values(array_filter($decoded, fn($item) => !empty(trim((string)$item))));
+                return array_values(array_filter($decoded, fn ($item) => ! empty(trim((string) $item))));
             }
             // If comma or newline separated
             $lines = preg_split('/[\r\n]+/', $value);
-            return array_values(array_filter(array_map('trim', $lines), fn($item) => !empty($item)));
+
+            return array_values(array_filter(array_map('trim', $lines), fn ($item) => ! empty($item)));
         }
 
         return null;

@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Book;
-use App\Models\BookCategory;
 use App\Models\BookBorrowing;
+use App\Models\BookCategory;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 
 class AdminBookController extends Controller
 {
@@ -28,12 +28,12 @@ class AdminBookController extends Controller
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('title_km', 'like', "%{$search}%")
-                  ->orWhere('title_en', 'like', "%{$search}%")
-                  ->orWhere('author', 'like', "%{$search}%")
-                  ->orWhere('isbn', 'like', "%{$search}%")
-                  ->orWhere('call_number', 'like', "%{$search}%")
-                  ->orWhere('shelf_location', 'like', "%{$search}%")
-                  ->orWhere('publisher', 'like', "%{$search}%");
+                    ->orWhere('title_en', 'like', "%{$search}%")
+                    ->orWhere('author', 'like', "%{$search}%")
+                    ->orWhere('isbn', 'like', "%{$search}%")
+                    ->orWhere('call_number', 'like', "%{$search}%")
+                    ->orWhere('shelf_location', 'like', "%{$search}%")
+                    ->orWhere('publisher', 'like', "%{$search}%");
             });
         }
 
@@ -112,7 +112,7 @@ class AdminBookController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        if (!isset($validated['available_copies']) || $validated['available_copies'] === null) {
+        if (! isset($validated['available_copies']) || $validated['available_copies'] === null) {
             $validated['available_copies'] = $validated['total_copies'];
         }
 
@@ -183,18 +183,18 @@ class AdminBookController extends Controller
     }
 
     /**
-     * Upload cover image or book document
+     * Upload cover image or book document securely
      */
     public function uploadCover(Request $request): JsonResponse
     {
         $request->validate([
-            'file' => 'required|file|max:20480', // 20MB max
+            'file' => 'required|file|mimes:jpeg,png,jpg,webp,pdf|max:20480', // strictly validated images or PDF
         ]);
 
         $file = $request->file('file');
-        $extension = strtolower($file->getClientOriginalExtension());
+        $extension = strtolower($file->extension() ?: $file->getClientOriginalExtension());
         $isPdf = $extension === 'pdf';
-        
+
         $folder = $isPdf ? 'books/documents' : 'books/covers';
         $path = $file->store($folder, 'public');
         $url = Storage::url($path);
@@ -260,7 +260,7 @@ class AdminBookController extends Controller
     public function deleteCategory($id): JsonResponse
     {
         $category = BookCategory::findOrFail($id);
-        
+
         // Disassociate books
         Book::where('category_id', $id)->update(['category_id' => null]);
         $category->delete();
@@ -288,11 +288,11 @@ class AdminBookController extends Controller
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('student_name', 'like', "%{$search}%")
-                  ->orWhere('student_id', 'like', "%{$search}%")
-                  ->orWhereHas('book', function ($bq) use ($search) {
-                      $bq->where('title_km', 'like', "%{$search}%")
-                         ->orWhere('title_en', 'like', "%{$search}%");
-                  });
+                    ->orWhere('student_id', 'like', "%{$search}%")
+                    ->orWhereHas('book', function ($bq) use ($search) {
+                        $bq->where('title_km', 'like', "%{$search}%")
+                            ->orWhere('title_en', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -353,6 +353,26 @@ class AdminBookController extends Controller
             'success' => true,
             'message' => 'Book marked as returned successfully',
             'borrowing' => $borrowing,
+        ]);
+    }
+
+    public function deleteBorrowing($id): JsonResponse
+    {
+        $borrowing = BookBorrowing::findOrFail($id);
+
+        // If not yet returned, restock the book
+        if ($borrowing->status !== 'returned') {
+            $book = Book::find($borrowing->book_id);
+            if ($book && $book->available_copies < $book->total_copies) {
+                $book->increment('available_copies');
+            }
+        }
+
+        $borrowing->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Borrowing record deleted successfully',
         ]);
     }
 }

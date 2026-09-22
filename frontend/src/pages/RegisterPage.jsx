@@ -21,7 +21,9 @@ import {
   EyeOff,
   Sparkles,
   HelpCircle,
-  X
+  X,
+  Clock,
+  Hash
 } from 'lucide-react';
 
 export const RegisterPage = () => {
@@ -41,6 +43,7 @@ export const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isSubmittedSuccessfully, setIsSubmittedSuccessfully] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
 
   const { t, currentLanguage, language } = useLanguage();
@@ -56,7 +59,7 @@ export const RegisterPage = () => {
   };
 
   // Password live validation
-  const hasMinLength = formData.password.length >= 6;
+  const hasMinLength = formData.password.length >= 8;
   const passwordsMatch =
     formData.password.length > 0 &&
     formData.confirmPassword.length > 0 &&
@@ -86,8 +89,8 @@ export const RegisterPage = () => {
     if (!hasMinLength) {
       setError(
         isKhmer
-          ? 'ពាក្យសម្ងាត់ត្រូវតែមានយ៉ាងតិច ៦ តួអក្សរ'
-          : 'Password must be at least 6 characters long.'
+          ? 'ពាក្យសម្ងាត់ត្រូវតែមានយ៉ាងតិច ៨ តួអក្សរ'
+          : 'Password must be at least 8 characters long.'
       );
       return;
     }
@@ -101,11 +104,12 @@ export const RegisterPage = () => {
       return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+    const emailVal = formData.email.trim().toLowerCase();
+    if (!/^[a-zA-Z0-9._%+-]+@rpitssr\.edu\.kh$/i.test(emailVal)) {
       setError(
         isKhmer
-          ? 'សូមបញ្ចូលអាសយដ្ឋានអ៊ីមែលដែលមានទម្រង់ត្រឹមត្រូវ'
-          : 'Please enter a valid email address.'
+          ? 'សូមប្រើប្រាស់គណនីអ៊ីមែលផ្លូវការរបស់វិទ្យាស្ថាន (@rpitssr.edu.kh) ដែលលោកអ្នកទទួលបានក្រោយពេលចុះឈ្មោះចូលរៀន (ឧ. yourname@rpitssr.edu.kh)'
+          : 'Please use your official institutional email address (@rpitssr.edu.kh) provided upon enrollment (e.g. yourname@rpitssr.edu.kh).'
       );
       return;
     }
@@ -125,26 +129,15 @@ export const RegisterPage = () => {
         name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
         fullName: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
         username: formData.username.trim().toLowerCase().replace(/\s+/g, '_'),
-        email: formData.email.trim().toLowerCase(),
+        email: emailVal,
         password: formData.password,
+        studentId: formData.studentId.trim() || null,
         role: 'student'
       };
 
-      if (formData.studentId && formData.studentId.trim()) {
-        payload.studentId = formData.studentId.trim();
-      }
-
       await client.post('/auth/register', payload);
 
-      setSuccess(
-        isKhmer
-          ? 'ការចុះឈ្មោះបង្កើតគណនីបានជោគជ័យ! ប្រព័ន្ធកំពុងនាំលោកអ្នកទៅកាន់ទំព័រចូលគណនី...'
-          : 'Registration completed successfully! Redirecting to sign in portal...'
-      );
-
-      setTimeout(() => {
-        navigate('/login');
-      }, 1800);
+      setIsSubmittedSuccessfully(true);
     } catch (err) {
       let msg = isKhmer ? 'ការចុះឈ្មោះមិនបានសម្រេច ៖ ' : 'Registration failed: ';
       if (err.response?.data) {
@@ -382,6 +375,28 @@ export const RegisterPage = () => {
                     : 'Fill out the details below to register your institutional portal access.'}
                 </p>
 
+                {/* Institutional Enrollment Policy Notice */}
+                <div
+                  className="d-flex align-items-start gap-3 p-3 rounded-3 mb-4"
+                  style={{
+                    background: '#eff6ff',
+                    border: '1px solid #bfdbfe',
+                    color: '#1e40af',
+                    fontSize: '0.86rem',
+                    lineHeight: 1.55
+                  }}
+                >
+                  <ShieldCheck size={22} className="flex-shrink-0 mt-1" style={{ color: '#1e73be' }} />
+                  <div>
+                    <strong style={{ color: '#07294D' }}>
+                      {isKhmer ? 'គោលការណ៍ចុះឈ្មោះផ្លូវការ ៖ ' : 'Official Enrollment Policy: '}
+                    </strong>
+                    {isKhmer
+                      ? 'ការចុះឈ្មោះគណនីនិស្សិតទាមទារឱ្យប្រើប្រាស់គណនីអ៊ីមែលផ្លូវការរបស់វិទ្យាស្ថាន (@rpitssr.edu.kh) ដែលបានផ្តល់ជូនក្រោយពេលចុះឈ្មោះចូលរៀន។ គណនីថ្មីទាំងអស់នឹងត្រូវរង់ចាំការត្រួតពិនិត្យ និងអនុម័តដោយគណៈគ្រប់គ្រងសាលា (Admin Approval) មុនពេលអាចចូលប្រើប្រាស់បាន។'
+                      : 'Student registration strictly requires an official institutional email (@rpitssr.edu.kh) issued upon enrollment. All new accounts must be approved by the academic administration prior to accessing the portal.'}
+                  </div>
+                </div>
+
                 {error && (
                   <div
                     className="alert alert-danger d-flex align-items-center gap-2 p-3 rounded-3 mb-4"
@@ -393,18 +408,134 @@ export const RegisterPage = () => {
                   </div>
                 )}
 
-                {success && (
-                  <div
-                    className="alert alert-success d-flex align-items-center gap-2 p-3 rounded-3 mb-4"
-                    role="alert"
-                    style={{ fontSize: '0.88rem' }}
-                  >
-                    <CheckCircle2 size={18} className="flex-shrink-0" />
-                    <div>{success}</div>
-                  </div>
-                )}
+                {isSubmittedSuccessfully ? (
+                  /* =========================================================
+                     PENDING ADMIN APPROVAL SUCCESS CONFIRMATION SCREEN
+                     ========================================================= */
+                  <div className="text-center py-4">
+                    <div
+                      style={{
+                        width: 80,
+                        height: 80,
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                        color: '#d97706',
+                        border: '2px solid #fcd34d',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 20px',
+                        boxShadow: '0 10px 25px rgba(217, 119, 6, 0.2)'
+                      }}
+                    >
+                      <Clock size={38} style={{ strokeWidth: 2.2 }} />
+                    </div>
 
-                <form onSubmit={handleSubmit}>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#07294D', marginBottom: 10 }}>
+                      {isKhmer ? 'ការចុះឈ្មោះទទួលបានជោគជ័យ!' : 'Registration Submitted Successfully!'}
+                    </h2>
+
+                    <p style={{ color: '#475569', fontSize: '0.96rem', maxWidth: 480, margin: '0 auto 20px', lineHeight: 1.6 }}>
+                      {isKhmer ? (
+                        <>
+                          គណនី <strong>{formData.email}</strong> ត្រូវបានកត់ត្រាក្នុងប្រព័ន្ធ និងកំពុងស្ថិតក្នុងស្ថានភាព{' '}
+                          <strong style={{ color: '#b45309' }}>រង់ចាំការត្រួតពិនិត្យ និងអនុម័តពីគណៈគ្រប់គ្រងសាលា (Pending Admin Approval)</strong>។
+                        </>
+                      ) : (
+                        <>
+                          Your account <strong>{formData.email}</strong> has been registered and is currently{' '}
+                          <strong style={{ color: '#b45309' }}>awaiting approval by the academic administration (Pending Admin Approval)</strong>.
+                        </>
+                      )}
+                    </p>
+
+                    <div
+                      style={{
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: 16,
+                        padding: '16px 20px',
+                        maxWidth: 480,
+                        margin: '0 auto 28px',
+                        textAlign: 'left'
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontWeight: 700,
+                          color: '#07294D',
+                          marginBottom: 8,
+                          fontSize: '0.92rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6
+                        }}
+                      >
+                        <ShieldCheck size={16} color="#1e73be" />
+                        {isKhmer ? 'ព័ត៌មានគណនីដែលបានចុះឈ្មោះ' : 'Submitted Account Details'}
+                      </div>
+                      <div style={{ fontSize: '0.86rem', color: '#64748b', lineHeight: 1.7 }}>
+                        <div>• {isKhmer ? 'ឈ្មោះពេញ' : 'Full Name'}: <strong>{formData.lastName} {formData.firstName}</strong></div>
+                        <div>• {isKhmer ? 'អត្តលេខនិស្សិត' : 'Student ID'}: <strong>{formData.studentId || (isKhmer ? 'មិនបានបញ្ចូល' : 'Not provided')}</strong></div>
+                        <div>• {isKhmer ? 'អ៊ីមែលសាលា' : 'School Email'}: <strong>{formData.email}</strong></div>
+                        <div>
+                          • {isKhmer ? 'ស្ថានភាព' : 'Status'}:{' '}
+                          <span
+                            style={{
+                              background: '#fef3c7',
+                              color: '#b45309',
+                              padding: '2px 8px',
+                              borderRadius: 6,
+                              fontWeight: 700,
+                              fontSize: '0.78rem'
+                            }}
+                          >
+                            {isKhmer ? '⏳ កំពុងរង់ចាំការអនុម័ត' : '⏳ Pending Approval'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p style={{ color: '#64748b', fontSize: '0.85rem', maxWidth: 440, margin: '0 auto 24px' }}>
+                      {isKhmer
+                        ? 'ក្រោយពេលការិយាល័យសិក្សាអនុម័តរួច លោកអ្នកអាចប្រើអ៊ីមែលនេះ និងពាក្យសម្ងាត់ដើម្បីចូលប្រើប្រាស់ Student Dashboard បាន។'
+                        : 'Once approved by the Academic Affairs Office, you will be able to sign in and access the Student Dashboard.'}
+                    </p>
+
+                    <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+                      <Link
+                        to="/"
+                        className="btn"
+                        style={{
+                          background: '#f1f5f9',
+                          color: '#475569',
+                          fontWeight: 600,
+                          padding: '10px 24px',
+                          borderRadius: 12,
+                          textDecoration: 'none'
+                        }}
+                      >
+                        {isKhmer ? 'ត្រឡប់ទៅទំព័រដើម' : 'Back to Home'}
+                      </Link>
+                      <Link
+                        to="/login"
+                        className="btn"
+                        style={{
+                          background: 'linear-gradient(135deg, #07294D, #1e73be)',
+                          color: '#ffffff',
+                          fontWeight: 700,
+                          padding: '10px 26px',
+                          borderRadius: 12,
+                          textDecoration: 'none',
+                          boxShadow: '0 4px 14px rgba(7, 41, 77, 0.25)'
+                        }}
+                      >
+                        {isKhmer ? 'ទៅកាន់ទំព័រចូលគណនី' : 'Go to Sign In'}
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit}>
                   {/* Name Row: Last Name & First Name */}
                   <div className="row g-3 mb-3">
                     <div className="col-md-6">
@@ -448,7 +579,7 @@ export const RegisterPage = () => {
                     </div>
                   </div>
 
-                  {/* Username & Email Row */}
+                  {/* Username & Student ID Row */}
                   <div className="row g-3 mb-3">
                     <div className="col-md-6">
                       <div className="auth-input-group mb-0">
@@ -474,42 +605,47 @@ export const RegisterPage = () => {
                     <div className="col-md-6">
                       <div className="auth-input-group mb-0">
                         <label className="auth-input-label">
-                          {isKhmer ? 'អាសយដ្ឋានអ៊ីមែល' : 'Email Address'} *
+                          {isKhmer ? 'អត្តលេខនិស្សិត (Student ID)' : 'Official Student ID'}
                         </label>
                         <div className="auth-input-wrapper">
-                          <Mail className="auth-input-icon" size={18} />
+                          <Hash className="auth-input-icon" size={18} />
                           <input
-                            type="email"
-                            name="email"
+                            type="text"
+                            name="studentId"
                             className="auth-field-control no-toggle"
-                            value={formData.email}
+                            value={formData.studentId}
                             onChange={handleChange}
-                            placeholder="dara@gmail.com"
-                            required
-                            autoComplete="email"
+                            placeholder={isKhmer ? 'ឧ. STU-2026-089' : 'e.g. STU-2026-089'}
                           />
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Optional Student ID */}
-                  <div className="auth-input-group mb-3">
-                    <label className="auth-input-label">
-                      {isKhmer
-                        ? 'អត្តលេខនិស្សិត ឬលេខកូដពាក្យ (Student ID - ជម្រើស)'
-                        : 'Student ID / Applicant No (Optional)'}
-                    </label>
-                    <div className="auth-input-wrapper">
-                      <GraduationCap className="auth-input-icon" size={18} />
-                      <input
-                        type="text"
-                        name="studentId"
-                        className="auth-field-control no-toggle"
-                        value={formData.studentId}
-                        onChange={handleChange}
-                        placeholder={isKhmer ? 'ឧ. IT-2026-001 (បើមាន)' : 'e.g. IT-2026-001 (if available)'}
-                      />
+                  {/* Institutional Email Row */}
+                  <div className="mb-3">
+                    <div className="auth-input-group mb-0">
+                      <label className="auth-input-label">
+                        {isKhmer ? 'អ៊ីមែលផ្លូវការរបស់វិទ្យាស្ថាន (@rpitssr.edu.kh)' : 'Institutional Email (@rpitssr.edu.kh)'} *
+                      </label>
+                      <div className="auth-input-wrapper">
+                        <Mail className="auth-input-icon" size={18} />
+                        <input
+                          type="email"
+                          name="email"
+                          className="auth-field-control no-toggle"
+                          value={formData.email}
+                          onChange={handleChange}
+                          placeholder="yourname@rpitssr.edu.kh"
+                          required
+                          autoComplete="email"
+                        />
+                      </div>
+                      <span style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '4px', display: 'block' }}>
+                        {isKhmer
+                          ? 'ឧទាហរណ៍ ៖ thorngvanthiev@rpitssr.edu.kh (គណនីដែលទទួលបានពីសាលា)'
+                          : 'Example: thorngvanthiev@rpitssr.edu.kh (provided upon enrollment)'}
+                      </span>
                     </div>
                   </div>
 
@@ -584,7 +720,7 @@ export const RegisterPage = () => {
                       ) : (
                         <span style={{ fontSize: '10px' }}>○</span>
                       )}
-                      {isKhmer ? 'យ៉ាងតិច ៦ តួអក្សរ' : 'Min 6 characters'}
+                      {isKhmer ? 'យ៉ាងតិច ៨ តួអក្សរ' : 'Min 8 characters'}
                     </span>
 
                     <span className={`auth-pwd-req-item ${passwordsMatch ? 'valid' : 'invalid'}`}>
@@ -693,6 +829,7 @@ export const RegisterPage = () => {
                     </Link>
                   </div>
                 </form>
+                )}
               </div>
             </div>
           </div>

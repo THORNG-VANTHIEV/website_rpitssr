@@ -44,6 +44,14 @@ class BlogPost extends BaseModel
         return $this->hasMany(Comment::class, 'blogPostId');
     }
 
+    public function approvedComments()
+    {
+        return $this->hasMany(Comment::class, 'blogPostId')
+            ->where(function ($q) {
+                $q->where('status', 'approved')->orWhereNull('status');
+            });
+    }
+
     public function facebookEmbed()
     {
         return $this->hasOne(FacebookEmbed::class, 'postId');

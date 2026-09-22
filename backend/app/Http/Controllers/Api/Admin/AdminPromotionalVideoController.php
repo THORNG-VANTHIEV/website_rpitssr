@@ -25,7 +25,7 @@ class AdminPromotionalVideoController extends Controller
     {
         $video = PromotionalVideo::find($id);
 
-        if (!$video) {
+        if (! $video) {
             return response()->json(['error' => 'Video not found'], 404);
         }
 
@@ -52,14 +52,14 @@ class AdminPromotionalVideoController extends Controller
         $youtubeId = PromotionalVideo::extractYouTubeId($validated['video_url']);
         $thumbnail = $validated['thumbnail'] ?? null;
 
-        if (!$thumbnail && $youtubeId) {
+        if (! $thumbnail && $youtubeId) {
             $thumbnail = "https://img.youtube.com/vi/{$youtubeId}/maxresdefault.jpg";
         }
 
         $publishedDate = $validated['published_date'] ?? 'ថ្មីៗនេះ (ក្រោម ១ ខែ)';
 
         // If marked as featured, optionally unfeature others if we only want one main featured
-        if (!empty($validated['is_featured'])) {
+        if (! empty($validated['is_featured'])) {
             PromotionalVideo::where('is_featured', true)->update(['is_featured' => false]);
         }
 
@@ -87,7 +87,7 @@ class AdminPromotionalVideoController extends Controller
     {
         $video = PromotionalVideo::find($id);
 
-        if (!$video) {
+        if (! $video) {
             return response()->json(['error' => 'Video not found'], 404);
         }
 
@@ -111,7 +111,7 @@ class AdminPromotionalVideoController extends Controller
             }
         }
 
-        if (!empty($validated['is_featured'])) {
+        if (! empty($validated['is_featured'])) {
             PromotionalVideo::where('id', '!=', $id)->where('is_featured', true)->update(['is_featured' => false]);
         }
 
@@ -128,7 +128,7 @@ class AdminPromotionalVideoController extends Controller
     {
         $video = PromotionalVideo::find($id);
 
-        if (!$video) {
+        if (! $video) {
             return response()->json(['error' => 'Video not found'], 404);
         }
 
@@ -144,11 +144,11 @@ class AdminPromotionalVideoController extends Controller
     {
         $video = PromotionalVideo::find($id);
 
-        if (!$video) {
+        if (! $video) {
             return response()->json(['error' => 'Video not found'], 404);
         }
 
-        $video->is_active = !$video->is_active;
+        $video->is_active = ! $video->is_active;
         $video->save();
 
         return response()->json([
@@ -156,5 +156,45 @@ class AdminPromotionalVideoController extends Controller
             'message' => 'Status updated successfully',
             'data' => $video,
         ], 200);
+    }
+
+    /**
+     * Manual Thumbnail Upload
+     */
+    public function uploadThumbnail(Request $request): JsonResponse
+    {
+        $request->validate([
+            'thumbnail' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
+        ]);
+
+        if ($request->hasFile('thumbnail')) {
+            $file = $request->file('thumbnail');
+            $rawExt = strtolower($file->extension() ?: $file->guessExtension() ?: 'jpg');
+            $allowedExtensions = ['jpeg', 'jpg', 'png', 'webp'];
+            $extension = in_array($rawExt, $allowedExtensions, true) ? $rawExt : 'jpg';
+            $filename = 'thumb_'.time().'_'.uniqid().'.'.$extension;
+            $dir = public_path('uploads/videos');
+            if (! file_exists($dir)) {
+                mkdir($dir, 0755, true);
+            }
+            $file->move($dir, $filename);
+            $url = '/uploads/videos/'.$filename;
+
+            // Also copy to frontend public directory
+            $frontendDir = base_path('../frontend/public/uploads/videos');
+            if (file_exists(base_path('../frontend/public'))) {
+                if (! file_exists($frontendDir)) {
+                    mkdir($frontendDir, 0755, true);
+                }
+                @copy($dir.'/'.$filename, $frontendDir.'/'.$filename);
+            }
+
+            return response()->json([
+                'success' => true,
+                'thumbnail_url' => $url,
+            ]);
+        }
+
+        return response()->json(['error' => 'No file uploaded'], 400);
     }
 }

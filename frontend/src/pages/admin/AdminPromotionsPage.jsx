@@ -646,10 +646,241 @@ export const AdminPromotionsPage = () => {
     }
   ];
 
+  // Mobile Card Renderer (< 768px viewports)
+  const renderMobileCard = (row) => {
+    const isToggling = togglingId === row.id;
+
+    return (
+      <div className="admin-user-mobile-card">
+        {/* Top: Type Badge, Priority Pill & Active Status */}
+        <div className="admin-user-mobile-card-top">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            {getTypeBadge(row.type)}
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                padding: '2px 8px',
+                borderRadius: '6px',
+                background: '#fefce8',
+                color: '#ca8a04',
+                border: '1px solid #fef08a'
+              }}
+            >
+              <Star size={11} fill="#ca8a04" />
+              <span>★ {row.priority || 0}</span>
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <label
+              className="admin-switch"
+              style={{
+                position: 'relative',
+                display: 'inline-block',
+                width: '36px',
+                height: '20px',
+                margin: 0,
+                cursor: isToggling ? 'wait' : 'pointer'
+              }}
+              title={isKhmer ? 'ចុចដើម្បីបិទ/បើកការផ្សាយ' : 'Click to toggle status'}
+            >
+              <input
+                type="checkbox"
+                checked={Boolean(row.is_active)}
+                disabled={isToggling}
+                onChange={(e) => handleToggleActive(row, e)}
+                style={{ opacity: 0, width: 0, height: 0 }}
+              />
+              <span
+                style={{
+                  position: 'absolute',
+                  cursor: isToggling ? 'wait' : 'pointer',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: row.is_active ? '#059669' : '#cbd5e1',
+                  transition: '0.2s',
+                  borderRadius: '20px'
+                }}
+              >
+                <span
+                  style={{
+                    position: 'absolute',
+                    content: '""',
+                    height: '14px',
+                    width: '14px',
+                    left: row.is_active ? '19px' : '3px',
+                    bottom: '3px',
+                    backgroundColor: '#ffffff',
+                    transition: '0.2s',
+                    borderRadius: '50%',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                  }}
+                />
+              </span>
+            </label>
+            <span
+              style={{
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                color: row.is_active ? '#059669' : '#94a3b8'
+              }}
+            >
+              {row.is_active ? (isKhmer ? 'ផ្សាយ' : 'Live') : (isKhmer ? 'ព្រាង' : 'Draft')}
+            </span>
+          </div>
+        </div>
+
+        {/* Content Body */}
+        <div style={{ padding: '12px 14px 10px' }}>
+          {/* Optional Image Thumbnail Preview */}
+          {(row.image_url || row.background_image) && (
+            <div
+              style={{
+                width: '100%',
+                height: '110px',
+                borderRadius: '10px',
+                overflow: 'hidden',
+                marginBottom: '10px',
+                backgroundColor: '#f1f5f9',
+                border: '1px solid #e2e8f0'
+              }}
+            >
+              <img
+                src={row.image_url || row.background_image}
+                alt={row.title}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+          )}
+
+          <div
+            style={{
+              fontWeight: 800,
+              fontSize: '0.94rem',
+              color: '#07294D',
+              lineHeight: 1.35,
+              marginBottom: '6px'
+            }}
+          >
+            {row.title}
+          </div>
+
+          {(row.message || row.description) && (
+            <p
+              style={{
+                fontSize: '0.82rem',
+                color: '#64748b',
+                lineHeight: 1.5,
+                margin: '0 0 10px',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden'
+              }}
+            >
+              {row.message || row.description}
+            </p>
+          )}
+
+          {/* Target Link & CTA details */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+              padding: '8px 10px',
+              borderRadius: '8px',
+              background: '#f8fafc',
+              border: '1px solid #e2e8f0',
+              fontSize: '0.78rem'
+            }}
+          >
+            {row.button_text && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ color: '#64748b', fontWeight: 600 }}>{isKhmer ? 'ប៊ូតុងសកម្មភាព ៖' : 'CTA Button:'}</span>
+                <span
+                  style={{
+                    fontWeight: 700,
+                    color: '#07294D',
+                    background: '#ffffff',
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid #cbd5e1'
+                  }}
+                >
+                  {row.button_text} &rarr;
+                </span>
+              </div>
+            )}
+            {row.button_link && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                <span style={{ color: '#64748b', fontWeight: 600 }}>{isKhmer ? 'តំណភ្ជាប់ ៖' : 'Target URL:'}</span>
+                <span
+                  style={{
+                    color: '#1e73be',
+                    fontFamily: 'monospace',
+                    fontSize: '0.74rem',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: '180px'
+                  }}
+                >
+                  {row.button_link}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Tactile Mobile Action Buttons */}
+        <div className="admin-user-mobile-card-actions">
+          <button
+            type="button"
+            onClick={() => setPreviewPromo(row)}
+            className="admin-user-mobile-action-btn view"
+            title={isKhmer ? 'មើលការបង្ហាញជាក់ស្តែង' : 'Preview Live'}
+          >
+            <Eye size={13} />
+            <span>{isKhmer ? 'មើល' : 'Preview'}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => openEditModal(row)}
+            className="admin-user-mobile-action-btn edit"
+            title={isKhmer ? 'កែសម្រួល' : 'Edit Campaign'}
+          >
+            <Edit2 size={13} />
+            <span>{isKhmer ? 'កែប្រែ' : 'Edit'}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setDeletePromo(row)}
+            className="admin-user-mobile-action-btn delete"
+            title={isKhmer ? 'លុបយុទ្ធនាការ' : 'Delete'}
+          >
+            <Trash2 size={13} />
+            <span>{isKhmer ? 'លុប' : 'Delete'}</span>
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={{ paddingBottom: '60px' }}>
       {/* 1. Institutional Header Banner */}
       <div
+        className="admin-page-header admin-promotions-header"
         style={{
           background: '#ffffff',
           borderRadius: '20px',
@@ -717,7 +948,7 @@ export const AdminPromotionsPage = () => {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <div className="admin-promotions-header-actions" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <button
             type="button"
             onClick={handleRefresh}
@@ -1081,289 +1312,201 @@ export const AdminPromotionsPage = () => {
       )}
 
       {/* 3. 4-Card Institutional KPI Metric Strip */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '16px',
-          marginBottom: '24px'
-        }}
-      >
-        {/* Total Campaigns */}
+      <div className="admin-kpi-grid admin-promotions-kpis">
+        {/* KPI 1: Total Campaigns */}
         <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '16px',
-            padding: '20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 18px rgba(7, 41, 77, 0.04)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px'
-          }}
+          className="admin-kpi-card"
+          onClick={() => setActiveTab('all')}
+          style={{ cursor: 'pointer' }}
         >
-          <div
-            style={{
-              width: '50px',
-              height: '50px',
-              borderRadius: '12px',
-              backgroundColor: '#eff6ff',
-              color: '#1e73be',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
-            }}
-          >
-            <Megaphone size={24} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">
+                {isKhmer ? 'យុទ្ធនាការសរុប' : 'Total Campaigns'}
+              </span>
+              <div className="admin-kpi-value">{totalCampaigns}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#1e73be' }} />
+                <span>{isKhmer ? 'យុទ្ធនាការផ្សព្វផ្សាយ' : 'Broadcast campaigns'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#eff6ff', color: '#1e73be' }}>
+                {isKhmer ? 'សរុប' : 'Total'}
+              </span>
+              <div
+                className="admin-kpi-icon-badge"
+                style={{ background: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}
+              >
+                <Megaphone size={22} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#07294D', lineHeight: 1.1 }}>
-              {totalCampaigns}
-            </div>
-            <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748b', marginTop: '4px' }}>
-              {isKhmer ? 'យុទ្ធនាការសរុប' : 'Total Campaigns'}
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'មើលយុទ្ធនាការទាំងអស់' : 'View all campaigns'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
-        {/* Live Active */}
+        {/* KPI 2: Live Active */}
         <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '16px',
-            padding: '20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 18px rgba(7, 41, 77, 0.04)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px'
-          }}
+          className="admin-kpi-card"
+          onClick={() => setActiveTab('active')}
+          style={{ cursor: 'pointer' }}
         >
-          <div
-            style={{
-              width: '50px',
-              height: '50px',
-              borderRadius: '12px',
-              backgroundColor: '#f0fdf4',
-              color: '#059669',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
-            }}
-          >
-            <CheckCircle2 size={24} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">
+                {isKhmer ? 'កំពុងផ្សាយផ្ទាល់' : 'Active Live'}
+              </span>
+              <div className="admin-kpi-value" style={{ color: '#059669' }}>
+                {activeCampaigns}
+              </div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#059669' }} />
+                <span>{isKhmer ? 'ផ្សាយលើគេហទំព័រ' : 'Live on website'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#f0fdf4', color: '#059669' }}>
+                {isKhmer ? 'សកម្ម' : 'Active'}
+              </span>
+              <div
+                className="admin-kpi-icon-badge"
+                style={{ background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}
+              >
+                <CheckCircle2 size={22} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#059669', lineHeight: 1.1 }}>
-              {activeCampaigns}
-            </div>
-            <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748b', marginTop: '4px' }}>
-              {isKhmer ? 'កំពុងផ្សាយផ្ទាល់' : 'Active Live'}
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'ត្រងយកការផ្សាយសកម្ម' : 'Filter active live'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
-        {/* Drafts / Paused */}
+        {/* KPI 3: Drafts / Paused */}
         <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '16px',
-            padding: '20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 18px rgba(7, 41, 77, 0.04)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px'
-          }}
+          className="admin-kpi-card"
+          onClick={() => setActiveTab('inactive')}
+          style={{ cursor: 'pointer' }}
         >
-          <div
-            style={{
-              width: '50px',
-              height: '50px',
-              borderRadius: '12px',
-              backgroundColor: '#fff7ed',
-              color: '#ea580c',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
-            }}
-          >
-            <PauseCircle size={24} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">
+                {isKhmer ? 'សេចក្តីព្រាង & ផ្អាក' : 'Drafts / Paused'}
+              </span>
+              <div className="admin-kpi-value" style={{ color: '#ea580c' }}>
+                {draftCampaigns}
+              </div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#ea580c' }} />
+                <span>{isKhmer ? 'មិនទាន់ផ្សាយជាសាធារណៈ' : 'Unpublished drafts'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#fff7ed', color: '#ea580c' }}>
+                {isKhmer ? 'ព្រាង' : 'Draft'}
+              </span>
+              <div
+                className="admin-kpi-icon-badge"
+                style={{ background: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa' }}
+              >
+                <PauseCircle size={22} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#ea580c', lineHeight: 1.1 }}>
-              {draftCampaigns}
-            </div>
-            <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748b', marginTop: '4px' }}>
-              {isKhmer ? 'សេចក្តីព្រាង & ផ្អាក' : 'Drafts / Paused'}
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'ត្រងយកសេចក្តីព្រាង' : 'Filter paused drafts'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
-        {/* High Priority Targets */}
+        {/* KPI 4: High Priority Targets */}
         <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '16px',
-            padding: '20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 18px rgba(7, 41, 77, 0.04)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px'
+          className="admin-kpi-card"
+          onClick={() => {
+            setActiveTab('all');
+            setSortBy('priority_desc');
           }}
+          style={{ cursor: 'pointer' }}
         >
-          <div
-            style={{
-              width: '50px',
-              height: '50px',
-              borderRadius: '12px',
-              backgroundColor: '#faf5ff',
-              color: '#7c3aed',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
-            }}
-          >
-            <Zap size={24} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">
+                {isKhmer ? 'អាទិភាពបន្ទាន់ (≥ 8)' : 'High Priority (≥ 8)'}
+              </span>
+              <div className="admin-kpi-value" style={{ color: '#7c3aed' }}>
+                {highPriorityCampaigns}
+              </div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#7c3aed' }} />
+                <span>{isKhmer ? 'អាទិភាពបង្ហាញមុនគេ' : 'Priority top display'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#faf5ff', color: '#7c3aed' }}>
+                {isKhmer ? 'អាទិភាព' : 'Priority'}
+              </span>
+              <div
+                className="admin-kpi-icon-badge"
+                style={{ background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}
+              >
+                <Zap size={22} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#7c3aed', lineHeight: 1.1 }}>
-              {highPriorityCampaigns}
-            </div>
-            <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#64748b', marginTop: '4px' }}>
-              {isKhmer ? 'អាទិភាពខ្ពស់ (≥ 8)' : 'High Priority'}
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'តម្រៀបអាទិភាពខ្ពស់' : 'Sort highest priority'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
       </div>
 
-      {/* 4. Filter Toolbar & Search Bar */}
-      <div
-        style={{
-          background: '#ffffff',
-          borderRadius: '16px',
-          padding: '16px 20px',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 4px 18px rgba(7, 41, 77, 0.04)',
-          marginBottom: '20px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '14px'
-        }}
-      >
-        {/* Category Tabs */}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-          {[
-            { id: 'all', label: isKhmer ? 'ទាំងអស់' : 'All', count: totalCampaigns },
-            { id: 'active', label: isKhmer ? '🟢 កំពុងផ្សាយ' : '🟢 Active', count: activeCampaigns },
-            { id: 'inactive', label: isKhmer ? '⚪ ផ្អាកទុក' : '⚪ Drafts', count: draftCampaigns },
-            { id: 'popup', label: isKhmer ? '🪟 ផ្ទាំងលោត' : '🪟 Popups', count: promotions.filter((p) => p.type === 'popup').length },
-            { id: 'banner', label: isKhmer ? '🚩 បដា' : '🚩 Banners', count: promotions.filter((p) => p.type === 'banner').length },
-            { id: 'notification', label: isKhmer ? '🔔 សារបន្ទាន់' : '🔔 Alerts', count: promotions.filter((p) => p.type === 'notification').length }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                border: 'none',
-                background: activeTab === tab.id ? '#07294D' : '#f8fafc',
-                color: activeTab === tab.id ? '#ffffff' : '#64748b',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                transition: 'all 0.15s ease',
-                borderWidth: '1px',
-                borderStyle: 'solid',
-                borderColor: activeTab === tab.id ? '#07294D' : '#e2e8f0'
-              }}
-            >
-              <span>{tab.label}</span>
-              <span
-                style={{
-                  background: activeTab === tab.id ? 'rgba(255,255,255,0.2)' : '#e2e8f0',
-                  color: activeTab === tab.id ? '#ffffff' : '#64748b',
-                  fontSize: '0.72rem',
-                  padding: '1px 6px',
-                  borderRadius: '10px'
-                }}
-              >
-                {tab.count}
-              </span>
-            </button>
-          ))}
-        </div>
-
-        {/* Search Input & Sort */}
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <div
-            style={{
-              position: 'relative',
-              width: '260px',
-              display: 'flex',
-              alignItems: 'center'
-            }}
+      {/* 4. Category Filter Bar (Sleek Horizontal Scroll Pills) */}
+      <div className="admin-user-filter-bar">
+        {[
+          { id: 'all', label: isKhmer ? 'ទាំងអស់' : 'All', count: totalCampaigns },
+          { id: 'active', label: isKhmer ? '🟢 កំពុងផ្សាយ' : '🟢 Active', count: activeCampaigns },
+          { id: 'inactive', label: isKhmer ? '⚪ ផ្អាកទុក' : '⚪ Drafts', count: draftCampaigns },
+          { id: 'popup', label: isKhmer ? '🪟 ផ្ទាំងលោត' : '🪟 Popups', count: promotions.filter((p) => p.type === 'popup').length },
+          { id: 'banner', label: isKhmer ? '🚩 បដា' : '🚩 Banners', count: promotions.filter((p) => p.type === 'banner').length },
+          { id: 'notification', label: isKhmer ? '🔔 សារបន្ទាន់' : '🔔 Alerts', count: promotions.filter((p) => p.type === 'notification').length }
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            className={`admin-user-filter-pill ${activeTab === tab.id ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab.id)}
           >
-            <Search
-              size={15}
-              style={{
-                position: 'absolute',
-                left: '12px',
-                color: '#94a3b8'
-              }}
-            />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={isKhmer ? 'ស្វែងរកយុទ្ធនាការ...' : 'Search campaigns...'}
-              style={{
-                width: '100%',
-                padding: '8px 32px 8px 36px',
-                borderRadius: '8px',
-                border: '1px solid #e2e8f0',
-                fontSize: '0.84rem',
-                background: '#f8fafc',
-                color: '#07294D',
-                outline: 'none'
-              }}
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                style={{
-                  position: 'absolute',
-                  right: '10px',
-                  background: 'none',
-                  border: 'none',
-                  color: '#94a3b8',
-                  cursor: 'pointer',
-                  padding: 0
-                }}
-              >
-                <X size={14} />
-              </button>
-            )}
-          </div>
+            <span>{tab.label}</span>
+            <span className="admin-user-filter-count">{tab.count}</span>
+          </button>
+        ))}
+      </div>
 
+      {/* 5. Institutional DataTable & Mobile Cards View */}
+      <AdminDataTable
+        title={isKhmer ? 'បញ្ជីយុទ្ធនាការផ្សព្វផ្សាយពិសេស' : 'Broadcast Campaigns Directory'}
+        subtitle={
+          isKhmer
+            ? `បង្ហាញ ${filteredPromotions.length} ក្នុងចំណោមយុទ្ធនាការសរុប ${totalCampaigns}`
+            : `Showing ${filteredPromotions.length} of ${totalCampaigns} total campaigns`
+        }
+        columns={columns}
+        data={filteredPromotions}
+        loading={loading}
+        onAdd={openAddModal}
+        addLabel={isKhmer ? 'បង្កើតយុទ្ធនាការថ្មី' : 'New Campaign'}
+        onRefresh={handleRefresh}
+        searchPlaceholder={isKhmer ? 'ស្វែងរកយុទ្ធនាការ ឬខ្លឹមសារ...' : 'Search campaigns or content...'}
+        renderMobileCard={renderMobileCard}
+        customHeaderActions={
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
             style={{
-              padding: '8px 12px',
+              padding: '7px 12px',
               borderRadius: '8px',
               border: '1px solid #e2e8f0',
               fontSize: '0.82rem',
@@ -1373,25 +1516,11 @@ export const AdminPromotionsPage = () => {
               cursor: 'pointer'
             }}
           >
-            <option value="priority_desc">{isKhmer ? 'តម្រៀបតាម ៖ អាទិភាពខ្ពស់មុន' : 'Sort: Highest Priority'}</option>
-            <option value="newest">{isKhmer ? 'តម្រៀបតាម ៖ បង្កើតថ្មីបំផុត' : 'Sort: Newest Created'}</option>
-            <option value="title_asc">{isKhmer ? 'តម្រៀបតាម ៖ ចំណងជើង (A-Z)' : 'Sort: Title A-Z'}</option>
+            <option value="priority_desc">{isKhmer ? 'តម្រៀប ៖ អាទិភាពខ្ពស់មុន' : 'Sort: Highest Priority'}</option>
+            <option value="newest">{isKhmer ? 'តម្រៀប ៖ បង្កើតថ្មីបំផុត' : 'Sort: Newest Created'}</option>
+            <option value="title_asc">{isKhmer ? 'តម្រៀប ៖ ចំណងជើង (A-Z)' : 'Sort: Title A-Z'}</option>
           </select>
-        </div>
-      </div>
-
-      {/* 5. Institutional DataTable */}
-      <AdminDataTable
-        title={isKhmer ? 'បញ្ជីយុទ្ធនាការផ្សព្វផ្សាយពិសេស' : 'Broadcast Campaigns Directory'}
-        subtitle={
-          isKhmer
-            ? `បង្ហាញ ${filteredPromotions.length} ក្នុងចំណោមយុទ្ធនាការសរុប ${totalCampaigns}`
-            : `Showing ${filteredPromotions.length} of ${totalCampaigns} total campaigns`
         }
-        hideHeader={true}
-        columns={columns}
-        data={filteredPromotions}
-        loading={loading}
       />
 
       {/* 6. Campaign Preview Lightbox Modal */}

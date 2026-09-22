@@ -95,9 +95,9 @@ export const resolveCategoryName = (post, isKhmer) => {
 };
 
 export const BlogCard = ({ post, featured = false }) => {
+  const { t, language, currentLanguage } = useLanguage();
   if (!post) return null;
 
-  const { t, language, currentLanguage } = useLanguage();
   const isKhmer = (currentLanguage || language) === 'km';
   const imageUrl = post.imageUrl || post.image_url || '/images/blog-placeholder.jpg';
 

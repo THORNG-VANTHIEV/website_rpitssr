@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import {
@@ -20,7 +20,8 @@ import {
   HelpCircle,
   X,
   UserCheck,
-  Sparkles
+  Sparkles,
+  Clock
 } from 'lucide-react';
 
 export const LoginPage = () => {
@@ -30,9 +31,11 @@ export const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isPendingApproval, setIsPendingApproval] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { login, logout, user, isAuthenticated } = useAuth();
   const { t, currentLanguage, language } = useLanguage();
   const isKhmer = (currentLanguage || language) === 'km';
@@ -64,6 +67,7 @@ export const LoginPage = () => {
 
     setLoading(true);
     setError('');
+    setIsPendingApproval(false);
 
     try {
       localStorage.removeItem('token');
@@ -78,6 +82,12 @@ export const LoginPage = () => {
       }
     } catch (err) {
       localStorage.removeItem('token');
+      if (err.response?.data?.status === 'pending') {
+        setIsPendingApproval(true);
+      } else {
+        setIsPendingApproval(false);
+      }
+
       let msg = isKhmer ? 'ការចូលគណនីមិនបានជោគជ័យ ៖ ' : 'Sign-in failed: ';
       if (err.response?.data) {
         const d = err.response.data;
@@ -96,18 +106,6 @@ export const LoginPage = () => {
       setError(msg);
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Preset credentials helper for testing/demonstration
-  const handleQuickFill = (roleType) => {
-    setError('');
-    if (roleType === 'admin') {
-      setEmail('admin@rpitssr.edu.kh');
-      setPassword('password123');
-    } else {
-      setEmail('hackerrith168@gmail.com');
-      setPassword('password123');
     }
   };
 
@@ -285,7 +283,36 @@ export const LoginPage = () => {
                     : 'Enter your institutional email and password to access your dashboard.'}
                 </p>
 
-                {error && (
+                {location.state?.passwordChanged && (
+                  <div className="alert alert-success rounded-3 mb-4" role="status">
+                    {isKhmer
+                      ? 'ពាក្យសម្ងាត់ត្រូវបានផ្លាស់ប្តូរ ហើយគ្រប់ឧបករណ៍ត្រូវបានចាកចេញ។ សូមចូលគណនីម្តងទៀត។'
+                      : 'Your password has changed and all devices have been signed out. Please sign in again.'}
+                  </div>
+                )}
+
+                {isPendingApproval ? (
+                  <div
+                    className="d-flex align-items-start gap-3 p-3 rounded-3 mb-4"
+                    style={{
+                      background: '#fffbeb',
+                      border: '1px solid #fde68a',
+                      color: '#92400e',
+                      fontSize: '0.88rem',
+                      lineHeight: 1.55
+                    }}
+                  >
+                    <Clock size={22} className="flex-shrink-0 mt-1" style={{ color: '#d97706' }} />
+                    <div>
+                      <strong style={{ color: '#78350f', display: 'block', marginBottom: '2px' }}>
+                        {isKhmer ? 'គណនីកំពុងរង់ចាំការអនុម័ត (Pending Admin Approval)' : 'Account Pending Admin Approval'}
+                      </strong>
+                      {isKhmer
+                        ? 'គណនីរបស់អ្នកត្រូវបានកត់ត្រាក្នុងប្រព័ន្ធរួចរាល់ហើយ ប៉ុន្តែកំពុងស្ថិតក្នុងដំណាក់កាលត្រួតពិនិត្យ និងអនុម័តដោយគណៈគ្រប់គ្រងសាលា។ សូមរង់ចាំការជូនដំណឹង ឬទាក់ទងមកកាន់ការិយាល័យសិក្សា។'
+                        : 'Your account has been created but is awaiting review and approval by the institute administration before access can be granted. Please check back later or contact Academic Affairs.'}
+                    </div>
+                  </div>
+                ) : error && (
                   <div className="alert alert-danger d-flex align-items-center gap-2 p-3 rounded-3 mb-4" role="alert" style={{ fontSize: '0.88rem' }}>
                     <AlertCircle size={18} className="flex-shrink-0" />
                     <div>{error}</div>
@@ -397,32 +424,6 @@ export const LoginPage = () => {
                       </>
                     )}
                   </button>
-
-                  {/* Quick Fill Testing Credentials */}
-                  <div className="auth-role-hints">
-                    <div className="auth-role-title">
-                      {isKhmer ? 'គណនីសាកល្បងរហ័ស (Quick Demo Fill)' : 'Demo Credentials'}
-                    </div>
-                    <div className="auth-role-pills-list">
-                      <button
-                        type="button"
-                        className="auth-role-pill-btn"
-                        onClick={() => handleQuickFill('student')}
-                      >
-                        <GraduationCap size={13} color="#1e73be" />
-                        <span>{isKhmer ? 'និស្សិត (Student)' : 'Student Demo'}</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        className="auth-role-pill-btn"
-                        onClick={() => handleQuickFill('admin')}
-                      >
-                        <UserCheck size={13} color="#059669" />
-                        <span>{isKhmer ? 'រដ្ឋបាល / សាស្ត្រាចារ្យ (Admin)' : 'Admin Demo'}</span>
-                      </button>
-                    </div>
-                  </div>
 
                   {/* Register Link Footer */}
                   <div

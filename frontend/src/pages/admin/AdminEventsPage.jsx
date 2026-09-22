@@ -22,7 +22,9 @@ import {
   User,
   ExternalLink,
   Users,
-  FileText
+  FileText,
+  ArrowRight,
+  Tag
 } from 'lucide-react';
 
 export const AdminEventsPage = () => {
@@ -46,8 +48,7 @@ export const AdminEventsPage = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Search & Filter State
-  const [searchTerm, setSearchTerm] = useState('');
+  // Category Filter State
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   const [formData, setFormData] = useState({
@@ -110,24 +111,15 @@ export const AdminEventsPage = () => {
   const totalCategories = categories.length;
   const distinctVenues = new Set(events.map((e) => e.place).filter(Boolean)).size;
 
-  // Filtered Events
+  // Category-Filtered Events
   const filteredEvents = useMemo(() => {
-    return events.filter((ev) => {
-      const matchSearch =
-        searchTerm === '' ||
-        ev.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ev.place?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ev.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ev.speakers?.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchCat =
-        selectedCategory === 'all' ||
-        String(ev.category_id) === String(selectedCategory) ||
-        ev.category?.name === selectedCategory;
-
-      return matchSearch && matchCat;
-    });
-  }, [events, searchTerm, selectedCategory]);
+    if (selectedCategory === 'all') return events;
+    return events.filter((ev) =>
+      String(ev.category_id) === String(selectedCategory) ||
+      String(ev.category?.id) === String(selectedCategory) ||
+      ev.category?.name === selectedCategory
+    );
+  }, [events, selectedCategory]);
 
   const openAddModal = () => {
     setEditingEvent(null);
@@ -377,10 +369,151 @@ export const AdminEventsPage = () => {
     },
   ];
 
+  const renderMobileCard = (row) => {
+    const catName = row.category?.name || (isKhmer ? 'កម្មវិធីទូទៅ' : 'General Event');
+    const theme = getCategoryTheme(catName);
+    const isFree = !row.fee || row.fee.toLowerCase().includes('free') || row.fee.includes('ឥតគិតថ្លៃ');
+
+    return (
+      <div className="admin-user-mobile-card">
+        {/* Top: Thumbnail, Title, Category Badge, and Admission Badge */}
+        <div className="admin-user-mobile-card-top">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flex: 1 }}>
+            <div className="admin-event-thumb-wrapper" style={{ width: '54px', height: '42px', flexShrink: 0 }}>
+              <img
+                src={row.imageUrl || '/images/gallery/gallery 1.jpg'}
+                alt={row.title}
+                className="admin-event-thumb-img"
+                onError={(e) => {
+                  e.target.src = '/images/gallery/gallery 1.jpg';
+                }}
+              />
+            </div>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div
+                style={{
+                  fontWeight: '700',
+                  fontSize: '0.88rem',
+                  color: '#07294D',
+                  lineHeight: 1.35,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
+              >
+                {row.title}
+              </div>
+              <div style={{ marginTop: '4px' }}>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                    fontSize: '0.70rem',
+                    fontWeight: 700,
+                    background: theme.bg,
+                    color: theme.color,
+                    border: `1px solid ${theme.border}`,
+                  }}
+                >
+                  {catName}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ flexShrink: 0 }}>
+            {isFree ? (
+              <span className="admin-fee-badge-free" style={{ fontSize: '0.70rem', padding: '2px 8px' }}>
+                <Sparkles size={11} style={{ color: '#ca8a04' }} />
+                <span>{isKhmer ? 'ឥតគិតថ្លៃ' : 'Free'}</span>
+              </span>
+            ) : (
+              <span className="admin-fee-badge-paid" style={{ fontSize: '0.70rem', padding: '2px 8px' }}>
+                <span>{row.fee}</span>
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Details: Date/Time & Place */}
+        <div className="admin-user-mobile-card-details">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.78rem', color: '#07294D', fontWeight: '700' }}>
+              <Calendar size={13} color="#1e73be" style={{ flexShrink: 0 }} />
+              <span>{formatDate(row.date || row.eventDate)}</span>
+              {row.time && (
+                <span style={{ color: '#64748b', fontSize: '0.74rem', fontWeight: '500' }}>
+                  • {row.time}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '5px', fontSize: '0.76rem', color: '#334155', marginTop: '6px' }}>
+            <MapPin size={12} color="#ea580c" style={{ flexShrink: 0, marginTop: '2px' }} />
+            <span style={{ lineHeight: 1.35 }}>
+              {row.place || row.location || (isKhmer ? 'វិទ្យាស្ថាន RPITSSR' : 'RPITSSR Campus')}
+            </span>
+          </div>
+
+          {row.description && (
+            <div
+              style={{
+                fontSize: '0.74rem',
+                color: '#64748b',
+                marginTop: '6px',
+                paddingTop: '6px',
+                borderTop: '1px dashed #e2e8f0',
+                lineHeight: 1.4,
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
+              {row.description}
+            </div>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="admin-user-mobile-card-actions">
+          <button
+            onClick={() => openPreviewModal(row)}
+            className="admin-user-mobile-action-btn view"
+            title={isKhmer ? 'មើលព័ត៌មានលម្អិត' : 'Preview Event'}
+          >
+            <Eye size={13} />
+            <span>{isKhmer ? 'មើលលម្អិត' : 'Preview'}</span>
+          </button>
+          <button
+            onClick={() => openEditModal(row)}
+            className="admin-user-mobile-action-btn edit"
+            title={isKhmer ? 'កែសម្រួល' : 'Edit Event'}
+          >
+            <Edit2 size={13} />
+            <span>{isKhmer ? 'កែប្រែ' : 'Edit'}</span>
+          </button>
+          <button
+            onClick={() => openDeleteModal(row)}
+            className="admin-user-mobile-action-btn delete"
+            title={isKhmer ? 'លុប' : 'Delete Event'}
+          >
+            <Trash2 size={13} />
+            <span>{isKhmer ? 'លុប' : 'Delete'}</span>
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div>
       {/* 1. Institutional Header Banner */}
       <div
+        className="admin-events-header"
         style={{
           background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
           borderRadius: '20px',
@@ -406,48 +539,42 @@ export const AdminEventsPage = () => {
               background: '#eff6ff',
               color: '#1e73be',
               fontSize: '0.78rem',
-              fontWeight: 700,
+              fontWeight: '700',
               marginBottom: '8px',
               border: '1px solid #dbeafe',
             }}
           >
             <Calendar size={14} />
-            {isKhmer ? 'ការគ្រប់គ្រងព្រឹត្តិការណ៍ & កម្មវិធីស្ថាប័ន' : 'Institutional Events & Activities Portal'}
+            <span>{isKhmer ? 'ការគ្រប់គ្រងព្រឹត្តិការណ៍ & កម្មវិធីស្ថាប័ន' : 'Institutional Events & Activities Portal'}</span>
           </div>
           <h1
             style={{
-              fontSize: '1.6rem',
+              fontSize: '1.65rem',
               fontWeight: 800,
               color: '#07294D',
               margin: '0 0 6px 0',
               lineHeight: 1.2,
+              letterSpacing: '-0.3px',
             }}
           >
             {isKhmer ? 'ព្រឹត្តិការណ៍ & កម្មវិធីស្ថាប័ន' : 'Campus Events & Programs'}
           </h1>
-          <p style={{ margin: 0, color: '#64748b', fontSize: '0.88rem' }}>
+          <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>
             {isKhmer
               ? 'គ្រប់គ្រង សិក្ខាសាលា ពិធីប្រគល់សញ្ញាបត្រ ពិព័រណ៍ការងារ និងសកម្មភាពថ្នាក់ជាតិ TVET 1.5M'
-              : 'Manage conferences, graduation ceremonies, job fairs, and national TVET training events'}
+              : 'Manage conferences, graduation ceremonies, job fairs, and national TVET training events.'}
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div className="admin-events-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button
             onClick={fetchData}
             disabled={loading}
             className="admin-btn admin-btn-outline"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              borderRadius: '12px',
-              padding: '9px 16px',
-              fontWeight: 600,
-            }}
+            title={isKhmer ? 'ធ្វើបច្ចុប្បន្នភាព' : 'Refresh'}
           >
             <RotateCw size={15} className={loading ? 'fa-spin' : ''} />
-            {isKhmer ? 'ធ្វើបច្ចុប្បន្នភាព' : 'Refresh'}
+            <span>{isKhmer ? 'ធ្វើបច្ចុប្បន្នភាព' : 'Refresh'}</span>
           </button>
           <button
             onClick={openAddModal}
@@ -456,298 +583,153 @@ export const AdminEventsPage = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              borderRadius: '12px',
-              padding: '9px 18px',
-              fontWeight: 600,
-              background: 'linear-gradient(135deg, #07294D 0%, #1e73be 100%)',
-              border: 'none',
-              boxShadow: '0 4px 12px rgba(7, 41, 77, 0.15)',
+              boxShadow: '0 4px 14px rgba(7, 41, 77, 0.15)',
             }}
           >
             <Plus size={16} />
-            {isKhmer ? 'បង្កើតព្រឹត្តិការណ៍ថ្មី' : 'Add New Event'}
+            <span>{isKhmer ? 'បង្កើតព្រឹត្តិការណ៍ថ្មី' : 'Add New Event'}</span>
           </button>
         </div>
       </div>
 
       {/* 2. 4-Card Institutional KPI Metric Strip */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '16px',
-          marginBottom: '24px',
-        }}
-      >
+      <div className="admin-kpi-grid admin-event-kpis">
         {/* KPI 1: Total Events */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
-        >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#eff6ff',
-              color: '#1e73be',
-              border: '1px solid #dbeafe',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <Calendar size={22} />
+        <div className="admin-kpi-card" onClick={() => setSelectedCategory('all')}>
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'ព្រឹត្តិការណ៍សរុប' : 'Total Events'}</span>
+              <div className="admin-kpi-value">{totalEvents}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#1e73be' }} />
+                <span>{isKhmer ? 'កម្មវិធី និងសកម្មភាពស្ថាប័ន' : 'Institutional campus activities'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#eff6ff', color: '#1e73be' }}>
+                {isKhmer ? 'សរុប' : 'Total'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}>
+                <Calendar size={22} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'ព្រឹត្តិការណ៍សរុប' : 'Total Events'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {totalEvents} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#1e73be' }}>{isKhmer ? 'កម្មវិធី' : 'Programs'}</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'គ្រប់គ្រងព្រឹត្តិការណ៍' : 'Manage events'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* KPI 2: Free Admission */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
-        >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#f0fdf4',
-              color: '#059669',
-              border: '1px solid #bbf7d0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <Sparkles size={22} />
+        <div className="admin-kpi-card">
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'ចូលរួមឥតគិតថ្លៃ' : 'Free Admission'}</span>
+              <div className="admin-kpi-value">{freeEvents}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#059669' }} />
+                <span>{isKhmer ? 'កម្មវិធីបើកទូលាយឥតបង់ប្រាក់' : 'Open free public access'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#f0fdf4', color: '#059669' }}>
+                {isKhmer ? 'ឥតគិតថ្លៃ' : 'Free 100%'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}>
+                <Sparkles size={22} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'ចូលរួមឥតគិតថ្លៃ' : 'Free Admission'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {freeEvents} / {totalEvents}{' '}
-              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#059669' }}>(100%)</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'កម្មវិធីឥតគិតថ្លៃ' : 'Free access events'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* KPI 3: Event Categories */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
-        >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#faf5ff',
-              color: '#7c3aed',
-              border: '1px solid #e9d5ff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <Layers size={22} />
+        <div className="admin-kpi-card">
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'ប្រភេទកម្មវិធី' : 'Categories'}</span>
+              <div className="admin-kpi-value">{totalCategories}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#7c3aed' }} />
+                <span>{isKhmer ? 'បែងចែកតាមផ្នែក និងជំនាញ' : 'Classified program types'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#faf5ff', color: '#7c3aed' }}>
+                {isKhmer ? 'ប្រភេទ' : 'Categories'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}>
+                <Layers size={22} />
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'ប្រភេទកម្មវិធី' : 'Categories'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {totalCategories} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#7c3aed' }}>{isKhmer ? 'ប្រភេទ' : 'Types'}</span>
-            </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'ប្រភេទព្រឹត្តិការណ៍' : 'Event categories'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* KPI 4: Campus Venues */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '18px',
-            padding: '18px 20px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(7, 41, 77, 0.03)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '14px',
-          }}
+        <div className="admin-kpi-card">
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'ទីតាំងរៀបចំសកម្ម' : 'Active Venues'}</span>
+              <div className="admin-kpi-value">{distinctVenues}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#ea580c' }} />
+                <span>{isKhmer ? 'ក្នុង និងក្រៅបរិវេណវិទ្យាស្ថាន' : 'Campus halls & auditoriums'}</span>
+              </div>
+            </div>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#fff7ed', color: '#ea580c' }}>
+                {isKhmer ? 'ទីតាំង' : 'Venues'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa' }}>
+                <MapPin size={22} />
+              </div>
+            </div>
+          </div>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'ទីតាំងទាំងអស់' : 'All event venues'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Horizontal Swipeable Category Filter Pill Bar */}
+      <div className="admin-user-filter-bar">
+        <button
+          type="button"
+          className={`admin-user-filter-pill ${selectedCategory === 'all' ? 'active' : ''}`}
+          onClick={() => setSelectedCategory('all')}
         >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '14px',
-              background: '#fff7ed',
-              color: '#ea580c',
-              border: '1px solid #fed7aa',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <MapPin size={22} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {isKhmer ? 'ទីតាំងរៀបចំសកម្ម' : 'Active Venues'}
-            </div>
-            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#07294D', marginTop: '2px' }}>
-              {distinctVenues} <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#ea580c' }}>{isKhmer ? 'ទីតាំង' : 'Venues'}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+          <Layers size={14} />
+          <span>{isKhmer ? 'ទាំងអស់' : 'All Events'}</span>
+          <span className="admin-user-filter-count">{totalEvents}</span>
+        </button>
 
-      {/* 3. Category Filter Tabs & Live Search */}
-      <div
-        style={{
-          background: '#ffffff',
-          borderRadius: '16px',
-          border: '1px solid #e2e8f0',
-          padding: '14px 18px',
-          marginBottom: '20px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px',
-        }}
-      >
-        {/* Category Tabs */}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <button
-            type="button"
-            onClick={() => setSelectedCategory('all')}
-            style={{
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              border: '1px solid',
-              borderColor: selectedCategory === 'all' ? '#1e73be' : '#e2e8f0',
-              backgroundColor: selectedCategory === 'all' ? '#eff6ff' : '#ffffff',
-              color: selectedCategory === 'all' ? '#1e73be' : '#64748b',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            {isKhmer ? 'ទាំងអស់' : 'All Events'} ({totalEvents})
-          </button>
-
-          {categories.map((cat) => {
-            const count = events.filter((e) => e.category_id === cat.id || e.category?.id === cat.id).length;
-            const isSelected = String(selectedCategory) === String(cat.id);
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setSelectedCategory(cat.id)}
-                style={{
-                  padding: '6px 14px',
-                  borderRadius: '9999px',
-                  fontSize: '0.82rem',
-                  fontWeight: 600,
-                  border: '1px solid',
-                  borderColor: isSelected ? '#1e73be' : '#e2e8f0',
-                  backgroundColor: isSelected ? '#eff6ff' : '#ffffff',
-                  color: isSelected ? '#1e73be' : '#64748b',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                {cat.name} ({count})
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Live Search */}
-        <div style={{ position: 'relative', minWidth: '270px' }}>
-          <Search
-            size={16}
-            style={{
-              position: 'absolute',
-              left: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#94a3b8',
-            }}
-          />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={isKhmer ? 'ស្វែងរកព្រឹត្តិការណ៍, ទីកន្លែង, វាគ្មិន...' : 'Search title, venue, speakers...'}
-            style={{
-              width: '100%',
-              padding: '7px 32px 7px 36px',
-              borderRadius: '10px',
-              border: '1px solid #e2e8f0',
-              fontSize: '0.84rem',
-              outline: 'none',
-            }}
-          />
-          {searchTerm && (
+        {categories.map((cat) => {
+          const count = events.filter((e) => e.category_id === cat.id || e.category?.id === cat.id).length;
+          const isSelected = String(selectedCategory) === String(cat.id);
+          return (
             <button
-              onClick={() => setSearchTerm('')}
-              style={{
-                position: 'absolute',
-                right: '8px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'none',
-                border: 'none',
-                color: '#94a3b8',
-                cursor: 'pointer',
-                padding: '2px',
-              }}
+              key={cat.id}
+              type="button"
+              className={`admin-user-filter-pill ${isSelected ? 'active' : ''}`}
+              onClick={() => setSelectedCategory(cat.id)}
             >
-              <X size={14} />
+              <Tag size={13} />
+              <span>{cat.name}</span>
+              <span className="admin-user-filter-count">{count}</span>
             </button>
-          )}
-        </div>
+          );
+        })}
       </div>
 
-      {/* 4. DataTable */}
+      {/* 4. Institutional DataTable & Mobile Cards View */}
       <AdminDataTable
         columns={columns}
         data={filteredEvents}
@@ -758,6 +740,11 @@ export const AdminEventsPage = () => {
             ? `បង្ហាញ ${filteredEvents.length} ក្នុងចំណោមព្រឹត្តិការណ៍សរុប ${totalEvents}`
             : `Showing ${filteredEvents.length} of ${totalEvents} events`
         }
+        onAdd={openAddModal}
+        addLabel={isKhmer ? 'បង្កើតព្រឹត្តិការណ៍ថ្មី' : 'Add New Event'}
+        onRefresh={fetchData}
+        searchPlaceholder={isKhmer ? 'ស្វែងរកព្រឹត្តិការណ៍, ទីកន្លែង, វាគ្មិន...' : 'Search events, venue, speakers...'}
+        renderMobileCard={renderMobileCard}
       />
 
       {/* 5. Create / Edit Event Modal */}

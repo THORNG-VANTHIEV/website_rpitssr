@@ -36,7 +36,7 @@ import {
 } from 'lucide-react';
 
 export const StudentDashboardPage = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, logoutAll, clearSession } = useAuth();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('overview'); // overview, exams, library, notices, profile
@@ -73,15 +73,15 @@ export const StudentDashboardPage = () => {
   // Logout Modal State
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [loggingOutAll, setLoggingOutAll] = useState(false);
 
   // Fetch student dashboard data
   const fetchStudentData = async () => {
     setLoading(true);
     try {
-      const [dashRes, examRes, publicExamRes] = await Promise.all([
+      const [dashRes, examRes] = await Promise.all([
         api.get('/student/dashboard'),
         api.get('/student/exam-results').catch(() => ({ data: { data: [] } })),
-        api.get('/exam-results').catch(() => ({ data: { data: [] } })),
       ]);
 
       const data = dashRes.data?.data || {};
@@ -89,11 +89,7 @@ export const StudentDashboardPage = () => {
       setNotices(data.recentNotices || []);
       setBorrowings(data.borrowings || []);
 
-      let myResults = examRes.data?.data || data.recentResults || [];
-      if ((!Array.isArray(myResults) || myResults.length === 0) && Array.isArray(publicExamRes.data?.data) && publicExamRes.data.data.length > 0) {
-        // Use published institute exam results as fallback for demonstration so student sees rich results
-        myResults = publicExamRes.data.data;
-      }
+      const myResults = examRes.data?.data || data.recentResults || [];
       setExamResults(Array.isArray(myResults) ? myResults : []);
 
       // Pre-fill profile form
@@ -136,8 +132,8 @@ export const StudentDashboardPage = () => {
     setProfileError('');
 
     if (profileForm.newPassword) {
-      if (profileForm.newPassword.length < 6) {
-        setProfileError('ពាក្យសម្ងាត់ថ្មីត្រូវមានយ៉ាងតិច ៦ តួអក្សរ / New password must be at least 6 characters.');
+      if (profileForm.newPassword.length < 8) {
+        setProfileError('ពាក្យសម្ងាត់ថ្មីត្រូវមានយ៉ាងតិច ៨ តួអក្សរ / New password must be at least 8 characters.');
         setProfileSaving(false);
         return;
       }
@@ -157,7 +153,6 @@ export const StudentDashboardPage = () => {
       const payload = {
         fullName: profileForm.fullName.trim(),
         className: profileForm.className.trim(),
-        studentId: profileForm.studentId.trim(),
       };
       if (profileForm.newPassword) {
         payload.currentPassword = profileForm.currentPassword;
@@ -165,6 +160,11 @@ export const StudentDashboardPage = () => {
       }
 
       const res = await api.put('/student/profile', payload);
+      if (res.data?.requiresReauthentication) {
+        clearSession();
+        navigate('/login', { replace: true, state: { passwordChanged: true } });
+        return;
+      }
       setProfileSuccess('ព័ត៌មានគណនីត្រូវបានកែប្រែដោយជោគជ័យ! / Profile updated successfully.');
       setProfileForm((prev) => ({
         ...prev,
@@ -178,6 +178,19 @@ export const StudentDashboardPage = () => {
       setProfileError(msg);
     } finally {
       setProfileSaving(false);
+    }
+  };
+
+  const handleLogoutAll = async () => {
+    setLoggingOutAll(true);
+    setProfileError('');
+    try {
+      await logoutAll();
+      navigate('/login', { replace: true });
+    } catch {
+      setProfileError('មិនអាចចាកចេញពីគ្រប់ឧបករណ៍បានទេ។ សូមព្យាយាមម្តងទៀត។ / Could not sign out of all devices. Please try again.');
+    } finally {
+      setLoggingOutAll(false);
     }
   };
 
@@ -292,42 +305,43 @@ export const StudentDashboardPage = () => {
           }}
         >
           {/* Logo & Portal Title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <img
               src="/images/logo.png"
               alt="RPITSSR"
-              style={{ width: '42px', height: '42px', objectFit: 'contain', borderRadius: '8px' }}
+              style={{ width: '40px', height: '40px', objectFit: 'contain', borderRadius: '8px', flexShrink: 0 }}
             />
             <div>
-              <div style={{ fontWeight: '800', color: '#07294d', fontSize: '1.05rem', lineHeight: '1.2' }}>
+              <div style={{ fontWeight: '800', color: '#07294d', fontSize: 'clamp(0.92rem, 2.5vw, 1.05rem)', lineHeight: '1.2' }}>
                 RPITSSR STUDENT PORTAL
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+              <div style={{ fontSize: '0.72rem', color: '#64748b' }}>
                 វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប
               </div>
             </div>
           </div>
 
           {/* Right Navigation & Profile */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 1.5vw, 14px)' }}>
             <Link
               to="/"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '6px',
-                fontSize: '0.85rem',
+                gap: '5px',
+                fontSize: '0.82rem',
                 color: '#07294d',
                 textDecoration: 'none',
                 fontWeight: '600',
-                padding: '6px 12px',
+                padding: '6px 10px',
                 borderRadius: '6px',
                 border: '1px solid #e2e8f0',
                 backgroundColor: '#f8fafc',
+                whiteSpace: 'nowrap',
               }}
             >
-              <ExternalLink size={14} />
-              <span>ទំព័រដើម Website</span>
+              <ExternalLink size={13} />
+              <span>ទំព័រដើម</span>
             </Link>
 
             <Link
@@ -336,19 +350,20 @@ export const StudentDashboardPage = () => {
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '6px',
-                fontSize: '0.85rem',
+                gap: '5px',
+                fontSize: '0.82rem',
                 color: '#1e73be',
                 textDecoration: 'none',
                 fontWeight: '600',
-                padding: '6px 12px',
+                padding: '6px 10px',
                 borderRadius: '6px',
                 border: '1px solid #bfdbfe',
                 backgroundColor: '#eff6ff',
+                whiteSpace: 'nowrap',
               }}
             >
-              <FileText size={14} />
-              <span>ទាញយកឯកសារ Forms</span>
+              <FileText size={13} />
+              <span>ទម្រង់បែបបទ</span>
             </Link>
 
             {/* Student Avatar & Name */}
@@ -405,65 +420,68 @@ export const StudentDashboardPage = () => {
       </header>
 
       {/* Main Content Area */}
-      <main style={{ maxWidth: '1280px', margin: '0 auto', padding: '28px 20px' }}>
+      <main style={{ maxWidth: '1280px', margin: '0 auto', padding: 'clamp(16px, 3vw, 28px) clamp(12px, 3vw, 24px) 60px' }}>
         {/* Welcome Hero Card */}
         <div
           style={{
             background: 'linear-gradient(135deg, #07294d 0%, #0d3c61 60%, #0c8b51 100%)',
             borderRadius: '16px',
-            padding: '28px 32px',
+            padding: 'clamp(18px, 3.5vw, 28px) clamp(16px, 3.5vw, 32px)',
             color: '#ffffff',
-            marginBottom: '28px',
+            marginBottom: '24px',
             boxShadow: '0 10px 25px -5px rgba(7, 41, 77, 0.2)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             flexWrap: 'wrap',
-            gap: '20px',
+            gap: '18px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0, flex: '1 1 320px' }}>
             <div
               style={{
-                width: '64px',
-                height: '64px',
+                width: '56px',
+                height: '56px',
                 borderRadius: '50%',
                 backgroundColor: 'rgba(255,255,255,0.15)',
                 border: '2px solid rgba(255,255,255,0.4)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '1.6rem',
+                fontSize: '1.4rem',
                 fontWeight: '800',
+                flexShrink: 0,
               }}
             >
-              <GraduationCap size={32} />
+              <GraduationCap size={28} />
             </div>
-            <div>
-              <div style={{ fontSize: '0.9rem', color: '#e2e8f0', fontWeight: '500' }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: '0.82rem', color: '#e2e8f0', fontWeight: '500' }}>
                 សូមស្វាគមន៍មកកាន់ប្រព័ន្ធព័ត៌មានវិទ្យាល័យបច្ចេកទេស (Welcome Back)
               </div>
               <h1
                 style={{
-                  fontSize: '1.85rem',
+                  fontSize: 'clamp(1.35rem, 4vw, 1.85rem)',
                   fontWeight: '800',
                   color: '#ffffff',
                   margin: '4px 0 8px',
                   letterSpacing: '-0.01em',
                   textShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
+                  lineHeight: 1.2,
+                  wordBreak: 'break-word',
                 }}
               >
                 {student.fullName || student.username}
               </h1>
-              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                 <span
                   style={{
                     backgroundColor: 'rgba(255, 255, 255, 0.22)',
                     border: '1px solid rgba(255, 255, 255, 0.35)',
                     color: '#ffffff',
-                    padding: '4px 12px',
+                    padding: '3px 10px',
                     borderRadius: '9999px',
-                    fontSize: '0.8rem',
+                    fontSize: '0.76rem',
                     fontWeight: '700',
                     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                   }}
@@ -475,9 +493,9 @@ export const StudentDashboardPage = () => {
                     backgroundColor: 'rgba(255, 255, 255, 0.22)',
                     border: '1px solid rgba(255, 255, 255, 0.35)',
                     color: '#ffffff',
-                    padding: '4px 12px',
+                    padding: '3px 10px',
                     borderRadius: '9999px',
-                    fontSize: '0.8rem',
+                    fontSize: '0.76rem',
                     fontWeight: '700',
                     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                   }}
@@ -489,9 +507,9 @@ export const StudentDashboardPage = () => {
                     backgroundColor: '#0c8b51',
                     border: '1px solid rgba(255, 255, 255, 0.35)',
                     color: '#ffffff',
-                    padding: '4px 12px',
+                    padding: '3px 10px',
                     borderRadius: '9999px',
-                    fontSize: '0.8rem',
+                    fontSize: '0.76rem',
                     fontWeight: '700',
                     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.15)',
                   }}
@@ -590,7 +608,11 @@ export const StudentDashboardPage = () => {
           </div>
 
           {/* Card 3: Major & Class */}
-          <div className="student-stat-card stat-class" title="ព័ត៌មានថ្នាក់ និងជំនាញសិក្សា">
+          <div
+            className="student-stat-card stat-class"
+            onClick={() => setActiveTab('profile')}
+            title="ចុចដើម្បីមើលព័ត៌មានគណនី និងថ្នាក់រៀន"
+          >
             <div className="stat-card-header">
               <span className="stat-card-label">ថ្នាក់ & ជំនាញ (Class & Major)</span>
               <div className="stat-gradient-icon class-icon">
@@ -662,9 +684,9 @@ export const StudentDashboardPage = () => {
 
         {/* TAB 1: OVERVIEW */}
         {activeTab === 'overview' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '20px' }}>
             {/* Left Column: Recent Exam Results */}
-            <div style={{ backgroundColor: '#ffffff', borderRadius: '14px', border: '1px solid #e2e8f0', padding: '24px' }}>
+            <div style={{ backgroundColor: '#ffffff', borderRadius: '14px', border: '1px solid #e2e8f0', padding: 'clamp(16px, 3vw, 24px)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
                 <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#07294d', margin: 0 }}>
                   លទ្ធផលប្រឡងចុងក្រោយ (Recent Exam Results)
@@ -733,7 +755,7 @@ export const StudentDashboardPage = () => {
             </div>
 
             {/* Right Column: Academic Announcements */}
-            <div style={{ backgroundColor: '#ffffff', borderRadius: '14px', border: '1px solid #e2e8f0', padding: '24px' }}>
+            <div style={{ backgroundColor: '#ffffff', borderRadius: '14px', border: '1px solid #e2e8f0', padding: 'clamp(16px, 3vw, 24px)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
                 <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#07294d', margin: 0 }}>
                   សេចក្តីជូនដំណឹងសំខាន់ៗ (Notices)
@@ -944,7 +966,7 @@ export const StudentDashboardPage = () => {
               </div>
             </div>
 
-            {/* Exam Results Table */}
+            {/* Exam Results Table (Desktop) & Mobile Cards */}
             {filteredExamResults.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '48px 20px', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
                 <Award size={48} style={{ color: '#94a3b8', margin: '0 auto 12px' }} />
@@ -979,40 +1001,129 @@ export const StudentDashboardPage = () => {
                 )}
               </div>
             ) : (
-              <div className="student-exam-table-wrapper">
-                <table className="student-table">
-                  <thead>
-                    <tr>
-                      <th>មុខវិជ្ជា & កាលបរិច្ឆេទប្រឡង</th>
-                      <th>ជំនាញ & ឆមាស</th>
-                      <th>ពិន្ទុទទួលបាន</th>
-                      <th>ភាគរយ (Score %)</th>
-                      <th>និទ្ទេស & ស្ថានភាព</th>
-                      <th style={{ textAlign: 'right' }}>សន្លឹកពិន្ទុផ្លូវការ</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredExamResults.map((row) => {
-                      const scorePercent =
-                        parseFloat(row.percentage) ||
-                        Math.round(((parseFloat(row.obtainedMarks) || 0) / (parseFloat(row.totalMarks) || 100)) * 100) ||
-                        0;
-                      const gradeClass =
-                        row.grade === 'A'
-                          ? 'grade-a'
-                          : row.grade?.startsWith('B')
-                          ? 'grade-b'
-                          : row.grade?.startsWith('C')
-                          ? 'grade-c'
-                          : 'grade-f';
-                      const progressColor =
-                        scorePercent >= 80 ? '#10b981' : scorePercent >= 65 ? '#0ea5e9' : scorePercent >= 50 ? '#f59e0b' : '#ef4444';
-                      const isPassed = (row.grade || '').toUpperCase() !== 'F' && (row.grade || '').toUpperCase() !== 'FAIL';
+              <>
+                {/* Desktop Table View */}
+                <div className="student-exam-table-wrapper student-exam-desktop-table">
+                  <table className="student-table">
+                    <thead>
+                      <tr>
+                        <th>មុខវិជ្ជា & កាលបរិច្ឆេទប្រឡង</th>
+                        <th>ជំនាញ & ឆមាស</th>
+                        <th>ពិន្ទុទទួលបាន</th>
+                        <th>ភាគរយ (Score %)</th>
+                        <th>និទ្ទេស & ស្ថានភាព</th>
+                        <th style={{ textAlign: 'right' }}>សន្លឹកពិន្ទុផ្លូវការ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredExamResults.map((row) => {
+                        const scorePercent =
+                          parseFloat(row.percentage) ||
+                          Math.round(((parseFloat(row.obtainedMarks) || 0) / (parseFloat(row.totalMarks) || 100)) * 100) ||
+                          0;
+                        const gradeClass =
+                          row.grade === 'A'
+                            ? 'grade-a'
+                            : row.grade?.startsWith('B')
+                            ? 'grade-b'
+                            : row.grade?.startsWith('C')
+                            ? 'grade-c'
+                            : 'grade-f';
+                        const progressColor =
+                          scorePercent >= 80 ? '#10b981' : scorePercent >= 65 ? '#0ea5e9' : scorePercent >= 50 ? '#f59e0b' : '#ef4444';
+                        const isPassed = (row.grade || '').toUpperCase() !== 'F' && (row.grade || '').toUpperCase() !== 'FAIL';
 
-                      return (
-                        <tr key={row.id}>
-                          <td>
-                            <div style={{ fontWeight: '700', color: '#0f172a', fontSize: '0.94rem' }}>
+                        return (
+                          <tr key={row.id}>
+                            <td>
+                              <div style={{ fontWeight: '700', color: '#0f172a', fontSize: '0.94rem' }}>
+                                {row.subject || row.examName}
+                              </div>
+                              <div style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
+                                <Calendar size={12} />
+                                <span>{row.examDate ? new Date(row.examDate).toLocaleDateString('km-KH') : 'ការប្រឡងឆមាស'}</span>
+                                <span>•</span>
+                                <span>{row.examName || 'Final Exam'}</span>
+                              </div>
+                            </td>
+                            <td>
+                              <div style={{ fontWeight: '600', color: '#334155' }}>
+                                {row.courseName || student.className || 'Information Technology'}
+                              </div>
+                              <div style={{ fontSize: '0.76rem', color: '#64748b', marginTop: '2px' }}>
+                                {row.semester || 'ឆមាសទី ១'} • ឆ្នាំសិក្សា {row.year || '២០២៥-២០២៦'}
+                              </div>
+                            </td>
+                            <td>
+                              <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                                <span style={{ fontSize: '1.05rem', fontWeight: '800', color: '#07294D' }}>{row.obtainedMarks}</span>
+                                <span style={{ fontSize: '0.8rem', color: '#64748b' }}>/ {row.totalMarks || 100}</span>
+                              </div>
+                              <div className="score-progress-wrap">
+                                <div
+                                  className="score-progress-bar"
+                                  style={{ width: `${Math.min(scorePercent, 100)}%`, backgroundColor: progressColor }}
+                                />
+                              </div>
+                            </td>
+                            <td>
+                              <span style={{ fontWeight: '800', fontSize: '0.95rem', color: '#1e293b' }}>
+                                {scorePercent}%
+                              </span>
+                            </td>
+                            <td>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span className={`grade-pill ${gradeClass}`}>
+                                  Grade {row.grade || 'A'}
+                                </span>
+                                <span style={{ fontSize: '0.78rem', fontWeight: '700', color: isPassed ? '#15803d' : '#dc2626' }}>
+                                  {isPassed ? '✓ ជាប់' : '✕ ធ្លាក់'}
+                                </span>
+                              </div>
+                            </td>
+                            <td style={{ textAlign: 'right' }}>
+                              <button
+                                type="button"
+                                onClick={() => setSelectedTranscript(row)}
+                                className="view-transcript-btn"
+                                title="មើលព្រឹត្តិបត្រពិន្ទុផ្លូវការ"
+                              >
+                                <Eye size={14} />
+                                <span>បើកមើលសន្លឹកពិន្ទុ</span>
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Dedicated Mobile Cards View */}
+                <div className="student-exam-mobile-cards">
+                  {filteredExamResults.map((row) => {
+                    const scorePercent =
+                      parseFloat(row.percentage) ||
+                      Math.round(((parseFloat(row.obtainedMarks) || 0) / (parseFloat(row.totalMarks) || 100)) * 100) ||
+                      0;
+                    const gradeClass =
+                      row.grade === 'A'
+                        ? 'grade-a'
+                        : row.grade?.startsWith('B')
+                        ? 'grade-b'
+                        : row.grade?.startsWith('C')
+                        ? 'grade-c'
+                        : 'grade-f';
+                    const progressColor =
+                      scorePercent >= 80 ? '#10b981' : scorePercent >= 65 ? '#0ea5e9' : scorePercent >= 50 ? '#f59e0b' : '#ef4444';
+                    const isPassed = (row.grade || '').toUpperCase() !== 'F' && (row.grade || '').toUpperCase() !== 'FAIL';
+
+                    return (
+                      <div key={row.id} className="student-exam-mobile-card">
+                        {/* Top Row: Subject & Grade Pill */}
+                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontWeight: '700', color: '#0f172a', fontSize: '0.94rem', lineHeight: 1.3 }}>
                               {row.subject || row.examName}
                             </div>
                             <div style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
@@ -1021,59 +1132,70 @@ export const StudentDashboardPage = () => {
                               <span>•</span>
                               <span>{row.examName || 'Final Exam'}</span>
                             </div>
-                          </td>
-                          <td>
-                            <div style={{ fontWeight: '600', color: '#334155' }}>
-                              {row.courseName || student.className || 'Information Technology'}
+                          </div>
+                          <span className={`grade-pill ${gradeClass}`} style={{ flexShrink: 0 }}>
+                            Grade {row.grade || 'A'}
+                          </span>
+                        </div>
+
+                        {/* Middle Row: Course & Semester */}
+                        <div style={{ backgroundColor: '#f8fafc', borderRadius: '8px', padding: '8px 12px', border: '1px solid #edf2f7' }}>
+                          <div style={{ fontSize: '0.82rem', fontWeight: '600', color: '#334155' }}>
+                            {row.courseName || student.className || 'Information Technology'}
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '2px' }}>
+                            {row.semester || 'ឆមាសទី ១'} • ឆ្នាំសិក្សា {row.year || '២០២៥-២០២៦'}
+                          </div>
+                        </div>
+
+                        {/* Score Details & Progress */}
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                            <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600' }}>
+                              ពិន្ទុទទួលបាន: <strong style={{ color: '#07294D', fontSize: '0.95rem' }}>{row.obtainedMarks}</strong> / {row.totalMarks || 100}
                             </div>
-                            <div style={{ fontSize: '0.76rem', color: '#64748b', marginTop: '2px' }}>
-                              {row.semester || 'ឆមាសទី ១'} • ឆ្នាំសិក្សា {row.year || '២០២៥-២០២៦'}
+                            <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#1e293b' }}>
+                              {scorePercent}% ({isPassed ? '✓ ជាប់' : '✕ ធ្លាក់'})
                             </div>
-                          </td>
-                          <td>
-                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                              <span style={{ fontSize: '1.05rem', fontWeight: '800', color: '#07294D' }}>{row.obtainedMarks}</span>
-                              <span style={{ fontSize: '0.8rem', color: '#64748b' }}>/ {row.totalMarks || 100}</span>
-                            </div>
-                            <div className="score-progress-wrap">
-                              <div
-                                className="score-progress-bar"
-                                style={{ width: `${Math.min(scorePercent, 100)}%`, backgroundColor: progressColor }}
-                              />
-                            </div>
-                          </td>
-                          <td>
-                            <span style={{ fontWeight: '800', fontSize: '0.95rem', color: '#1e293b' }}>
-                              {scorePercent}%
-                            </span>
-                          </td>
-                          <td>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <span className={`grade-pill ${gradeClass}`}>
-                                Grade {row.grade || 'A'}
-                              </span>
-                              <span style={{ fontSize: '0.78rem', fontWeight: '700', color: isPassed ? '#15803d' : '#dc2626' }}>
-                                {isPassed ? '✓ ជាប់' : '✕ ធ្លាក់'}
-                              </span>
-                            </div>
-                          </td>
-                          <td style={{ textAlign: 'right' }}>
-                            <button
-                              type="button"
-                              onClick={() => setSelectedTranscript(row)}
-                              className="view-transcript-btn"
-                              title="មើលព្រឹត្តិបត្រពិន្ទុផ្លូវការ"
-                            >
-                              <Eye size={14} />
-                              <span>បើកមើលសន្លឹកពិន្ទុ</span>
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                          </div>
+                          <div className="score-progress-wrap" style={{ maxWidth: '100%' }}>
+                            <div
+                              className="score-progress-bar"
+                              style={{ width: `${Math.min(scorePercent, 100)}%`, backgroundColor: progressColor }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Bottom Action: View Transcript */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedTranscript(row)}
+                          style={{
+                            width: '100%',
+                            padding: '10px 14px',
+                            backgroundColor: '#eff6ff',
+                            color: '#1e73be',
+                            border: '1px solid #bfdbfe',
+                            borderRadius: '8px',
+                            fontSize: '0.84rem',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '6px',
+                            minHeight: '40px',
+                            transition: 'all 0.2s ease',
+                          }}
+                        >
+                          <Eye size={15} />
+                          <span>បើកមើលសន្លឹកពិន្ទុផ្លូវការ</span>
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
             )}
           </div>
         )}
@@ -1462,17 +1584,18 @@ export const StudentDashboardPage = () => {
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '16px', marginBottom: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', fontWeight: '600', fontSize: '0.88rem', color: '#334155', marginBottom: '6px' }}>
-                    អត្តលេខនិស្សិត (Student ID)
+                  <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontWeight: '600', fontSize: '0.88rem', color: '#334155', marginBottom: '6px' }}>
+                    <span>អត្តលេខនិស្សិត (Student ID)</span>
+                    <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 'normal' }}>🔒 កំណត់ដោយការិយាល័យសិក្សា</span>
                   </label>
                   <input
                     type="text"
-                    value={profileForm.studentId}
-                    onChange={(e) => setProfileForm({ ...profileForm, studentId: e.target.value })}
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9rem', outline: 'none' }}
-                    placeholder="e.g. STU-2026-001"
+                    value={profileForm.studentId || 'មិនទាន់កំណត់ (Not Assigned)'}
+                    readOnly
+                    disabled
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', color: '#64748b', fontSize: '0.9rem', outline: 'none', cursor: 'not-allowed' }}
                   />
                 </div>
                 <div>
@@ -1507,7 +1630,7 @@ export const StudentDashboardPage = () => {
                   />
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '18px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '16px', marginBottom: '18px' }}>
                   <div>
                     <label style={{ display: 'block', fontWeight: '600', fontSize: '0.85rem', color: '#475569', marginBottom: '4px' }}>
                       ពាក្យសម្ងាត់ថ្មី (New Password)
@@ -1517,7 +1640,7 @@ export const StudentDashboardPage = () => {
                       value={profileForm.newPassword}
                       onChange={(e) => setProfileForm({ ...profileForm, newPassword: e.target.value })}
                       style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9rem', outline: 'none' }}
-                      placeholder="យ៉ាងតិច ៦ តួអក្សរ"
+                      placeholder="យ៉ាងតិច ៨ តួអក្សរ"
                     />
                   </div>
                   <div>
@@ -1535,7 +1658,18 @@ export const StudentDashboardPage = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+              <p style={{ color: '#64748b', fontSize: '0.85rem' }}>
+                ការផ្លាស់ប្តូរពាក្យសម្ងាត់នឹងចាកចេញពីគ្រប់ឧបករណ៍។ / Changing your password signs out all devices.
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'flex-end', marginTop: '20px' }}>
+                <button
+                  type="button"
+                  onClick={handleLogoutAll}
+                  disabled={loggingOutAll || profileSaving}
+                  style={{ padding: '10px 20px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#ffffff', color: '#07294D', fontWeight: 600 }}
+                >
+                  {loggingOutAll ? 'កំពុងចាកចេញ... / Signing out...' : 'ចាកចេញពីគ្រប់ឧបករណ៍ / Sign out of all devices'}
+                </button>
                 <button
                   type="submit"
                   disabled={profileSaving}
@@ -1785,42 +1919,44 @@ export const StudentDashboardPage = () => {
                   </div>
                 </div>
 
-                {/* Subject & Score Table */}
-                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px', fontSize: '0.88rem' }}>
-                  <thead>
-                    <tr style={{ backgroundColor: '#07294D', color: '#ffffff' }}>
-                      <th style={{ padding: '10px 14px', textAlign: 'left', borderRadius: '6px 0 0 6px' }}>មុខវិជ្ជា (Subject)</th>
-                      <th style={{ padding: '10px 14px', textAlign: 'center' }}>ពិន្ទុពេញ</th>
-                      <th style={{ padding: '10px 14px', textAlign: 'center' }}>ពិន្ទុទទួលបាន</th>
-                      <th style={{ padding: '10px 14px', textAlign: 'center' }}>ភាគរយ</th>
-                      <th style={{ padding: '10px 14px', textAlign: 'center', borderRadius: '0 6px 6px 0' }}>និទ្ទេស</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#ffffff' }}>
-                      <td style={{ padding: '14px', fontWeight: '700', color: '#0f172a' }}>
-                        {selectedTranscript.subject || selectedTranscript.examName}
-                        <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '400', marginTop: '2px' }}>
-                          {selectedTranscript.examName} • {selectedTranscript.semester}
-                        </div>
-                      </td>
-                      <td style={{ padding: '14px', textAlign: 'center', fontWeight: '600' }}>
-                        {selectedTranscript.totalMarks || 100}
-                      </td>
-                      <td style={{ padding: '14px', textAlign: 'center', fontWeight: '800', color: '#0284c7', fontSize: '1.05rem' }}>
-                        {selectedTranscript.obtainedMarks}
-                      </td>
-                      <td style={{ padding: '14px', textAlign: 'center', fontWeight: '800' }}>
-                        {selectedTranscript.percentage}%
-                      </td>
-                      <td style={{ padding: '14px', textAlign: 'center' }}>
-                        <span className={`grade-pill ${selectedTranscript.grade === 'A' ? 'grade-a' : 'grade-b'}`}>
-                          Grade {selectedTranscript.grade || 'A'}
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                {/* Subject & Score Table (Responsive Wrapper) */}
+                <div style={{ overflowX: 'auto', width: '100%', marginBottom: '20px' }}>
+                  <table style={{ width: '100%', minWidth: '460px', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#07294D', color: '#ffffff' }}>
+                        <th style={{ padding: '10px 14px', textAlign: 'left', borderRadius: '6px 0 0 6px' }}>មុខវិជ្ជា (Subject)</th>
+                        <th style={{ padding: '10px 14px', textAlign: 'center' }}>ពិន្ទុពេញ</th>
+                        <th style={{ padding: '10px 14px', textAlign: 'center' }}>ពិន្ទុទទួលបាន</th>
+                        <th style={{ padding: '10px 14px', textAlign: 'center' }}>ភាគរយ</th>
+                        <th style={{ padding: '10px 14px', textAlign: 'center', borderRadius: '0 6px 6px 0' }}>និទ្ទេស</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#ffffff' }}>
+                        <td style={{ padding: '14px', fontWeight: '700', color: '#0f172a' }}>
+                          {selectedTranscript.subject || selectedTranscript.examName}
+                          <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '400', marginTop: '2px' }}>
+                            {selectedTranscript.examName} • {selectedTranscript.semester}
+                          </div>
+                        </td>
+                        <td style={{ padding: '14px', textAlign: 'center', fontWeight: '600' }}>
+                          {selectedTranscript.totalMarks || 100}
+                        </td>
+                        <td style={{ padding: '14px', textAlign: 'center', fontWeight: '800', color: '#0284c7', fontSize: '1.05rem' }}>
+                          {selectedTranscript.obtainedMarks}
+                        </td>
+                        <td style={{ padding: '14px', textAlign: 'center', fontWeight: '800' }}>
+                          {selectedTranscript.percentage}%
+                        </td>
+                        <td style={{ padding: '14px', textAlign: 'center' }}>
+                          <span className={`grade-pill ${selectedTranscript.grade === 'A' ? 'grade-a' : 'grade-b'}`}>
+                            Grade {selectedTranscript.grade || 'A'}
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
 
                 {/* Evaluation Remark */}
                 <div

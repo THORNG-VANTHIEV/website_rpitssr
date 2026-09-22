@@ -23,7 +23,7 @@ class AdminUploadController extends Controller
 
         $file = $request->file('image') ?? $request->file('file');
 
-        if (!$file) {
+        if (! $file) {
             return response()->json([
                 'success' => false,
                 'error' => 'No file uploaded',
@@ -31,8 +31,10 @@ class AdminUploadController extends Controller
         }
 
         $subDir = $request->input('subDir', 'general');
-        $extension = $file->getClientOriginalExtension();
-        $fileName = Str::random(24) . '_' . time() . '.' . $extension;
+        $rawExt = strtolower($file->extension() ?: $file->guessExtension() ?: 'jpg');
+        $allowedExtensions = ['jpeg', 'jpg', 'png', 'gif', 'webp', 'pdf'];
+        $extension = in_array($rawExt, $allowedExtensions, true) ? $rawExt : 'jpg';
+        $fileName = Str::random(24).'_'.time().'.'.$extension;
         $filePath = "uploads/{$subDir}/{$fileName}";
 
         // Store file on public disk

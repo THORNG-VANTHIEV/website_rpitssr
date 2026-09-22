@@ -10,6 +10,7 @@ import {
   Sparkles,
   FolderTree,
   Plus,
+  ArrowRight,
   RefreshCw,
   Edit2,
   Trash2,
@@ -336,6 +337,143 @@ export const AdminCoursesPage = () => {
     },
   ];
 
+  // Mobile Card Renderer (< 768px viewports)
+  const renderMobileCard = (row) => {
+    const isFree = row.fee === '0' || !row.fee || /free|ឥតគិតថ្លៃ/i.test(row.fee);
+
+    return (
+      <div className="admin-user-mobile-card">
+        {/* Top: Thumbnail, Title, Category & Fee Badge */}
+        <div className="admin-user-mobile-card-top">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+            <div className="admin-course-thumb-wrapper" style={{ width: '54px', height: '40px', flexShrink: 0 }}>
+              <img
+                src={row.imageUrl || '/images/courses/course 2.jpg'}
+                alt={row.title}
+                className="admin-course-thumb-img"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = '/images/courses/course 2.jpg';
+                }}
+              />
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div
+                style={{
+                  fontWeight: '700',
+                  color: '#07294D',
+                  fontSize: '0.90rem',
+                  lineHeight: 1.3,
+                  wordBreak: 'break-word',
+                }}
+              >
+                {row.title}
+              </div>
+              <div
+                style={{
+                  fontSize: '0.76rem',
+                  color: '#64748b',
+                  marginTop: '2px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+              >
+                <FolderTree size={12} style={{ color: '#1e73be', flexShrink: 0 }} />
+                <span>{row.category?.name || (isKhmer ? 'ទូទៅ' : 'General')}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Fee / Scholarship Badge */}
+          <div style={{ flexShrink: 0 }}>
+            {isFree ? (
+              <span className="admin-fee-badge-free" style={{ fontSize: '0.70rem', padding: '2px 8px' }}>
+                <Sparkles size={11} style={{ color: '#ca8a04' }} />
+                <span>{isKhmer ? 'ឥតគិតថ្លៃ' : 'Free'}</span>
+              </span>
+            ) : (
+              <span className="admin-fee-badge-paid" style={{ fontSize: '0.70rem', padding: '2px 8px' }}>
+                <span>{row.fee}</span>
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Details Block: Duration, Credits, and Description Snippet */}
+        <div className="admin-user-mobile-card-details">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.78rem', color: '#334155' }}>
+              <Clock size={13} style={{ color: '#1e73be', flexShrink: 0 }} />
+              <span style={{ fontWeight: '600' }}>{row.duration || '—'}</span>
+              {row.semester && (
+                <span style={{ color: '#64748b', fontSize: '0.74rem' }}>
+                  ({row.semester} {isKhmer ? 'ឆមាស' : 'sem.'})
+                </span>
+              )}
+            </div>
+
+            {row.credit && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.76rem', color: '#ea580c', fontWeight: '600' }}>
+                <Award size={12} />
+                <span>{row.credit} {isKhmer ? 'ក្រេឌីត' : 'Credits'}</span>
+              </div>
+            )}
+          </div>
+
+          {row.description && (
+            <div
+              style={{
+                fontSize: '0.76rem',
+                color: '#64748b',
+                marginTop: '6px',
+                paddingTop: '6px',
+                borderTop: '1px dashed #e2e8f0',
+                lineHeight: 1.4,
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
+              {row.description}
+            </div>
+          )}
+        </div>
+
+        {/* Action Buttons Bar */}
+        <div className="admin-user-mobile-card-actions">
+          <button
+            onClick={() => openPreviewModal(row)}
+            className="admin-user-mobile-action-btn view"
+            title={isKhmer ? 'មើលព័ត៌មានលម្អិត' : 'View Course'}
+          >
+            <Eye size={13} />
+            <span>{isKhmer ? 'ព័ត៌មាន' : 'View'}</span>
+          </button>
+
+          <button
+            onClick={() => openEditModal(row)}
+            className="admin-user-mobile-action-btn edit"
+            title={isKhmer ? 'កែសម្រួលវគ្គសិក្សា' : 'Edit Course'}
+          >
+            <Edit2 size={13} />
+            <span>{isKhmer ? 'កែសម្រួល' : 'Edit'}</span>
+          </button>
+
+          <button
+            onClick={() => openDeleteModal(row)}
+            className="admin-user-mobile-action-btn delete"
+            title={isKhmer ? 'លុបវគ្គសិក្សា' : 'Delete Course'}
+          >
+            <Trash2 size={13} />
+            <span>{isKhmer ? 'លុប' : 'Delete'}</span>
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={{ maxWidth: '1440px', margin: '0 auto', paddingBottom: '40px' }}>
       {/* Floating Alert Toast */}
@@ -381,6 +519,7 @@ export const AdminCoursesPage = () => {
 
       {/* Header Banner */}
       <div
+        className="admin-courses-header"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -427,7 +566,7 @@ export const AdminCoursesPage = () => {
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="admin-courses-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button
             onClick={fetchData}
             className="admin-btn admin-btn-outline"
@@ -455,79 +594,108 @@ export const AdminCoursesPage = () => {
       </div>
 
       {/* 4-Card Institutional KPI Metric Strip */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap: '16px',
-          marginBottom: '24px',
-        }}
-      >
+      <div className="admin-kpi-grid admin-course-kpis">
         {/* Total Courses */}
         <div className="admin-kpi-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div className="admin-kpi-icon-badge" style={{ background: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}>
-              <BookOpen size={22} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'វគ្គសិក្សាសរុប' : 'Total Programs'}</span>
+              <div className="admin-kpi-value">{metrics.total}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#1e73be' }} />
+                <span>{isKhmer ? 'ជំនាញបណ្តុះបណ្តាលសកម្ម' : 'Active accredited programs'}</span>
+              </div>
             </div>
-            <span className="admin-kpi-tag" style={{ background: '#eff6ff', color: '#1e73be' }}>
-              {isKhmer ? 'សរុប' : 'Total'}
-            </span>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#eff6ff', color: '#1e73be' }}>
+                {isKhmer ? 'សរុប' : 'Total'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#eff6ff', color: '#1e73be', border: '1px solid #dbeafe' }}>
+                <BookOpen size={24} />
+              </div>
+            </div>
           </div>
-          <div className="admin-kpi-value">{metrics.total}</div>
-          <div className="admin-kpi-title">{isKhmer ? 'វគ្គសិក្សាសរុប' : 'Total Programs'}</div>
-          <div className="admin-kpi-subtitle">
-            <span>{isKhmer ? 'ជំនាញបណ្តុះបណ្តាលសកម្ម' : 'Active accredited programs'}</span>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'គ្រប់គ្រងវគ្គសិក្សា' : 'Manage programs'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* Free TVET Scholarships */}
         <div className="admin-kpi-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div className="admin-kpi-icon-badge" style={{ background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}>
-              <Sparkles size={22} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'អាហារូបករណ៍ ១០០%' : '100% Scholarships'}</span>
+              <div className="admin-kpi-value">{metrics.free}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#059669' }} />
+                <span>{isKhmer ? 'កម្មវិធីរដ្ឋាភិបាល TVET 1.5M' : 'National TVET initiative'}</span>
+              </div>
             </div>
-            <span className="admin-kpi-tag" style={{ background: '#f0fdf4', color: '#059669' }}>
-              {isKhmer ? 'ឥតគិតថ្លៃ' : 'Free TVET'}
-            </span>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#f0fdf4', color: '#059669' }}>
+                {isKhmer ? 'ឥតគិតថ្លៃ' : 'Free TVET'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#f0fdf4', color: '#059669', border: '1px solid #bbf7d0' }}>
+                <Sparkles size={24} />
+              </div>
+            </div>
           </div>
-          <div className="admin-kpi-value">{metrics.free}</div>
-          <div className="admin-kpi-title">{isKhmer ? 'អាហារូបករណ៍ ១០០%' : '100% Scholarships'}</div>
-          <div className="admin-kpi-subtitle">
-            <span>{isKhmer ? 'កម្មវិធីរដ្ឋាភិបាល TVET 1.5M' : 'National TVET initiative'}</span>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'វគ្គបណ្តុះបណ្តាលឥតគិតថ្លៃ' : 'Free vocational courses'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* Academic Categories */}
         <div className="admin-kpi-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div className="admin-kpi-icon-badge" style={{ background: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa' }}>
-              <FolderTree size={22} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'ប្រភេទជំនាញសិក្សា' : 'Training Categories'}</span>
+              <div className="admin-kpi-value">{metrics.catCount}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#ea580c' }} />
+                <span>{isKhmer ? 'ដេប៉ាតឺម៉ង់ និងជំនាញចម្បង' : 'Academic disciplines'}</span>
+              </div>
             </div>
-            <span className="admin-kpi-tag" style={{ background: '#fff7ed', color: '#ea580c' }}>
-              {isKhmer ? 'ប្រភេទ' : 'Categories'}
-            </span>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#fff7ed', color: '#ea580c' }}>
+                {isKhmer ? 'ប្រភេទ' : 'Categories'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#fff7ed', color: '#ea580c', border: '1px solid #fed7aa' }}>
+                <FolderTree size={24} />
+              </div>
+            </div>
           </div>
-          <div className="admin-kpi-value">{metrics.catCount}</div>
-          <div className="admin-kpi-title">{isKhmer ? 'ប្រភេទជំនាញសិក្សា' : 'Training Categories'}</div>
-          <div className="admin-kpi-subtitle">
-            <span>{isKhmer ? 'ដេប៉ាតឺម៉ង់ និងជំនាញចម្បង' : 'Academic disciplines'}</span>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'ដេប៉ាតឺម៉ង់បណ្តុះបណ្តាល' : 'Department categories'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
 
         {/* Bachelor Programs */}
         <div className="admin-kpi-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div className="admin-kpi-icon-badge" style={{ background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}>
-              <GraduationCap size={22} />
+          <div className="admin-kpi-main-row">
+            <div className="admin-kpi-left-stack">
+              <span className="admin-kpi-category-label">{isKhmer ? 'កម្មវិធី ៤ ឆ្នាំ' : '4-Year Degree Programs'}</span>
+              <div className="admin-kpi-value">{metrics.bachelors}</div>
+              <div className="admin-kpi-context-pill">
+                <span className="admin-kpi-dot" style={{ backgroundColor: '#7c3aed' }} />
+                <span>{isKhmer ? 'កម្រិតបរិញ្ញាបត្របច្ចេកវិទ្យា' : 'Bachelor of Technology'}</span>
+              </div>
             </div>
-            <span className="admin-kpi-tag" style={{ background: '#faf5ff', color: '#7c3aed' }}>
-              {isKhmer ? 'បរិញ្ញាបត្រ' : 'Degree'}
-            </span>
+            <div className="admin-kpi-right-stack">
+              <span className="admin-kpi-tag" style={{ background: '#faf5ff', color: '#7c3aed' }}>
+                {isKhmer ? 'បរិញ្ញាបត្រ' : 'Degree'}
+              </span>
+              <div className="admin-kpi-icon-badge" style={{ background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}>
+                <GraduationCap size={24} />
+              </div>
+            </div>
           </div>
-          <div className="admin-kpi-value">{metrics.bachelors}</div>
-          <div className="admin-kpi-title">{isKhmer ? 'កម្មវិធី ៤ ឆ្នាំ' : '4-Year Degree Programs'}</div>
-          <div className="admin-kpi-subtitle">
-            <span>{isKhmer ? 'កម្រិតបរិញ្ញាបត្របច្ចេកវិទ្យា' : 'Bachelor of Technology level'}</span>
+          <div className="admin-kpi-footer-action">
+            <span>{isKhmer ? 'កម្រិតសញ្ញាបត្រឧត្តម' : 'Higher degree level'}</span>
+            <ArrowRight size={14} className="admin-kpi-action-arrow" />
           </div>
         </div>
       </div>
@@ -574,6 +742,7 @@ export const AdminCoursesPage = () => {
         addLabel={isKhmer ? 'បង្កើតវគ្គសិក្សាថ្មី' : 'Add New Course'}
         onRefresh={fetchData}
         searchPlaceholder={isKhmer ? 'ស្វែងរកតាមចំណងជើងវគ្គសិក្សា ឬប្រភេទ...' : 'Search courses by title or category...'}
+        renderMobileCard={renderMobileCard}
       />
 
       {/* =========================================================
@@ -802,10 +971,17 @@ export const AdminCoursesPage = () => {
               <img
                 src={previewCourse.imageUrl || '/images/courses/course 2.jpg'}
                 alt={previewCourse.title}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.9 }}
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = '/images/courses/course 2.jpg';
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(to top, rgba(7, 41, 77, 0.92) 0%, rgba(7, 41, 77, 0.4) 60%, rgba(0, 0, 0, 0.3) 100%)',
                 }}
               />
               <button
@@ -825,6 +1001,7 @@ export const AdminCoursesPage = () => {
                   color: '#ffffff',
                   cursor: 'pointer',
                   backdropFilter: 'blur(4px)',
+                  zIndex: 2,
                 }}
               >
                 <X size={18} />
@@ -837,6 +1014,7 @@ export const AdminCoursesPage = () => {
                   left: '20px',
                   right: '20px',
                   color: '#ffffff',
+                  zIndex: 2,
                 }}
               >
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '6px' }}>
@@ -848,6 +1026,7 @@ export const AdminCoursesPage = () => {
                       borderRadius: '9999px',
                       fontSize: '0.75rem',
                       fontWeight: '700',
+                      color: '#ffffff',
                     }}
                   >
                     {previewCourse.category?.name || 'Academic'}
@@ -860,13 +1039,14 @@ export const AdminCoursesPage = () => {
                         borderRadius: '9999px',
                         fontSize: '0.75rem',
                         fontWeight: '700',
+                        color: '#ffffff',
                       }}
                     >
                       {isKhmer ? 'អាហារូបករណ៍ ១០០%' : '100% Scholarship'}
                     </span>
                   )}
                 </div>
-                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '800', textShadow: '0 2px 4px rgba(0,0,0,0.4)' }}>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '800', color: '#ffffff', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
                   {previewCourse.title}
                 </h3>
               </div>

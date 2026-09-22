@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import api from '../../api/client';
 import { AdminDataTable } from '../../components/admin/AdminDataTable';
 import { AdminModal } from '../../components/admin/AdminModal';
@@ -24,7 +24,9 @@ import {
   Layers,
   Award,
   Calendar,
-  Share2
+  Share2,
+  Upload,
+  Image as ImageIcon
 } from 'lucide-react';
 
 export const AdminPromotionalVideosPage = () => {
@@ -52,6 +54,11 @@ export const AdminPromotionalVideosPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
 
+  // Custom thumbnail upload state
+  const fileInputRef = useRef(null);
+  const [uploadingThumb, setUploadingThumb] = useState(false);
+  const [metaStatus, setMetaStatus] = useState(null);
+
   const [formData, setFormData] = useState({
     title: '',
     video_url: '',
@@ -78,9 +85,42 @@ export const AdminPromotionalVideosPage = () => {
 
   const previewId = extractYouTubeId(formData.video_url);
   const isFbVideo = isFacebookUrl(formData.video_url);
-  const previewThumbnail = previewId
+  const previewThumbnail = formData.thumbnail
+    ? formData.thumbnail
+    : previewId
     ? `https://img.youtube.com/vi/${previewId}/hqdefault.jpg`
-    : formData.thumbnail || (isFbVideo ? '/images/videos/fb_reel_1639279004473101.jpg' : null);
+    : null;
+
+  const handleUploadThumbnail = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert(isKhmer ? 'ទំហំរូបភាពមិនអាចលើសពី 5MB បានទេ' : 'Image size cannot exceed 5MB');
+      return;
+    }
+    setUploadingThumb(true);
+    setMetaStatus(null);
+    try {
+      const fd = new FormData();
+      fd.append('thumbnail', file);
+      const res = await api.post('/admin/promotional-videos/upload-thumbnail', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      if (res.data?.thumbnail_url) {
+        setFormData((prev) => ({ ...prev, thumbnail: res.data.thumbnail_url }));
+        setMetaStatus({
+          type: 'success',
+          message: isKhmer ? '✓ បានបង្ហោះរូបភាពតំណាងថ្មីដោយជោគជ័យ' : '✓ Thumbnail uploaded successfully',
+        });
+      }
+    } catch (err) {
+      console.error('Upload thumbnail error:', err);
+      alert(isKhmer ? 'ការបង្ហោះរូបភាពបរាជ័យ' : 'Failed to upload thumbnail');
+    } finally {
+      setUploadingThumb(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -211,6 +251,7 @@ export const AdminPromotionalVideosPage = () => {
 
   const openAddModal = () => {
     setEditingVideo(null);
+    setMetaStatus(null);
     setFormData({
       title: '',
       video_url: '',
@@ -227,6 +268,7 @@ export const AdminPromotionalVideosPage = () => {
 
   const openEditModal = (vid) => {
     setEditingVideo(vid);
+    setMetaStatus(null);
     setFormData({
       title: vid.title || '',
       video_url: vid.video_url || '',
@@ -1473,8 +1515,8 @@ export const AdminPromotionalVideosPage = () => {
         isSubmitting={submitting}
         maxWidth="680px"
       >
-        {/* Section 1: Video Link & Parser */}
-        <div style={{ marginBottom: '20px' }}>
+        {/* Section 1: Video Link & Thumbnail */}
+        <div style={{ marginBottom: '22px' }}>
           <div
             style={{
               display: 'flex',
@@ -1489,79 +1531,252 @@ export const AdminPromotionalVideosPage = () => {
             }}
           >
             <Video size={15} color="#ef4444" />
-            {isKhmer ? 'ផ្នែកទី ១៖ តំណភ្ជាប់វីដេអូ (YouTube / Facebook)' : 'Section 1: Video URL & Platform'}
+            {isKhmer ? 'ផ្នែកទី ១៖ តំណភ្ជាប់វីដេអូ & រូបភាពតំណាង (URL & Thumbnail)' : 'Section 1: Video URL & Thumbnail'}
           </div>
 
-          <div className="admin-form-group">
+          <div className="admin-form-group" style={{ marginBottom: '14px' }}>
             <label className="admin-form-label">
-              {isKhmer ? 'តំណភ្ជាប់វីដេអូ (YouTube ឬ Facebook Video URL) *' : 'Video URL *'}
+              {isKhmer ? 'តំណភ្ជាប់វីដេអូ (YouTube ឬ Facebook Video / Reel URL) *' : 'Video URL *'}
             </label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                type="url"
+                className="admin-form-control"
+                required
+                placeholder="https://www.facebook.com/reel/... ឬ https://www.youtube.com/watch?v=..."
+                value={formData.video_url}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setFormData({ ...formData, video_url: val });
+                }}
+              />
+            </div>
+            <p style={{ margin: '8px 0 0', color: '#64748b', fontSize: '0.78rem' }}>
+              {isKhmer
+                ? 'សូមបញ្ចូលចំណងជើង និងការពិពណ៌នាដោយផ្ទាល់។ សម្រាប់វីដេអូ Facebook សូមបង្ហោះរូបភាពតំណាង។ រូបភាពតំណាង YouTube នឹងបង្ហាញដោយស្វ័យប្រវត្តិ។'
+                : 'Enter the title and description manually. Upload a thumbnail for Facebook videos. YouTube thumbnails appear automatically.'}
+            </p>
+
+            {/* Status / feedback message */}
+            {metaStatus && (
+              <div
+                style={{
+                  marginTop: '8px',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  fontSize: '0.78rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  backgroundColor: metaStatus.type === 'success' ? '#f0fdf4' : '#fef2f2',
+                  border: `1px solid ${metaStatus.type === 'success' ? '#bbf7d0' : '#fecaca'}`,
+                  color: metaStatus.type === 'success' ? '#15803d' : '#b91c1c',
+                }}
+              >
+                {metaStatus.type === 'success' ? (
+                  <CheckCircle2 size={14} color="#15803d" />
+                ) : (
+                  <AlertTriangle size={14} color="#b91c1c" />
+                )}
+                <span>{metaStatus.message}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Thumbnail Preview & Upload Card */}
+          <div
+            style={{
+              backgroundColor: '#f8fafc',
+              border: '1px solid #e2e8f0',
+              borderRadius: '12px',
+              padding: '12px 14px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#07294D', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <ImageIcon size={15} color="#1e73be" />
+                <span>{isKhmer ? 'រូបភាពតំណាងវីដេអូ (Video Thumbnail)' : 'Video Thumbnail'}</span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingThumb}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    color: '#07294D',
+                    cursor: uploadingThumb ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  <Upload size={12} color="#1e73be" />
+                  <span>{uploadingThumb ? (isKhmer ? 'កំពុងបង្ហោះ...' : 'Uploading...') : (isKhmer ? 'បង្ហោះរូបភាពថ្មី' : 'Upload Image')}</span>
+                </button>
+                {formData.thumbnail && (
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, thumbnail: '' })}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #fecaca',
+                      color: '#ef4444',
+                      cursor: 'pointer',
+                    }}
+                    title={isKhmer ? 'សម្អាតរូបភាព' : 'Clear thumbnail'}
+                  >
+                    <X size={12} />
+                    <span>{isKhmer ? 'សម្អាត' : 'Clear'}</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Hidden File Input for Custom Upload */}
             <input
-              type="url"
-              className="admin-form-control"
-              required
-              placeholder="e.g. https://www.youtube.com/watch?v=v7UHTRM4Qmo ឬ https://web.facebook.com/..."
-              value={formData.video_url}
-              onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+              type="file"
+              ref={fileInputRef}
+              onChange={handleUploadThumbnail}
+              accept="image/jpeg,image/png,image/webp,image/jpg"
+              style={{ display: 'none' }}
             />
 
-            {previewId ? (
+            {previewThumbnail ? (
               <div
                 style={{
-                  marginTop: '10px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '12px',
-                  padding: '10px 14px',
-                  backgroundColor: '#f0fdf4',
+                  gap: '14px',
+                  backgroundColor: '#ffffff',
+                  padding: '8px 12px',
                   borderRadius: '10px',
-                  border: '1px solid #bbf7d0',
+                  border: '1px solid #e2e8f0',
                 }}
               >
-                <img
-                  src={previewThumbnail}
-                  alt="Thumbnail"
-                  style={{ width: '80px', height: '48px', objectFit: 'cover', borderRadius: '6px' }}
-                />
-                <div>
-                  <div style={{ fontSize: '0.82rem', color: '#166534', fontWeight: 700 }}>
-                    ✓ {isKhmer ? `បានសម្គាល់ YouTube ID: ${previewId}` : `Detected YouTube ID: ${previewId}`}
+                <div
+                  style={{
+                    width: '120px',
+                    height: '68px',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    backgroundColor: '#07294D',
+                    flexShrink: 0,
+                    position: 'relative',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+                  }}
+                >
+                  <img
+                    src={previewThumbnail}
+                    alt="Thumbnail Preview"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={(e) => {
+                      e.target.src = '/images/gallery/school.jpg';
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '4px',
+                      left: '4px',
+                      padding: '2px 5px',
+                      borderRadius: '4px',
+                      fontSize: '0.65rem',
+                      fontWeight: 700,
+                      backgroundColor: isFbVideo ? '#1877f2' : previewId ? '#dc2626' : '#059669',
+                      color: '#ffffff',
+                    }}
+                  >
+                    {isFbVideo ? 'Facebook' : previewId ? 'YouTube' : 'Custom'}
                   </div>
-                  <div style={{ fontSize: '0.74rem', color: '#15803d', marginTop: '2px' }}>
+                </div>
+
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '0.82rem', color: '#07294D', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <CheckCircle2 size={14} color="#16a34a" />
+                    <span>
+                      {isFbVideo
+                        ? (isKhmer ? 'រូបភាពតំណាងវីដេអូ Facebook ដែលបានបង្ហោះ' : 'Uploaded Facebook Video Thumbnail')
+                        : previewId
+                        ? (isKhmer ? 'រូបភាពតំណាង HD ពី YouTube' : 'HD Thumbnail from YouTube')
+                        : (isKhmer ? 'រូបភាពតំណាងផ្ទាល់ខ្លួន' : 'Custom Uploaded Thumbnail')}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '0.72rem',
+                      color: '#64748b',
+                      marginTop: '3px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      maxWidth: '380px',
+                    }}
+                    title={previewThumbnail}
+                  >
+                    {previewThumbnail}
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '2px' }}>
                     {isKhmer
-                      ? 'រូបតំណាង HD Thumbnail នឹងត្រូវបានទាញយកដោយស្វ័យប្រវត្តិពី YouTube'
-                      : 'HD thumbnail will be automatically retrieved from YouTube'}
+                      ? 'រូបភាពនេះនឹងបង្ហាញនៅលើកាតវីដេអូទំព័រដើម និងផ្ទាំងគ្រប់គ្រង'
+                      : 'This thumbnail will appear on public video cards and admin lists'}
                   </div>
                 </div>
               </div>
-            ) : isFbVideo ? (
+            ) : (
               <div
                 style={{
-                  marginTop: '10px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '10px 14px',
-                  backgroundColor: '#eff6ff',
+                  border: '1.5px dashed #cbd5e1',
                   borderRadius: '10px',
-                  border: '1px solid #dbeafe',
+                  padding: '16px',
+                  textAlign: 'center',
+                  backgroundColor: '#ffffff',
                 }}
               >
-                <img
-                  src={previewThumbnail || '/images/videos/fb_reel_1639279004473101.jpg'}
-                  alt="Facebook Thumbnail"
-                  style={{ width: '80px', height: '48px', objectFit: 'cover', borderRadius: '6px' }}
-                />
-                <div>
-                  <div style={{ fontSize: '0.82rem', color: '#1e73be', fontWeight: 700 }}>
-                    ✓ {isKhmer ? 'បានសម្គាល់ Facebook Video / Reel' : 'Detected Facebook Video / Reel'}
-                  </div>
-                  <div style={{ fontSize: '0.74rem', color: '#1d4ed8', marginTop: '2px' }}>
-                    {isKhmer ? 'ភ្ជាប់ទៅកាន់ Facebook Video ផ្លូវការ' : 'Links directly to official Facebook post'}
-                  </div>
+                <ImageIcon size={28} color="#94a3b8" style={{ margin: '0 auto 6px' }} />
+                <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#475569' }}>
+                  {isKhmer ? 'មិនទាន់មានរូបភាពតំណាង (No Thumbnail)' : 'No Thumbnail Set'}
                 </div>
+                <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '2px', marginBottom: '10px' }}>
+                  {isKhmer
+                    ? 'ចុច "បង្ហោះរូបភាពថ្មី" ដើម្បីជ្រើសរូបភាពពីកុំព្យូទ័រ'
+                    : 'Click "Upload Image" to choose a file'}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '6px 14px',
+                    borderRadius: '8px',
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    backgroundColor: '#eff6ff',
+                    border: '1px solid #bfdbfe',
+                    color: '#1e73be',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Upload size={13} />
+                  <span>{isKhmer ? 'ជ្រើសរើសរូបភាពពីកុំព្យូទ័រ (Upload File)' : 'Choose Image File'}</span>
+                </button>
               </div>
-            ) : null}
+            )}
           </div>
         </div>
 

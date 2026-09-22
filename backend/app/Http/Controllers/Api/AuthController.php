@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,16 +17,33 @@ class AuthController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
+        // Security: Check if public registration is currently enabled in institutional settings
+        $setting = Setting::first();
+        if ($setting && $setting->enableRegistration === false) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ការចុះឈ្មោះត្រូវបានផ្អាកជាបណ្តោះអាសន្ន។ / Public registration is currently closed.',
+            ], 403);
+        }
+
         $validator = Validator::make($request->all(), [
-            'username' => 'required|string|min:3|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'role' => 'nullable|in:student,sub_admin,admin',
-            'studentId' => 'nullable|string',
+            'username' => 'required|string|min:3|max:255|unique:users,username',
+            'email' => [
+                'required',
+                'email',
+                'unique:users,email',
+                'regex:/^[a-zA-Z0-9._%+-]+@rpitssr\.edu\.kh$/i',
+            ],
+            'password' => 'required|string|min:8',
             'fullName' => 'nullable|string',
+            'studentId' => 'nullable|string|max:50',
             'className' => 'nullable|string',
             'semester' => 'nullable|string',
             'academicYear' => 'nullable|string',
+        ], [
+            'email.regex' => 'សូមប្រើប្រាស់គណនីអ៊ីមែលផ្លូវការរបស់វិទ្យាស្ថាន (@rpitssr.edu.kh) / Please use official institutional email (@rpitssr.edu.kh).',
+            'email.unique' => 'អ៊ីមែលនេះមានក្នុងប្រព័ន្ធរួចហើយ។ / This email is already registered.',
+            'username.unique' => 'ឈ្មោះអ្នកប្រើប្រាស់នេះមានក្នុងប្រព័ន្ធរួចហើយ។ / This username is already taken.',
         ]);
 
         if ($validator->fails()) {
@@ -37,9 +55,10 @@ class AuthController extends Controller
 
         $user = User::create([
             'username' => $request->input('username'),
-            'email' => $request->input('email'),
+            'email' => strtolower($request->input('email')),
             'password' => Hash::make($request->input('password')),
-            'role' => $request->input('role', 'student'),
+            'role' => 'student', // Security: Public registration is strictly restricted to students
+            'status' => 'pending', // Security: Requires admin approval before login
             'studentId' => $request->input('studentId'),
             'fullName' => $request->input('fullName'),
             'className' => $request->input('className'),
@@ -47,10 +66,10 @@ class AuthController extends Controller
             'academicYear' => $request->input('academicYear'),
         ]);
 
-        $token = $user->createToken('auth-token')->plainTextToken;
-
         return response()->json([
-            'token' => $token,
+            'success' => true,
+            'status' => 'pending',
+            'message' => 'ការចុះឈ្មោះទទួលបានជោគជ័យ! គណនីរបស់អ្នកកំពុងរង់ចាំការត្រួតពិនិត្យ និងអនុម័តពីគណៈគ្រប់គ្រងសាលា។ / Registration successful! Your account is pending admin approval.',
             'user' => $user,
         ], 201);
     }
@@ -74,10 +93,29 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->input('email'))->first();
 
-        if (!$user || !Hash::check($request->input('password'), $user->password)) {
+        if (! $user || ! Hash::check($request->input('password'), $user->password)) {
             return response()->json([
                 'error' => 'Invalid credentials',
             ], 401);
+        }
+
+        // Security: Check student account status
+        if ($user->status === 'pending') {
+            return response()->json([
+                'success' => false,
+                'status' => 'pending',
+                'error' => 'គណនីរបស់អ្នកកំពុងរង់ចាំការត្រួតពិនិត្យ និងអនុម័តពីគណៈគ្រប់គ្រងសាលា (Pending Admin Approval)។ សូមទាក់ទងការិយាល័យសិក្សា ឬរង់ចាំការជូនដំណឹង។',
+                'message' => 'គណនីរបស់អ្នកកំពុងរង់ចាំការត្រួតពិនិត្យ និងអនុម័តពីគណៈគ្រប់គ្រងសាលា (Pending Admin Approval)។ សូមទាក់ទងការិយាល័យសិក្សា ឬរង់ចាំការជូនដំណឹង។',
+            ], 403);
+        }
+
+        if ($user->status === 'rejected') {
+            return response()->json([
+                'success' => false,
+                'status' => 'rejected',
+                'error' => 'គណនីនេះត្រូវបានបដិសេធ (Account Registration Rejected)។ សូមទាក់ទងការិយាល័យសិក្សាសម្រាប់ព័ត៌មានបន្ថែម។',
+                'message' => 'គណនីនេះត្រូវបានបដិសេធ (Account Registration Rejected)។ សូមទាក់ទងការិយាល័យសិក្សាសម្រាប់ព័ត៌មានបន្ថែម។',
+            ], 403);
         }
 
         $token = $user->createToken('auth-token')->plainTextToken;
@@ -114,7 +152,7 @@ class AuthController extends Controller
     {
         $user = $request->user();
 
-        if (!$user || !$user->isSubAdmin()) {
+        if (! $user || ! $user->isSubAdmin()) {
             return response()->json([
                 'valid' => false,
                 'error' => 'Unauthorized. Admin access required.',
@@ -132,11 +170,24 @@ class AuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $user = $request->user();
+        if ($user && method_exists($user, 'currentAccessToken') && $user->currentAccessToken()) {
+            $user->currentAccessToken()->delete();
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'Logged out successfully',
         ], 200);
+    }
+
+    public function logoutAll(Request $request): JsonResponse
+    {
+        $request->user()->tokens()->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Logged out of all devices successfully',
+        ]);
     }
 }

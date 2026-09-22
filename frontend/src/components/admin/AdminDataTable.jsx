@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plus, RefreshCw } from 'lucide-react';
+import { Search, Plus, RefreshCw, ArrowLeftRight } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
 export const AdminDataTable = ({
@@ -16,6 +16,8 @@ export const AdminDataTable = ({
   keyField = 'id',
   hideSearch = false,
   hideHeader = false,
+  fixedLayout = false,
+  renderMobileCard,
 }) => {
   const { currentLanguage } = useLanguage();
   const isKhmer = currentLanguage === 'km';
@@ -89,8 +91,19 @@ export const AdminDataTable = ({
       </div>
       )}
 
-      <div className="admin-table-container">
-        <table className="admin-table">
+      {fixedLayout && (
+        <div className="admin-table-scroll-hint">
+          <ArrowLeftRight size={13} />
+          <span>
+            {isKhmer
+              ? 'អូសទៅឆ្វេង/ស្តាំ ដើម្បីមើលជួរឈរទាំងអស់'
+              : 'Swipe horizontally to view all columns'}
+          </span>
+        </div>
+      )}
+
+      <div className={`admin-table-container ${fixedLayout ? 'admin-table-container-fixed' : ''} ${renderMobileCard ? 'admin-table-hide-mobile' : ''}`}>
+        <table className={`admin-table ${fixedLayout ? 'admin-table-fixed' : ''}`}>
           <thead>
             <tr>
               {columns.map((col, idx) => (
@@ -132,6 +145,30 @@ export const AdminDataTable = ({
           </tbody>
         </table>
       </div>
+
+      {/* Mobile Card List View (Responsive on screens < 768px) */}
+      {renderMobileCard && (
+        <div className="admin-mobile-cards-container">
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '36px 16px', color: 'var(--admin-text-muted)' }}>
+              <RefreshCw size={20} className="animate-spin" style={{ display: 'inline-block', marginBottom: '8px' }} />
+              <div>{isKhmer ? 'កំពុងផ្ទុកទិន្នន័យ...' : 'Loading data...'}</div>
+            </div>
+          ) : filteredData.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '36px 16px', color: 'var(--admin-text-muted)', fontSize: '0.88rem' }}>
+              {searchTerm
+                ? (isKhmer ? `មិនមានទិន្នន័យត្រូវគ្នានឹង "${searchTerm}" ឡើយ` : `No records matching "${searchTerm}"`)
+                : (isKhmer ? 'មិនមានទិន្នន័យឡើយ' : 'No records found.')}
+            </div>
+          ) : (
+            filteredData.map((row, rowIdx) => (
+              <div key={row[keyField] || rowIdx} className="admin-mobile-card-item">
+                {renderMobileCard(row, rowIdx)}
+              </div>
+            ))
+          )}
+        </div>
+      )}
 
       <div style={{ padding: '12px 24px', borderTop: '1px solid var(--admin-border)', fontSize: '0.82rem', color: 'var(--admin-text-muted)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span>{isKhmer ? `បង្ហាញសរុប ${filteredData.length} ជួរដេក` : `Showing ${filteredData.length} records`}</span>

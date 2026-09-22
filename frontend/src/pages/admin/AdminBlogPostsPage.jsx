@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import DOMPurify from 'dompurify';
 import api from '../../api/client';
 import { AdminModal } from '../../components/admin/AdminModal';
 import { useLanguage } from '../../context/LanguageContext';
@@ -341,7 +342,7 @@ export const AdminBlogPostsPage = () => {
   return (
     <div style={{ paddingBottom: '60px' }}>
       {/* 1. Institutional Header Banner */}
-      <div className="admin-page-header" style={{ marginBottom: '24px' }}>
+      <div className="admin-page-header admin-blog-header" style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div
@@ -375,7 +376,7 @@ export const AdminBlogPostsPage = () => {
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div className="admin-blog-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <button
               onClick={() => fetchData(true)}
               disabled={refreshing}
@@ -410,26 +411,13 @@ export const AdminBlogPostsPage = () => {
       </div>
 
       {/* 2. 4-Card Institutional KPI Metric Strip */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap: '16px',
-          marginBottom: '28px',
-        }}
-      >
+      <div className="admin-kpi-grid admin-blog-kpis" style={{ marginBottom: '28px' }}>
         {/* KPI 1: Total Articles */}
         <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '16px',
-            border: '1px solid #e2e8f0',
-            padding: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px',
-            boxShadow: '0 4px 18px rgba(7, 41, 77, 0.04)',
-          }}
+          className="admin-kpi-card"
+          onClick={() => setActiveTab('all')}
+          style={{ cursor: 'pointer' }}
+          title={isKhmer ? 'ចុចដើម្បីមើលអត្ថបទទាំងអស់' : 'Click to view all articles'}
         >
           <div
             style={{
@@ -462,16 +450,10 @@ export const AdminBlogPostsPage = () => {
 
         {/* KPI 2: Featured Articles */}
         <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '16px',
-            border: '1px solid #e2e8f0',
-            padding: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px',
-            boxShadow: '0 4px 18px rgba(7, 41, 77, 0.04)',
-          }}
+          className="admin-kpi-card"
+          onClick={() => setActiveTab('featured')}
+          style={{ cursor: 'pointer' }}
+          title={isKhmer ? 'ចុចដើម្បីមើលអត្ថបទលេចធ្លោ' : 'Click to view featured articles'}
         >
           <div
             style={{
@@ -503,18 +485,7 @@ export const AdminBlogPostsPage = () => {
         </div>
 
         {/* KPI 3: Total Views */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '16px',
-            border: '1px solid #e2e8f0',
-            padding: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px',
-            boxShadow: '0 4px 18px rgba(7, 41, 77, 0.04)',
-          }}
-        >
+        <div className="admin-kpi-card">
           <div
             style={{
               width: '52px',
@@ -545,18 +516,7 @@ export const AdminBlogPostsPage = () => {
         </div>
 
         {/* KPI 4: Active Categories */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: '16px',
-            border: '1px solid #e2e8f0',
-            padding: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px',
-            boxShadow: '0 4px 18px rgba(7, 41, 77, 0.04)',
-          }}
-        >
+        <div className="admin-kpi-card">
           <div
             style={{
               width: '52px',
@@ -606,6 +566,8 @@ export const AdminBlogPostsPage = () => {
             padding: '0 20px',
             gap: '6px',
             overflowX: 'auto',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
             background: '#fafafa',
           }}
         >
@@ -957,246 +919,511 @@ export const AdminBlogPostsPage = () => {
             </button>
           </div>
         ) : viewMode === 'table' ? (
-          /* Table View */
-          <div style={{ overflowX: 'auto' }}>
-            <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                  <th style={{ padding: '14px 18px', textAlign: 'left', fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>
-                    {isKhmer ? 'ចំណងជើង & សេចក្តីសង្ខេប' : 'Article Title & Excerpt'}
-                  </th>
-                  <th style={{ padding: '14px 16px', textAlign: 'left', fontSize: '0.82rem', fontWeight: 700, color: '#475569', width: '140px' }}>
-                    {isKhmer ? 'ប្រភេទ' : 'Category'}
-                  </th>
-                  <th style={{ padding: '14px 16px', textAlign: 'left', fontSize: '0.82rem', fontWeight: 700, color: '#475569', width: '140px' }}>
-                    {isKhmer ? 'អ្នកនិពន្ធ & ការទស្សនា' : 'Author & Views'}
-                  </th>
-                  <th style={{ padding: '14px 16px', textAlign: 'left', fontSize: '0.82rem', fontWeight: 700, color: '#475569', width: '120px' }}>
-                    {isKhmer ? 'កាលបរិច្ឆេទ' : 'Date'}
-                  </th>
-                  <th style={{ padding: '14px 16px', textAlign: 'center', fontSize: '0.82rem', fontWeight: 700, color: '#475569', width: '110px' }}>
-                    {isKhmer ? 'ស្ថានភាព' : 'Status'}
-                  </th>
-                  <th style={{ padding: '14px 16px', textAlign: 'center', fontSize: '0.82rem', fontWeight: 700, color: '#475569', width: '90px' }}>
-                    {isKhmer ? 'លេចធ្លោ' : 'Featured'}
-                  </th>
-                  <th style={{ padding: '14px 18px', textAlign: 'right', fontSize: '0.82rem', fontWeight: 700, color: '#475569', width: '150px' }}>
-                    {isKhmer ? 'សកម្មភាព' : 'Actions'}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredPosts.map((post) => {
-                  const isPub = post.status === 'published' || post.isPublished !== false;
-                  const isFeatured = Boolean(post.featured);
-                  const isBusy = actionLoadingId === post.id;
-                  const postDate = post.publishedAt || post.createdAt;
-                  const authorName = post.author || post.authorUser?.fullName || post.authorUser?.username || 'RPITSSR Newsroom';
+          <>
+            {/* Desktop Table View (hidden on <= 768px via admin.css) */}
+            <div className="admin-table-wrapper admin-blog-desktop-table" style={{ width: '100%', overflowX: 'auto' }}>
+              <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'auto' }}>
+                <thead>
+                  <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '0.82rem', fontWeight: 700, color: '#475569' }}>
+                      {isKhmer ? 'ចំណងជើង & សេចក្តីសង្ខេប' : 'Article Title & Excerpt'}
+                    </th>
+                    <th style={{ padding: '12px 12px', textAlign: 'left', fontSize: '0.82rem', fontWeight: 700, color: '#475569', width: '130px' }}>
+                      {isKhmer ? 'ប្រភេទ' : 'Category'}
+                    </th>
+                    <th style={{ padding: '12px 12px', textAlign: 'left', fontSize: '0.82rem', fontWeight: 700, color: '#475569', width: '145px' }}>
+                      {isKhmer ? 'អ្នកនិពន្ធ & កាលបរិច្ឆេទ' : 'Author & Date'}
+                    </th>
+                    <th style={{ padding: '12px 10px', textAlign: 'center', fontSize: '0.82rem', fontWeight: 700, color: '#475569', width: '100px' }}>
+                      {isKhmer ? 'ស្ថានភាព' : 'Status'}
+                    </th>
+                    <th style={{ padding: '12px 8px', textAlign: 'center', fontSize: '0.82rem', fontWeight: 700, color: '#475569', width: '60px' }}>
+                      {isKhmer ? 'លេចធ្លោ' : 'Featured'}
+                    </th>
+                    <th style={{ padding: '12px 16px', textAlign: 'right', fontSize: '0.82rem', fontWeight: 700, color: '#475569', width: '135px' }}>
+                      {isKhmer ? 'សកម្មភាព' : 'Actions'}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredPosts.map((post) => {
+                    const isPub = post.status === 'published' || post.isPublished !== false;
+                    const isFeatured = Boolean(post.featured);
+                    const isBusy = actionLoadingId === post.id;
+                    const postDate = post.publishedAt || post.createdAt;
+                    const authorName = post.author || post.authorUser?.fullName || post.authorUser?.username || 'RPITSSR Newsroom';
 
-                  return (
-                    <tr
-                      key={post.id}
-                      style={{
-                        borderBottom: '1px solid #f1f5f9',
-                        transition: 'background 0.15s ease',
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                    >
-                      {/* Title & Thumbnail */}
-                      <td style={{ padding: '14px 18px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                          <div
-                            style={{
-                              position: 'relative',
-                              width: '64px',
-                              height: '48px',
-                              borderRadius: '8px',
-                              overflow: 'hidden',
-                              flexShrink: 0,
-                              border: '1px solid #e2e8f0',
-                              background: '#f8fafc',
-                            }}
-                          >
-                            <img
-                              src={post.imageUrl || '/images/blog/b-1.webp'}
-                              alt=""
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                              onError={(e) => {
-                                e.target.src = '/images/blog/b-1.webp';
+                    return (
+                      <tr
+                        key={post.id}
+                        style={{
+                          borderBottom: '1px solid #f1f5f9',
+                          transition: 'background 0.15s ease',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                      >
+                        {/* Title & Thumbnail */}
+                        <td style={{ padding: '12px 16px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div
+                              style={{
+                                position: 'relative',
+                                width: '54px',
+                                height: '40px',
+                                borderRadius: '8px',
+                                overflow: 'hidden',
+                                flexShrink: 0,
+                                border: '1px solid #e2e8f0',
+                                background: '#f8fafc',
                               }}
-                            />
-                            {isFeatured && (
-                              <span
-                                title={isKhmer ? 'អត្ថបទលេចធ្លោ' : 'Featured Article'}
+                            >
+                              <img
+                                src={post.imageUrl || '/images/blog/b-1.webp'}
+                                alt=""
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                onError={(e) => {
+                                  e.target.src = '/images/blog/b-1.webp';
+                                }}
+                              />
+                              {isFeatured && (
+                                <span
+                                  title={isKhmer ? 'អត្ថបទលេចធ្លោ' : 'Featured Article'}
+                                  style={{
+                                    position: 'absolute',
+                                    top: '2px',
+                                    right: '2px',
+                                    background: '#f59e0b',
+                                    color: '#fff',
+                                    borderRadius: '50%',
+                                    width: '15px',
+                                    height: '15px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                                  }}
+                                >
+                                  <Star size={9} fill="#fff" />
+                                </span>
+                              )}
+                            </div>
+
+                            <div style={{ minWidth: 0, flex: 1 }}>
+                              <div
+                                onClick={() => openPreview(post)}
                                 style={{
-                                  position: 'absolute',
-                                  top: '2px',
-                                  right: '2px',
-                                  background: '#f59e0b',
-                                  color: '#fff',
-                                  borderRadius: '50%',
-                                  width: '16px',
-                                  height: '16px',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                                  fontWeight: 700,
+                                  color: '#07294D',
+                                  fontSize: '0.92rem',
+                                  marginBottom: '3px',
+                                  cursor: 'pointer',
+                                  lineHeight: 1.35,
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 1,
+                                  WebkitBoxOrient: 'vertical',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  wordBreak: 'break-word',
+                                  transition: 'color 0.15s ease',
+                                }}
+                                title={post.title}
+                                onMouseEnter={(e) => (e.currentTarget.style.color = '#1e73be')}
+                                onMouseLeave={(e) => (e.currentTarget.style.color = '#07294D')}
+                              >
+                                {post.title}
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: '0.78rem',
+                                  color: '#64748b',
+                                  lineHeight: 1.35,
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 1,
+                                  WebkitBoxOrient: 'vertical',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
                                 }}
                               >
-                                <Star size={9} fill="#fff" />
-                              </span>
-                            )}
-                          </div>
-
-                          <div style={{ minWidth: 0 }}>
-                            <div
-                              onClick={() => openPreview(post)}
-                              style={{
-                                fontWeight: 700,
-                                color: '#07294D',
-                                fontSize: '0.94rem',
-                                marginBottom: '4px',
-                                cursor: 'pointer',
-                                display: 'inline-block',
-                                maxWidth: '420px',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                              }}
-                              title={post.title}
-                            >
-                              {post.title}
-                            </div>
-                            <div
-                              style={{
-                                fontSize: '0.8rem',
-                                color: '#64748b',
-                                maxWidth: '420px',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                              }}
-                            >
-                              {stripHtml(post.excerpt || post.content || '') || (isKhmer ? 'មិនមានសេចក្តីសង្ខេប' : 'No excerpt available')}
-                            </div>
-                            {post.slug && (
-                              <div style={{ marginTop: '4px' }}>
-                                <span className="admin-blog-slug-pill">
-                                  /{post.slug}
-                                </span>
+                                {stripHtml(post.excerpt || post.content || '') || (isKhmer ? 'មិនមានសេចក្តីសង្ខេប' : 'No excerpt available')}
                               </div>
-                            )}
+                              {post.slug && (
+                                <div style={{ marginTop: '3px' }}>
+                                  <span className="admin-blog-slug-pill" style={{ fontSize: '0.68rem', padding: '1px 5px' }}>
+                                    /{post.slug}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      </td>
+                        </td>
 
-                      {/* Category */}
-                      <td style={{ padding: '14px 16px' }}>
-                        <span
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            padding: '3px 9px',
-                            borderRadius: '6px',
-                            fontSize: '0.76rem',
-                            fontWeight: 600,
-                            background: '#eff6ff',
-                            color: '#1e73be',
-                            border: '1px solid #dbeafe',
-                          }}
-                        >
-                          <FolderTree size={12} />
-                          <span>{post.category?.name || (isKhmer ? 'ព័ត៌មានទូទៅ' : 'General News')}</span>
-                        </span>
-                      </td>
-
-                      {/* Author & Views */}
-                      <td style={{ padding: '14px 16px' }}>
-                        <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#334155' }}>
-                          {authorName}
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '3px' }}>
-                          <span className="admin-blog-views-pill">
-                            <Eye size={11} /> {post.viewCount || 0}
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* Date */}
-                      <td style={{ padding: '14px 16px', fontSize: '0.82rem', color: '#64748b' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <Calendar size={12} style={{ color: '#94a3b8' }} />
-                          <span>{postDate ? new Date(postDate).toLocaleDateString() : 'N/A'}</span>
-                        </div>
-                      </td>
-
-                      {/* Status Toggle */}
-                      <td style={{ padding: '14px 16px', textAlign: 'center' }}>
-                        <button
-                          onClick={() => handleToggleStatus(post)}
-                          disabled={isBusy}
-                          style={{
-                            border: 'none',
-                            cursor: 'pointer',
-                            padding: '4px 10px',
-                            borderRadius: '20px',
-                            fontSize: '0.74rem',
-                            fontWeight: 700,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            background: isPub ? '#f0fdf4' : '#f8fafc',
-                            color: isPub ? '#166534' : '#64748b',
-                            border: isPub ? '1px solid #bbf7d0' : '1px solid #e2e8f0',
-                            transition: 'all 0.2s',
-                          }}
-                          title={isKhmer ? 'ចុចដើម្បីផ្លាស់ប្តូរស្ថានភាព' : 'Click to toggle status'}
-                        >
+                        {/* Category */}
+                        <td style={{ padding: '12px 12px' }}>
                           <span
                             style={{
-                              width: '6px',
-                              height: '6px',
-                              borderRadius: '50%',
-                              background: isPub ? '#16a34a' : '#94a3b8',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              padding: '3px 8px',
+                              borderRadius: '6px',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              background: '#eff6ff',
+                              color: '#1e73be',
+                              border: '1px solid #dbeafe',
+                              maxWidth: '125px',
                             }}
-                          />
-                          <span>{isPub ? (isKhmer ? 'បានផ្សាយ' : 'Published') : (isKhmer ? 'ព្រាងទុក' : 'Draft')}</span>
-                        </button>
-                      </td>
+                            title={post.category?.name || (isKhmer ? 'ព័ត៌មានទូទៅ' : 'General News')}
+                          >
+                            <FolderTree size={11} style={{ flexShrink: 0 }} />
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {post.category?.name || (isKhmer ? 'ព័ត៌មានទូទៅ' : 'General News')}
+                            </span>
+                          </span>
+                        </td>
 
-                      {/* Featured Star Toggle */}
-                      <td style={{ padding: '14px 16px', textAlign: 'center' }}>
-                        <button
-                          onClick={() => handleToggleFeatured(post)}
-                          disabled={isBusy}
+                        {/* Author & Date */}
+                        <td style={{ padding: '12px 12px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '3px' }}>
+                            <span
+                              style={{
+                                fontSize: '0.8rem',
+                                fontWeight: 600,
+                                color: '#334155',
+                                maxWidth: '85px',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                              title={authorName}
+                            >
+                              {authorName}
+                            </span>
+                            <span
+                              className="admin-blog-views-pill"
+                              style={{ fontSize: '0.68rem', padding: '1px 5px', gap: '3px' }}
+                              title={isKhmer ? `${post.viewCount || 0} ការទស្សនា` : `${post.viewCount || 0} views`}
+                            >
+                              <Eye size={10} /> {post.viewCount || 0}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#64748b' }}>
+                            <Calendar size={11} style={{ color: '#94a3b8', flexShrink: 0 }} />
+                            <span style={{ whiteSpace: 'nowrap' }}>
+                              {postDate ? new Date(postDate).toLocaleDateString('en-GB') : 'N/A'}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Status Toggle */}
+                        <td style={{ padding: '12px 10px', textAlign: 'center' }}>
+                          <button
+                            onClick={() => handleToggleStatus(post)}
+                            disabled={isBusy}
+                            style={{
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '3px 8px',
+                              borderRadius: '20px',
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              background: isPub ? '#f0fdf4' : '#f8fafc',
+                              color: isPub ? '#166534' : '#64748b',
+                              border: isPub ? '1px solid #bbf7d0' : '1px solid #e2e8f0',
+                              transition: 'all 0.2s',
+                              whiteSpace: 'nowrap',
+                            }}
+                            title={isKhmer ? 'ចុចដើម្បីផ្លាស់ប្តូរស្ថានភាព' : 'Click to toggle status'}
+                          >
+                            <span
+                              style={{
+                                width: '5px',
+                                height: '5px',
+                                borderRadius: '50%',
+                                background: isPub ? '#16a34a' : '#94a3b8',
+                                flexShrink: 0,
+                              }}
+                            />
+                            <span>{isPub ? (isKhmer ? 'បានផ្សាយ' : 'Published') : (isKhmer ? 'ព្រាងទុក' : 'Draft')}</span>
+                          </button>
+                        </td>
+
+                        {/* Featured Star Toggle */}
+                        <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                          <button
+                            onClick={() => handleToggleFeatured(post)}
+                            disabled={isBusy}
+                            style={{
+                              border: isFeatured ? '1px solid #fef08a' : '1px solid #e2e8f0',
+                              background: isFeatured ? '#fefce8' : '#f8fafc',
+                              cursor: 'pointer',
+                              padding: '5px',
+                              borderRadius: '6px',
+                              color: isFeatured ? '#ca8a04' : '#94a3b8',
+                              transition: 'all 0.15s ease',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                            title={isFeatured ? (isKhmer ? 'ដករំលេច' : 'Unfeature') : (isKhmer ? 'រំលេចអត្ថបទនេះ' : 'Feature this article')}
+                          >
+                            <Star size={14} fill={isFeatured ? '#ca8a04' : 'none'} />
+                          </button>
+                        </td>
+
+                        {/* Action Buttons */}
+                        <td style={{ padding: '12px 16px', textAlign: 'right' }}>
+                          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+                            <button
+                              onClick={() => openPreview(post)}
+                              className="admin-btn admin-btn-outline admin-btn-sm"
+                              title={isKhmer ? 'មើលលម្អិត' : 'Preview Details'}
+                              style={{ width: '28px', height: '28px', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px' }}
+                            >
+                              <Eye size={13} />
+                            </button>
+                            <a
+                              href={`/blog-details/${post.slug || post.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="admin-btn admin-btn-outline admin-btn-sm"
+                              title={isKhmer ? 'មើលលើគេហទំព័រផ្ទាល់' : 'View Public Post'}
+                              style={{ width: '28px', height: '28px', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px', textDecoration: 'none' }}
+                            >
+                              <ExternalLink size={13} />
+                            </a>
+                            <button
+                              onClick={() => openEditModal(post)}
+                              className="admin-btn admin-btn-outline admin-btn-sm"
+                              title={isKhmer ? 'កែសម្រួល' : 'Edit Article'}
+                              style={{ width: '28px', height: '28px', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px' }}
+                            >
+                              <Edit2 size={13} />
+                            </button>
+                            <button
+                              onClick={() => confirmDelete(post)}
+                              className="admin-btn admin-btn-danger admin-btn-sm"
+                              title={isKhmer ? 'លុប' : 'Delete Article'}
+                              style={{ width: '28px', height: '28px', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px' }}
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Cards View (< 768px via admin.css) */}
+            <div className="admin-blog-mobile-cards">
+              {filteredPosts.map((post) => {
+                const isPub = post.status === 'published' || post.isPublished !== false;
+                const isFeatured = Boolean(post.featured);
+                const isBusy = actionLoadingId === post.id;
+                const postDate = post.publishedAt || post.createdAt;
+                const authorName = post.author || post.authorUser?.fullName || post.authorUser?.username || 'RPITSSR Newsroom';
+
+                return (
+                  <div key={post.id} className="admin-blog-card">
+                    {/* Card Cover Image & Badges */}
+                    <div style={{ position: 'relative', height: '140px', overflow: 'hidden', background: '#e2e8f0' }}>
+                      <img
+                        src={post.imageUrl || '/images/blog/b-1.webp'}
+                        alt=""
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={(e) => {
+                          e.target.src = '/images/blog/b-1.webp';
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '8px',
+                          left: '8px',
+                          display: 'flex',
+                          gap: '6px',
+                          flexWrap: 'wrap',
+                        }}
+                      >
+                        <span
                           style={{
-                            border: 'none',
-                            background: isFeatured ? '#fefce8' : '#f8fafc',
-                            cursor: 'pointer',
-                            padding: '6px',
-                            borderRadius: '8px',
-                            color: isFeatured ? '#ca8a04' : '#94a3b8',
-                            border: isFeatured ? '1px solid #fef08a' : '1px solid #e2e8f0',
-                            transition: 'all 0.15s ease',
+                            background: 'rgba(7, 41, 77, 0.88)',
+                            backdropFilter: 'blur(4px)',
+                            color: '#ffffff',
+                            padding: '3px 8px',
+                            borderRadius: '6px',
+                            fontSize: '0.7rem',
+                            fontWeight: 700,
                           }}
-                          title={isFeatured ? (isKhmer ? 'ដករំលេច' : 'Unfeature') : (isKhmer ? 'រំលេចអត្ថបទនេះ' : 'Feature this article')}
                         >
-                          <Star size={15} fill={isFeatured ? '#ca8a04' : 'none'} />
-                        </button>
-                      </td>
+                          {post.category?.name || (isKhmer ? 'ព័ត៌មានទូទៅ' : 'News')}
+                        </span>
+                        {isFeatured && (
+                          <span className="admin-blog-featured-pill" style={{ fontSize: '0.68rem', padding: '2px 6px' }}>
+                            <Star size={10} fill="#b45309" />
+                            <span>{isKhmer ? 'លេចធ្លោ' : 'Featured'}</span>
+                          </span>
+                        )}
+                      </div>
 
-                      {/* Action Buttons */}
-                      <td style={{ padding: '14px 18px', textAlign: 'right' }}>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                      <div
+                        style={{
+                          position: 'absolute',
+                          bottom: '8px',
+                          right: '8px',
+                          background: 'rgba(0, 0, 0, 0.65)',
+                          backdropFilter: 'blur(4px)',
+                          color: '#ffffff',
+                          padding: '2px 7px',
+                          borderRadius: '12px',
+                          fontSize: '0.68rem',
+                          fontWeight: 600,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                        }}
+                      >
+                        <Eye size={11} /> {post.viewCount || 0}
+                      </div>
+                    </div>
+
+                    {/* Card Body */}
+                    <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {/* Meta: Author & Date */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.74rem', color: '#64748b' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', maxWidth: '60%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <User size={12} style={{ color: '#94a3b8', flexShrink: 0 }} />
+                          <span style={{ fontWeight: 600, color: '#334155' }}>{authorName}</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+                          <Calendar size={12} style={{ color: '#94a3b8' }} />
+                          <span>{postDate ? new Date(postDate).toLocaleDateString('en-GB') : 'N/A'}</span>
+                        </div>
+                      </div>
+
+                      {/* Title */}
+                      <h4
+                        onClick={() => openPreview(post)}
+                        style={{
+                          fontSize: '0.94rem',
+                          fontWeight: 700,
+                          color: '#07294D',
+                          margin: 0,
+                          lineHeight: 1.4,
+                          cursor: 'pointer',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                        }}
+                        title={post.title}
+                      >
+                        {post.title}
+                      </h4>
+
+                      {/* Excerpt */}
+                      <p
+                        style={{
+                          fontSize: '0.8rem',
+                          color: '#64748b',
+                          lineHeight: 1.45,
+                          margin: 0,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {stripHtml(post.excerpt || post.content || '') || (isKhmer ? 'មិនមានសេចក្តីសង្ខេប' : 'No excerpt available')}
+                      </p>
+
+                      {/* Slug pill if available */}
+                      {post.slug && (
+                        <div>
+                          <span className="admin-blog-slug-pill" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>
+                            /{post.slug}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Card Footer Controls */}
+                      <div
+                        style={{
+                          paddingTop: '10px',
+                          borderTop: '1px dashed #e2e8f0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '8px',
+                          flexWrap: 'wrap',
+                        }}
+                      >
+                        {/* Status & Featured Quick Toggles */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <button
+                            onClick={() => handleToggleStatus(post)}
+                            disabled={isBusy}
+                            style={{
+                              cursor: 'pointer',
+                              padding: '3px 8px',
+                              borderRadius: '20px',
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              background: isPub ? '#f0fdf4' : '#f8fafc',
+                              color: isPub ? '#166534' : '#64748b',
+                              border: isPub ? '1px solid #bbf7d0' : '1px solid #e2e8f0',
+                            }}
+                          >
+                            <span
+                              style={{
+                                width: '5px',
+                                height: '5px',
+                                borderRadius: '50%',
+                                background: isPub ? '#16a34a' : '#94a3b8',
+                              }}
+                            />
+                            <span>{isPub ? (isKhmer ? 'បានផ្សាយ' : 'Published') : (isKhmer ? 'ព្រាងទុក' : 'Draft')}</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleToggleFeatured(post)}
+                            disabled={isBusy}
+                            style={{
+                              border: isFeatured ? '1px solid #fef08a' : '1px solid #e2e8f0',
+                              background: isFeatured ? '#fefce8' : '#f8fafc',
+                              cursor: 'pointer',
+                              padding: '4px 6px',
+                              borderRadius: '6px',
+                              color: isFeatured ? '#ca8a04' : '#94a3b8',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                            title={isFeatured ? (isKhmer ? 'ដករំលេច' : 'Unfeature') : (isKhmer ? 'រំលេច' : 'Feature')}
+                          >
+                            <Star size={12} fill={isFeatured ? '#ca8a04' : 'none'} />
+                          </button>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                           <button
                             onClick={() => openPreview(post)}
                             className="admin-btn admin-btn-outline admin-btn-sm"
                             title={isKhmer ? 'មើលលម្អិត' : 'Preview Details'}
-                            style={{ padding: '6px 8px' }}
+                            style={{ width: '28px', height: '28px', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px' }}
                           >
-                            <Eye size={14} />
+                            <Eye size={13} />
                           </button>
                           <a
                             href={`/blog-details/${post.slug || post.id}`}
@@ -1204,42 +1431,42 @@ export const AdminBlogPostsPage = () => {
                             rel="noopener noreferrer"
                             className="admin-btn admin-btn-outline admin-btn-sm"
                             title={isKhmer ? 'មើលលើគេហទំព័រផ្ទាល់' : 'View Public Post'}
-                            style={{ padding: '6px 8px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+                            style={{ width: '28px', height: '28px', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px', textDecoration: 'none' }}
                           >
-                            <ExternalLink size={14} />
+                            <ExternalLink size={13} />
                           </a>
                           <button
                             onClick={() => openEditModal(post)}
                             className="admin-btn admin-btn-outline admin-btn-sm"
                             title={isKhmer ? 'កែសម្រួល' : 'Edit Article'}
-                            style={{ padding: '6px 8px' }}
+                            style={{ width: '28px', height: '28px', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px' }}
                           >
-                            <Edit2 size={14} />
+                            <Edit2 size={13} />
                           </button>
                           <button
                             onClick={() => confirmDelete(post)}
                             className="admin-btn admin-btn-danger admin-btn-sm"
                             title={isKhmer ? 'លុប' : 'Delete Article'}
-                            style={{ padding: '6px 8px' }}
+                            style={{ width: '28px', height: '28px', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px' }}
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={13} />
                           </button>
                         </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         ) : (
           /* Visual Card Grid View */
           <div
             style={{
-              padding: '24px',
+              padding: 'clamp(14px, 3vw, 24px)',
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-              gap: '20px',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: '16px',
               background: '#f8fafc',
             }}
           >
@@ -1640,7 +1867,7 @@ export const AdminBlogPostsPage = () => {
                 </div>
               )}
 
-              {/* Article Full Content */}
+              {/* Article Full Content (Sanitized against XSS) */}
               <div
                 className="admin-blog-reader-content"
                 style={{
@@ -1649,7 +1876,7 @@ export const AdminBlogPostsPage = () => {
                   marginBottom: '24px',
                 }}
                 dangerouslySetInnerHTML={{
-                  __html: previewPost.content || previewPost.excerpt || '<p>No content written yet.</p>',
+                  __html: DOMPurify.sanitize(previewPost.content || previewPost.excerpt || '<p>No content written yet.</p>'),
                 }}
               />
 

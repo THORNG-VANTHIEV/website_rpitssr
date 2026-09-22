@@ -407,7 +407,7 @@ export const FaqPage = () => {
       </section>
 
       {/* 3. MAIN FAQ CONTENT AREA */}
-      <section style={{ background: '#f8fafc', padding: '50px 0 90px', borderBottom: '1px solid #e2e8f0' }}>
+      <section className="faq-main-content-area" style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
         <div className="container" style={{ maxWidth: '1080px' }}>
           
           {/* Filter & Live Search Card */}

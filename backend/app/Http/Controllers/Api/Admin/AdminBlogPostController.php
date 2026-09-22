@@ -14,19 +14,19 @@ class AdminBlogPostController extends Controller
     {
         $query = BlogPost::with(['category', 'authorUser:id,username,fullName']);
 
-        if ($request->has('status') && !empty($request->status)) {
+        if ($request->has('status') && ! empty($request->status)) {
             $query->where('status', $request->status);
         }
 
-        if ($request->has('categoryId') && !empty($request->categoryId)) {
+        if ($request->has('categoryId') && ! empty($request->categoryId)) {
             $query->where('categoryId', $request->categoryId);
         }
 
-        if ($request->has('search') && !empty($request->search)) {
+        if ($request->has('search') && ! empty($request->search)) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%");
+                    ->orWhere('content', 'like', "%{$search}%");
             });
         }
 
@@ -53,24 +53,32 @@ class AdminBlogPostController extends Controller
     {
         $post = BlogPost::with(['category', 'authorUser:id,username,fullName', 'comments'])->find($id);
 
-        if (!$post) {
+        if (! $post) {
             return response()->json(['error' => 'Blog post not found'], 404);
         }
 
         return response()->json($post, 200);
     }
 
-    public function toggleStatus($id): JsonResponse
+    public function toggleStatus(Request $request, $id): JsonResponse
     {
+        $currentUser = $request->user();
         $post = BlogPost::find($id);
-        if (!$post) {
+        if (! $post) {
             return response()->json(['error' => 'Blog post not found'], 404);
         }
+
+        // Security: Sub-admins can only toggle status on their own articles
+        if (! $currentUser->isAdmin() && (int) $post->authorId !== (int) $currentUser->id) {
+            return response()->json(['error' => 'Unauthorized. You can only change status on your own articles.'], 403);
+        }
+
         $newStatus = ($post->status === 'published') ? 'draft' : 'published';
         $post->update([
             'status' => $newStatus,
-            'publishedAt' => ($newStatus === 'published' && !$post->publishedAt) ? now() : $post->publishedAt,
+            'publishedAt' => ($newStatus === 'published' && ! $post->publishedAt) ? now() : $post->publishedAt,
         ]);
+
         return response()->json([
             'message' => 'Status updated successfully',
             'post' => $post,
@@ -78,13 +86,21 @@ class AdminBlogPostController extends Controller
         ], 200);
     }
 
-    public function toggleFeatured($id): JsonResponse
+    public function toggleFeatured(Request $request, $id): JsonResponse
     {
+        $currentUser = $request->user();
         $post = BlogPost::find($id);
-        if (!$post) {
+        if (! $post) {
             return response()->json(['error' => 'Blog post not found'], 404);
         }
-        $post->update(['featured' => !$post->featured]);
+
+        // Security: Only super administrators can feature articles on homepage
+        if (! $currentUser->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized. Only super administrators can feature articles.'], 403);
+        }
+
+        $post->update(['featured' => ! $post->featured]);
+
         return response()->json([
             'message' => 'Featured status updated successfully',
             'post' => $post,
@@ -109,7 +125,7 @@ class AdminBlogPostController extends Controller
         ]);
 
         if (empty($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['title']) . '-' . time();
+            $validated['slug'] = Str::slug($validated['title']).'-'.time();
         }
 
         $validated['authorId'] = $request->user()->id;
@@ -122,15 +138,21 @@ class AdminBlogPostController extends Controller
 
     public function update(Request $request, $id): JsonResponse
     {
+        $currentUser = $request->user();
         $post = BlogPost::find($id);
 
-        if (!$post) {
+        if (! $post) {
             return response()->json(['error' => 'Blog post not found'], 404);
+        }
+
+        // Security: Sub-admins can only modify their own articles
+        if (! $currentUser->isAdmin() && (int) $post->authorId !== (int) $currentUser->id) {
+            return response()->json(['error' => 'Unauthorized. You can only edit your own articles.'], 403);
         }
 
         $validated = $request->validate([
             'title' => 'sometimes|required|string|max:255',
-            'slug' => 'nullable|string|unique:blog_posts,slug,' . $id,
+            'slug' => 'nullable|string|unique:blog_posts,slug,'.$id,
             'content' => 'sometimes|required|string',
             'excerpt' => 'nullable|string',
             'imageUrl' => 'nullable|string',
@@ -147,12 +169,18 @@ class AdminBlogPostController extends Controller
         return response()->json($post, 200);
     }
 
-    public function destroy($id): JsonResponse
+    public function destroy(Request $request, $id): JsonResponse
     {
+        $currentUser = $request->user();
         $post = BlogPost::find($id);
 
-        if (!$post) {
+        if (! $post) {
             return response()->json(['error' => 'Blog post not found'], 404);
+        }
+
+        // Security: Sub-admins can only delete their own articles
+        if (! $currentUser->isAdmin() && (int) $post->authorId !== (int) $currentUser->id) {
+            return response()->json(['error' => 'Unauthorized. You can only delete your own articles.'], 403);
         }
 
         $post->delete();

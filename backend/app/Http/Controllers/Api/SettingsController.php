@@ -3,16 +3,25 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\PromotionalVideo;
 use App\Models\Setting;
+use Carbon\Carbon;
+use Illuminate\Http\Client\Response;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 class SettingsController extends Controller
 {
+    private const YouTubeFeedUrl = 'https://www.youtube.com/feeds/videos.xml?channel_id=UC88b1w6PZ02seTQB1zkIDwQ';
+
+    private const YouTubeFeedMaxBytes = 1048576;
+
     public function publicSettings(): JsonResponse
     {
         $setting = Setting::first();
 
-        if (!$setting) {
+        if (! $setting) {
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -56,7 +65,7 @@ class SettingsController extends Controller
      */
     public function youtubeVideos(): JsonResponse
     {
-        $dbVideos = \App\Models\PromotionalVideo::where('is_active', true)
+        $dbVideos = PromotionalVideo::where('is_active', true)
             ->orderBy('is_featured', 'desc')
             ->orderBy('order_index', 'asc')
             ->orderBy('id', 'desc')
@@ -65,8 +74,9 @@ class SettingsController extends Controller
         if ($dbVideos->isNotEmpty()) {
             $mapped = $dbVideos->map(function ($v) {
                 $isFb = str_contains(strtolower($v->video_url ?? ''), 'facebook.com') || str_contains(strtolower($v->video_url ?? ''), 'fb.watch');
+
                 return [
-                    'id' => $v->youtube_id ?: (string)$v->id,
+                    'id' => $v->youtube_id ?: (string) $v->id,
                     'youtubeId' => $v->youtube_id,
                     'youtubeUrl' => $v->video_url,
                     'videoUrl' => $v->video_url,
@@ -77,7 +87,7 @@ class SettingsController extends Controller
                     'isNew' => true,
                     'category' => $v->category ?: 'សកម្មភាពទូទៅ',
                     'thumbnail' => $v->thumbnail ?: ($v->youtube_id ? "https://img.youtube.com/vi/{$v->youtube_id}/maxresdefault.jpg" : '/images/logo.png'),
-                    'isFeatured' => (bool)$v->is_featured,
+                    'isFeatured' => (bool) $v->is_featured,
                 ];
             });
 
@@ -86,30 +96,36 @@ class SettingsController extends Controller
                 'data' => [
                     'channelUrl' => 'https://youtube.com/@rpitssr_edu',
                     'videos' => $mapped,
-                ]
+                ],
             ], 200);
         }
 
-        $channelId = 'UC88b1w6PZ02seTQB1zkIDwQ'; // Official RPITSSR channel: @rpitssr_edu
-        $feedUrl = "https://www.youtube.com/feeds/videos.xml?channel_id={$channelId}";
-
-        $videos = \Illuminate\Support\Facades\Cache::remember('rpitssr_edu_youtube_latest_videos_v2', 1800, function () use ($feedUrl) {
+        $videos = Cache::remember('rpitssr_edu_youtube_latest_videos_v2', 1800, function () {
             try {
-                $response = \Illuminate\Support\Facades\Http::timeout(5)->get($feedUrl);
-                if (!$response->successful()) {
+                $response = Http::accept('application/atom+xml, application/xml, text/xml')
+                    ->withoutRedirecting()
+                    ->connectTimeout(2)
+                    ->timeout(5)
+                    ->get(self::YouTubeFeedUrl);
+                if (! $response->successful() || ! $this->isValidYouTubeFeedResponse($response)) {
                     return $this->fallbackVideos();
                 }
 
                 $xmlStr = $response->body();
-                $dom = new \DOMDocument();
-                @$dom->loadXML($xmlStr);
+                if (strlen($xmlStr) > self::YouTubeFeedMaxBytes) {
+                    return $this->fallbackVideos();
+                }
+
+                $dom = new \DOMDocument;
+                $dom->substituteEntities = false;
+                @$dom->loadXML($xmlStr, LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NOERROR);
                 $entries = $dom->getElementsByTagName('entry');
 
                 if ($entries->length === 0) {
                     return $this->fallbackVideos();
                 }
 
-                $now = \Carbon\Carbon::now();
+                $now = Carbon::now();
                 $list = [];
 
                 for ($i = 0; $i < $entries->length; $i++) {
@@ -119,14 +135,16 @@ class SettingsController extends Controller
                     $publishedStr = $entry->getElementsByTagName('published')->item(0)?->nodeValue;
                     $rawDesc = $entry->getElementsByTagName('description')->item(0)?->nodeValue ?? '';
 
-                    if (!$videoId || !$rawTitle) continue;
+                    if (! $videoId || ! $rawTitle) {
+                        continue;
+                    }
 
-                    $pubDate = $publishedStr ? \Carbon\Carbon::parse($publishedStr) : $now;
-                    $diffDays = (int)abs($now->diffInDays($pubDate, false));
+                    $pubDate = $publishedStr ? Carbon::parse($publishedStr) : $now;
+                    $diffDays = (int) abs($now->diffInDays($pubDate, false));
                     $isUnderMonth = ($diffDays <= 31);
 
                     $title = $this->formatVideoTitle($rawTitle);
-                    $dateKhmer = $this->formatDateKhmer((int)$diffDays, $pubDate);
+                    $dateKhmer = $this->formatDateKhmer((int) $diffDays, $pubDate);
                     $caption = $this->cleanVideoCaption($rawDesc, $title);
                     $category = $this->determineCategory($title, $rawDesc);
 
@@ -138,7 +156,7 @@ class SettingsController extends Controller
                         'description' => $caption,
                         'publishedDate' => $dateKhmer,
                         'rawDate' => $pubDate->toIso8601String(),
-                        'diffDays' => (int)$diffDays,
+                        'diffDays' => (int) $diffDays,
                         'isNew' => $isUnderMonth,
                         'category' => $category,
                         'thumbnail' => "https://img.youtube.com/vi/{$videoId}/maxresdefault.jpg",
@@ -160,8 +178,13 @@ class SettingsController extends Controller
             'data' => [
                 'channelUrl' => 'https://youtube.com/@rpitssr_edu',
                 'videos' => $videos,
-            ]
+            ],
         ], 200);
+    }
+
+    private function isValidYouTubeFeedResponse(Response $response): bool
+    {
+        return str_contains(strtolower((string) $response->header('Content-Type')), 'xml');
     }
 
     private function formatVideoTitle(string $rawTitle): string
@@ -179,6 +202,7 @@ class SettingsController extends Controller
         if (str_contains($clean, 'អាហារូបករណ៍១០០%') || str_contains($clean, 'អាហារូបករណ៍ 100%')) {
             return '📣 សេចក្តីជូនដំណឹង៖ វគ្គសិក្សាអាហារូបករណ៍ ១០០% សម្រាប់ឆ្នាំសិក្សាថ្មី';
         }
+
         return $clean;
     }
 
@@ -197,8 +221,8 @@ class SettingsController extends Controller
             return 'សូមស្វាគមន៍មកកាន់វិទ្យាស្ថានក្នុងឆ្នាំសិក្សាថ្មី! ចាប់ផ្តើមទទួលចុះឈ្មោះចូលសិក្សាថ្នាក់បរិញ្ញាបត្របច្ចេកវិទ្យា និងសញ្ញាបត្រជាន់ខ្ពស់បច្ចេកទេស (បរិញ្ញាបត្ររង) អាហារូបករណ៍ ១០០% — TVET ជំនាញពិត ជីវិតប្រសើរ រៀនឲ្យចេះ ឲ្យចប់ ឲ្យមានការងារ!';
         }
 
-        if (!$desc) {
-            return "ទស្សនាវីដេអូស្តីពី៖ " . $title . " របស់វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប (RPITSSR)។";
+        if (! $desc) {
+            return 'ទស្សនាវីដេអូស្តីពី៖ '.$title.' របស់វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប (RPITSSR)។';
         }
 
         $lines = explode("\n", $desc);
@@ -206,7 +230,9 @@ class SettingsController extends Controller
 
         foreach ($lines as $line) {
             $trimmed = trim($line);
-            if (empty($trimmed)) continue;
+            if (empty($trimmed)) {
+                continue;
+            }
             if (preg_match('/^(☎️|អាសយដ្ឋាន|🌎|Facebook|🎥|📩|Telegram|#)/u', $trimmed)) {
                 break;
             }
@@ -218,21 +244,36 @@ class SettingsController extends Controller
         $caption = trim(preg_replace('/\s+/', ' ', $caption));
 
         if (mb_strlen($caption) < 20) {
-            return "ទស្សនាវីដេអូស្តីពី៖ " . $title . " របស់វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប (RPITSSR)។";
+            return 'ទស្សនាវីដេអូស្តីពី៖ '.$title.' របស់វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប (RPITSSR)។';
         }
 
         return $caption;
     }
 
-    private function formatDateKhmer(int $diffDays, \Carbon\Carbon $pubDate): string
+    private function formatDateKhmer(int $diffDays, Carbon $pubDate): string
     {
-        if ($diffDays <= 1) return 'ទើបបង្ហោះថ្មីៗ';
-        if ($diffDays <= 7) return 'សប្តាហ៍នេះ';
-        if ($diffDays <= 14) return '១ សប្តាហ៍មុន';
-        if ($diffDays <= 21) return '២ សប្តាហ៍មុន';
-        if ($diffDays <= 31) return 'ថ្មីៗនេះ (ក្រោម ១ ខែ)';
-        if ($diffDays <= 60) return '១ ខែមុន';
-        if ($diffDays <= 90) return '២ ខែមុន';
+        if ($diffDays <= 1) {
+            return 'ទើបបង្ហោះថ្មីៗ';
+        }
+        if ($diffDays <= 7) {
+            return 'សប្តាហ៍នេះ';
+        }
+        if ($diffDays <= 14) {
+            return '១ សប្តាហ៍មុន';
+        }
+        if ($diffDays <= 21) {
+            return '២ សប្តាហ៍មុន';
+        }
+        if ($diffDays <= 31) {
+            return 'ថ្មីៗនេះ (ក្រោម ១ ខែ)';
+        }
+        if ($diffDays <= 60) {
+            return '១ ខែមុន';
+        }
+        if ($diffDays <= 90) {
+            return '២ ខែមុន';
+        }
+
         return $pubDate->format('d/m/Y');
     }
 
@@ -265,6 +306,7 @@ class SettingsController extends Controller
         if (str_contains($d, 'អាហារូបករណ៍')) {
             return 'អាហារូបករណ៍ ១០០%';
         }
+
         return 'ផ្សព្វផ្សាយទូទៅ';
     }
 

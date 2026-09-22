@@ -50,7 +50,8 @@ return [
     |
     */
 
-    'expiration' => null,
+    // Security: Tokens expire after 7 days (10080 minutes) by default to prevent indefinite persistence
+    'expiration' => env('SANCTUM_EXPIRATION', 10080),
 
     /*
     |--------------------------------------------------------------------------

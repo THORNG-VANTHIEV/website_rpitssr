@@ -13,41 +13,42 @@ class ExamResultController extends Controller
     {
         $query = ExamResult::where('isPublished', true);
 
-        if ($request->has('courseName') && !empty($request->courseName)) {
-            $query->where('courseName', 'like', '%' . $request->courseName . '%');
+        if ($request->has('courseName') && ! empty($request->courseName)) {
+            $query->where('courseName', 'like', '%'.$request->courseName.'%');
         }
 
-        if ($request->has('semester') && !empty($request->semester)) {
+        if ($request->has('semester') && ! empty($request->semester)) {
             $query->where('semester', $request->semester);
         }
 
-        if ($request->has('generation') && !empty($request->generation)) {
+        if ($request->has('generation') && ! empty($request->generation)) {
             $query->where('generation', $request->generation);
         }
 
-        if ($request->has('year') && !empty($request->year)) {
+        if ($request->has('year') && ! empty($request->year)) {
             $query->where('year', $request->year);
         }
 
-        if ($request->has('studentId') && !empty($request->studentId)) {
-            $query->where('studentId', 'like', '%' . $request->studentId . '%');
+        if ($request->has('studentId') && ! empty($request->studentId)) {
+            $query->where('studentId', 'like', '%'.$request->studentId.'%');
         }
 
-        if ($request->has('search') && !empty($request->search)) {
+        if ($request->has('search') && ! empty($request->search)) {
             $s = trim($request->search);
             $query->where(function ($q) use ($s) {
                 $q->where('courseName', 'like', "%{$s}%")
-                  ->orWhere('studentName', 'like', "%{$s}%")
-                  ->orWhere('studentId', 'like', "%{$s}%")
-                  ->orWhere('subject', 'like', "%{$s}%")
-                  ->orWhere('className', 'like', "%{$s}%")
-                  ->orWhere('examName', 'like', "%{$s}%");
+                    ->orWhere('studentName', 'like', "%{$s}%")
+                    ->orWhere('studentId', 'like', "%{$s}%")
+                    ->orWhere('subject', 'like', "%{$s}%")
+                    ->orWhere('className', 'like', "%{$s}%")
+                    ->orWhere('examName', 'like', "%{$s}%");
             });
         }
 
         $query->orderBy('examDate', 'desc')->orderBy('id', 'desc');
 
-        $limit = (int) $request->input('limit', 50);
+        // Security: Bound page size to max 50 to prevent bulk scraping and memory exhaustion
+        $limit = min(max((int) $request->input('limit', 25), 1), 50);
         $results = $query->paginate($limit);
 
         return response()->json($results->items(), 200);
@@ -57,7 +58,7 @@ class ExamResultController extends Controller
     {
         $result = ExamResult::where('isPublished', true)->find($id);
 
-        if (!$result) {
+        if (! $result) {
             return response()->json([
                 'success' => false,
                 'error' => 'Exam result not found',

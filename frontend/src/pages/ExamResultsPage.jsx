@@ -30,6 +30,24 @@ const toKhmerNumber = (num) => {
   return String(num).replace(/[0-9]/g, (digit) => khmerDigits[parseInt(digit, 10)]);
 };
 
+// Student initials helper
+const getStudentInitials = (name) => {
+  if (!name) return 'ST';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].substring(0, 2);
+  return parts[0].substring(0, 1) + parts[parts.length - 1].substring(0, 1);
+};
+
+// Grade color badge styling helper
+const getGradeStyle = (grade) => {
+  const g = (grade || 'A').toUpperCase();
+  if (g.startsWith('A')) return { bg: '#f0fdf4', text: '#16a34a', border: '#bbf7d0', pill: '#059669' };
+  if (g.startsWith('B')) return { bg: '#eff6ff', text: '#2563eb', border: '#bfdbfe', pill: '#1e73be' };
+  if (g.startsWith('C')) return { bg: '#fffbeb', text: '#d97706', border: '#fde68a', pill: '#d97706' };
+  if (g.startsWith('D')) return { bg: '#fff7ed', text: '#ea580c', border: '#fed7aa', pill: '#ea580c' };
+  return { bg: '#fef2f2', text: '#dc2626', border: '#fecaca', pill: '#dc2626' };
+};
+
 // Format Date nicely
 const formatExamDate = (dateString, isKhmer) => {
   if (!dateString) return isKhmer ? 'កាលបរិច្ឆេទមិនទាន់កំណត់' : 'Date not set';
@@ -280,7 +298,7 @@ export const ExamResultsPage = () => {
               <div className="exam-metric-icon" style={{ background: '#eff6ff', color: '#1e73be' }}>
                 <FileText size={24} />
               </div>
-              <div>
+              <div className="exam-metric-content">
                 <div className="exam-metric-num">
                   {isKhmer ? toKhmerNumber(metrics.totalResults) : metrics.totalResults}
                 </div>
@@ -294,7 +312,7 @@ export const ExamResultsPage = () => {
               <div className="exam-metric-icon" style={{ background: '#fff7ed', color: '#ea580c' }}>
                 <BookOpen size={24} />
               </div>
-              <div>
+              <div className="exam-metric-content">
                 <div className="exam-metric-num">
                   {isKhmer ? toKhmerNumber(metrics.uniqueCourses) : metrics.uniqueCourses}
                 </div>
@@ -308,7 +326,7 @@ export const ExamResultsPage = () => {
               <div className="exam-metric-icon" style={{ background: '#f0fdf4', color: '#059669' }}>
                 <Layers size={24} />
               </div>
-              <div>
+              <div className="exam-metric-content">
                 <div className="exam-metric-num" style={{ fontSize: '1.4rem' }}>
                   {isKhmer ? 'ជំនាន់ ១១ - ១៣' : metrics.activeGen}
                 </div>
@@ -322,7 +340,7 @@ export const ExamResultsPage = () => {
               <div className="exam-metric-icon" style={{ background: '#fefce8', color: '#ca8a04' }}>
                 <Award size={24} />
               </div>
-              <div>
+              <div className="exam-metric-content">
                 <div className="exam-metric-num">
                   {isKhmer ? '៩៨.៥%' : metrics.passRate}
                 </div>
@@ -535,11 +553,13 @@ export const ExamResultsPage = () => {
               {paginatedResults.map((result, idx) => {
                 const filePdf = getFileUrl(result.resultPdfUrl);
                 const fileImg = getFileUrl(result.resultImageUrl);
+                const initials = getStudentInitials(result.studentName);
+                const gradeStyle = getGradeStyle(result.grade);
 
                 return (
                   <div key={result.id || idx} className="col-lg-6 col-md-12">
                     <div className="inst-exam-card">
-                      {/* Card Header */}
+                      {/* Card Header & Status */}
                       <div className="exam-card-header">
                         <span className="exam-course-badge">
                           <BookOpen size={13} />
@@ -551,71 +571,91 @@ export const ExamResultsPage = () => {
                         </span>
                       </div>
 
-                      {/* Exam Title */}
-                      <h3 className="exam-card-title">
-                        {result.examName}
-                      </h3>
+                      {/* Exam Title & Date */}
+                      <div className="exam-card-title-row">
+                        <h3 className="exam-card-title">
+                          {result.examName}
+                        </h3>
+                        <div className="exam-card-date">
+                          <Calendar size={13} />
+                          <span>{formatExamDate(result.examDate, isKhmer)}</span>
+                        </div>
+                      </div>
 
-                      {/* Student Info Box */}
+                      {/* Student Identification & 4-Metric Strip (USEA Screen 18 Style) */}
                       <div className="exam-card-student-box">
-                        <div className="exam-student-row">
-                          <div className="d-flex align-items-center gap-2">
-                            <User size={16} color="#1e73be" />
-                            <span className="exam-student-name">
-                              {result.studentName || (isKhmer ? 'និស្សិតទូទៅ' : 'General Student')}
-                            </span>
+                        <div className="exam-student-profile-strip">
+                          <div className="exam-student-avatar" title={result.studentName}>
+                            {initials}
                           </div>
-                          {result.studentId && (
-                            <span className="exam-student-id-badge">
-                              {result.studentId}
-                            </span>
-                          )}
+                          <div className="exam-student-meta">
+                            <div className="exam-student-name">
+                              {result.studentName || (isKhmer ? 'និស្សិតទូទៅ' : 'General Student')}
+                            </div>
+                            <div className="exam-student-id-row">
+                              <span className="exam-student-id-badge">
+                                <User size={11} />
+                                <span>{result.studentId || 'N/A'}</span>
+                              </span>
+                            </div>
+                          </div>
                         </div>
 
-                        <div className="exam-meta-grid">
-                          <div className="exam-meta-item">
-                            <small>{isKhmer ? 'ថ្នាក់ / បន្ទប់' : 'Class / Section'}</small>
-                            <span>{result.className || 'N/A'}</span>
+                        {/* USEA-style 4-Metric Strip */}
+                        <div className="exam-metrics-strip">
+                          <div className="exam-metric-col">
+                            <span className="metric-label">{isKhmer ? 'ថ្នាក់' : 'Class'}</span>
+                            <span className="metric-val">{result.className || 'N/A'}</span>
                           </div>
-                          <div className="exam-meta-item">
-                            <small>{isKhmer ? 'ឆមាស & ឆ្នាំ' : 'Semester & Year'}</small>
-                            <span>
-                              {result.semester || ''} {result.year ? `• ${result.year}` : ''}
-                            </span>
+                          <div className="exam-metric-divider" />
+                          <div className="exam-metric-col">
+                            <span className="metric-label">{isKhmer ? 'ឆមាស' : 'Sem'}</span>
+                            <span className="metric-val">{result.semester || 'N/A'}</span>
                           </div>
-                          <div className="exam-meta-item">
-                            <small>{isKhmer ? 'ជំនាន់' : 'Generation'}</small>
-                            <span>{result.generation || 'N/A'}</span>
+                          <div className="exam-metric-divider" />
+                          <div className="exam-metric-col">
+                            <span className="metric-label">{isKhmer ? 'ឆ្នាំ' : 'Year'}</span>
+                            <span className="metric-val">{result.year || 'N/A'}</span>
                           </div>
-                          <div className="exam-meta-item">
-                            <small>{isKhmer ? 'កាលបរិច្ឆេទប្រឡង' : 'Exam Date'}</small>
-                            <span>{formatExamDate(result.examDate, isKhmer)}</span>
+                          <div className="exam-metric-divider" />
+                          <div className="exam-metric-col">
+                            <span className="metric-label">{isKhmer ? 'ជំនាន់' : 'Gen'}</span>
+                            <span className="metric-val">{result.generation || 'N/A'}</span>
                           </div>
                         </div>
                       </div>
 
-                      {/* Grade & Score Banner */}
-                      <div className="exam-score-banner">
-                        <div className="d-flex align-items-center gap-2">
-                          <div className="exam-grade-pill">
+                      {/* Academic Score & Performance Bar (USEA Screen 15 Style) */}
+                      <div
+                        className="exam-score-banner"
+                        style={{
+                          background: gradeStyle.bg,
+                          borderColor: gradeStyle.border
+                        }}
+                      >
+                        <div className="d-flex align-items-center gap-3">
+                          <div
+                            className="exam-grade-pill"
+                            style={{ background: gradeStyle.pill }}
+                          >
                             {result.grade || 'A'}
                           </div>
-                          <div>
-                            <div style={{ fontSize: '0.78rem', color: '#065f46', fontWeight: 700 }}>
-                              {isKhmer ? 'ចំណាត់ថ្នាក់និទ្ទេស' : 'Official Grade'}
+                          <div className="exam-score-details">
+                            <div className="exam-score-subject">
+                              {result.subject || (isKhmer ? 'មុខវិជ្ជាបច្ចេកទេសស្នូល' : 'Technical Module')}
                             </div>
-                            <div style={{ fontSize: '0.74rem', color: '#047857' }}>
-                              {result.subject || (isKhmer ? 'មុខវិជ្ជាស្នូល' : 'Core Subject')}
+                            <div className="exam-score-status" style={{ color: gradeStyle.text }}>
+                              {isKhmer ? 'និទ្ទេសផ្លូវការ' : 'Official Grade'} • {isKhmer ? 'ជាប់ជាស្ថាពរ' : 'Passed'}
                             </div>
                           </div>
                         </div>
 
                         <div className="exam-marks-info">
-                          <div className="exam-marks-num">
-                            {result.obtainedMarks || 100} / {result.totalMarks || 100}
+                          <div className="exam-marks-num" style={{ color: gradeStyle.text }}>
+                            {result.obtainedMarks || 100} <span className="exam-marks-denom">/ {result.totalMarks || 100}</span>
                           </div>
                           <div className="exam-marks-percent">
-                            {result.percentage || 100}% {isKhmer ? 'ពិន្ទុមធ្យម' : 'Score'}
+                            {result.percentage || 100}% {isKhmer ? 'ពិន្ទុសរុប' : 'Score'}
                           </div>
                         </div>
                       </div>
@@ -625,11 +665,11 @@ export const ExamResultsPage = () => {
                         {fileImg && (
                           <button
                             type="button"
-                            className="exam-btn-view-img"
+                            className="exam-btn-action exam-btn-view-img"
                             onClick={() => setSelectedPreviewImage(fileImg)}
                           >
                             <Eye size={14} />
-                            <span>{isKhmer ? 'មើលរូបភាពលទ្ធផល' : 'View Image'}</span>
+                            <span>{isKhmer ? 'រូបភាព' : 'Image'}</span>
                           </button>
                         )}
 
@@ -638,7 +678,7 @@ export const ExamResultsPage = () => {
                             href={filePdf}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="exam-btn-view-pdf"
+                            className="exam-btn-action exam-btn-view-pdf"
                           >
                             <Download size={14} />
                             <span>{isKhmer ? 'ទាញយក PDF' : 'Download PDF'}</span>
@@ -647,10 +687,10 @@ export const ExamResultsPage = () => {
 
                         <button
                           type="button"
-                          className="btn btn-outline-secondary rounded-pill d-inline-flex align-items-center justify-content-center gap-1"
-                          style={{ fontSize: '0.82rem', height: '36px', padding: '0 14px', fontWeight: 600 }}
+                          className="exam-btn-action exam-btn-transcript"
                           onClick={() => setSelectedTranscript(result)}
                         >
+                          <GraduationCap size={15} />
                           <span>{isKhmer ? 'តារាងពិន្ទុ' : 'Transcript'}</span>
                         </button>
                       </div>
@@ -780,11 +820,10 @@ export const ExamResultsPage = () => {
           onClick={() => setSelectedTranscript(null)}
         >
           <div
-            className="exam-modal-card"
+            className="exam-modal-card exam-transcript-modal-card"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
-            style={{ maxWidth: '720px' }}
           >
             <div className="exam-modal-header">
               <button
@@ -794,138 +833,191 @@ export const ExamResultsPage = () => {
               >
                 <X size={16} />
               </button>
-              <div className="d-flex align-items-center gap-2">
-                <GraduationCap size={20} color="#1e73be" />
-                <h5 style={{ margin: 0, color: '#07294D', fontWeight: 800 }}>
-                  {isKhmer ? 'តារាងពិន្ទុ និងលទ្ធផលប្រឡងផ្លូវការ' : 'Official Student Grade Transcript'}
-                </h5>
+              <div className="d-flex align-items-center gap-3">
+                <div className="exam-modal-icon-badge">
+                  <GraduationCap size={22} color="#1e73be" />
+                </div>
+                <div>
+                  <h5 style={{ margin: 0, color: '#07294D', fontWeight: 800, fontSize: '1.15rem' }}>
+                    {isKhmer ? 'តារាងពិន្ទុ និងកំណត់ត្រាប្រឡងផ្លូវការ' : 'Official Student Grade Transcript'}
+                  </h5>
+                  <small style={{ color: '#64748b', fontSize: '0.82rem' }}>
+                    {isKhmer
+                      ? 'វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប (RPITSSR)'
+                      : 'Regional Polytechnic Institute Techo Sen Siem Reap'}
+                  </small>
+                </div>
               </div>
             </div>
 
             <div className="exam-modal-body">
-              {/* Institution Seal & Header */}
-              <div className="text-center pb-3 mb-4" style={{ borderBottom: '2px solid #07294D' }}>
-                <h6 style={{ color: '#07294D', fontWeight: 800, margin: '0 0 4px 0', fontSize: '1rem' }}>
+              {/* Official Academic Header Banner */}
+              <div className="transcript-official-header">
+                <h6 className="national-motto">
                   {isKhmer
                     ? 'ព្រះរាជាណាចក្រកម្ពុជា • ជាតិ សាសនា ព្រះមហាក្សត្រ'
                     : 'KINGDOM OF CAMBODIA • NATION RELIGION KING'}
                 </h6>
-                <div style={{ color: '#1e73be', fontWeight: 700, fontSize: '0.88rem' }}>
+                <div className="institute-name">
                   {isKhmer
                     ? 'វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប'
                     : 'REGIONAL POLYTECHNIC INSTITUTE TECHO SEN SIEM REAP'}
                 </div>
-                <small style={{ color: '#64748b' }}>
-                  {isKhmer ? 'ការិយាល័យកិច្ចការសិក្សា និងស្រាវជ្រាវ' : 'Office of Academic Affairs & Research'}
-                </small>
+                <div className="office-title">
+                  {isKhmer
+                    ? 'ការិយាល័យកិច្ចការសិក្សា និងស្រាវជ្រាវ (Office of Academic Affairs)'
+                    : 'Office of Academic Affairs & Research'}
+                </div>
               </div>
 
-              {/* Student Identification Table */}
-              <div className="table-responsive mb-4">
-                <table className="table table-bordered mb-0" style={{ fontSize: '0.9rem' }}>
-                  <tbody>
-                    <tr>
-                      <td style={{ width: '35%', background: '#f8fafc', fontWeight: 700, color: '#334155' }}>
-                        {isKhmer ? 'ឈ្មោះនិស្សិត (Name)' : 'Student Name'}
-                      </td>
-                      <td style={{ fontWeight: 800, color: '#07294D' }}>
-                        {selectedTranscript.studentName || 'Sok Visal'}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ background: '#f8fafc', fontWeight: 700, color: '#334155' }}>
-                        {isKhmer ? 'អត្តលេខនិស្សិត (ID)' : 'Student ID'}
-                      </td>
-                      <td style={{ fontWeight: 700, color: '#1e73be', fontFamily: 'monospace' }}>
-                        {selectedTranscript.studentId || 'N/A'}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ background: '#f8fafc', fontWeight: 700, color: '#334155' }}>
-                        {isKhmer ? 'ជំនាញ / វគ្គសិក្សា' : 'Major / Course'}
-                      </td>
-                      <td style={{ fontWeight: 600 }}>
-                        {selectedTranscript.courseName}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ background: '#f8fafc', fontWeight: 700, color: '#334155' }}>
-                        {isKhmer ? 'ថ្នាក់ & ជំនាន់' : 'Class & Generation'}
-                      </td>
-                      <td>
-                        {selectedTranscript.className} • {selectedTranscript.generation}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ background: '#f8fafc', fontWeight: 700, color: '#334155' }}>
-                        {isKhmer ? 'ការប្រឡង' : 'Examination'}
-                      </td>
-                      <td style={{ fontWeight: 600, color: '#07294D' }}>
-                        {selectedTranscript.examName}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ background: '#f8fafc', fontWeight: 700, color: '#334155' }}>
-                        {isKhmer ? 'មុខវិជ្ជា' : 'Subject'}
-                      </td>
-                      <td>
-                        {selectedTranscript.subject || 'Core Technical Module'}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              {/* Student Identity Showcase (USEA Screen 18 Architecture) */}
+              <div className="transcript-student-card">
+                <div className="transcript-student-header">
+                  <div className="transcript-avatar">
+                    {getStudentInitials(selectedTranscript.studentName)}
+                  </div>
+                  <div className="transcript-student-id-block">
+                    <h4 className="transcript-student-name">
+                      {selectedTranscript.studentName || (isKhmer ? 'និស្សិតទូទៅ' : 'General Student')}
+                    </h4>
+                    <div className="d-flex align-items-center gap-2 flex-wrap mt-1">
+                      <span className="transcript-id-pill">
+                        <User size={12} />
+                        <span>{selectedTranscript.studentId || 'N/A'}</span>
+                      </span>
+                      <span className="transcript-verified-badge">
+                        <ShieldCheck size={12} />
+                        <span>{isKhmer ? 'បានផ្ទៀងផ្ទាត់ផ្លូវការ' : 'Officially Verified'}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
-              {/* Score Highlight Box */}
-              <div className="p-3 rounded-3 mb-4" style={{ background: '#f0fdf4', border: '1.5px solid #86efac' }}>
-                <div className="d-flex justify-content-around text-center">
-                  <div>
-                    <small style={{ color: '#065f46', fontWeight: 700, display: 'block' }}>
-                      {isKhmer ? 'ពិន្ទុទទួលបាន' : 'Marks Obtained'}
-                    </small>
-                    <span style={{ fontSize: '1.4rem', fontWeight: 900, color: '#065f46' }}>
-                      {selectedTranscript.obtainedMarks || 100} / {selectedTranscript.totalMarks || 100}
-                    </span>
+                {/* 4-Metric Strip (USEA Screen 18 Style) */}
+                <div className="transcript-metrics-strip">
+                  <div className="t-metric-item">
+                    <span className="t-metric-label">{isKhmer ? 'ថ្នាក់សិក្សា' : 'Class'}</span>
+                    <span className="t-metric-value">{selectedTranscript.className || 'N/A'}</span>
                   </div>
-                  <div>
-                    <small style={{ color: '#065f46', fontWeight: 700, display: 'block' }}>
-                      {isKhmer ? 'ភាគរយ' : 'Percentage'}
-                    </small>
-                    <span style={{ fontSize: '1.4rem', fontWeight: 900, color: '#065f46' }}>
-                      {selectedTranscript.percentage || 100}%
-                    </span>
+                  <div className="t-metric-divider" />
+                  <div className="t-metric-item">
+                    <span className="t-metric-label">{isKhmer ? 'ឆមាស' : 'Semester'}</span>
+                    <span className="t-metric-value">{selectedTranscript.semester || 'N/A'}</span>
                   </div>
-                  <div>
-                    <small style={{ color: '#065f46', fontWeight: 700, display: 'block' }}>
-                      {isKhmer ? 'និទ្ទេសផ្លូវការ' : 'Letter Grade'}
-                    </small>
-                    <span style={{ fontSize: '1.4rem', fontWeight: 900, color: '#059669' }}>
-                      {selectedTranscript.grade || 'A'}
-                    </span>
+                  <div className="t-metric-divider" />
+                  <div className="t-metric-item">
+                    <span className="t-metric-label">{isKhmer ? 'ឆ្នាំសិក្សា' : 'Year'}</span>
+                    <span className="t-metric-value">{selectedTranscript.year || 'N/A'}</span>
+                  </div>
+                  <div className="t-metric-divider" />
+                  <div className="t-metric-item">
+                    <span className="t-metric-label">{isKhmer ? 'ជំនាន់' : 'Generation'}</span>
+                    <span className="t-metric-value">{selectedTranscript.generation || 'N/A'}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Modal Bottom Actions */}
-              <div className="d-flex justify-content-between align-items-center pt-3" style={{ borderTop: '1px solid #e2e8f0' }}>
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary rounded-pill px-3 d-inline-flex align-items-center gap-2"
-                  onClick={() => window.print()}
-                >
-                  <Printer size={15} />
-                  <span>{isKhmer ? 'បោះពុម្ពតារាងពិន្ទុ' : 'Print Transcript'}</span>
-                </button>
-
-                <button
-                  type="button"
-                  className="btn btn-primary rounded-pill px-4"
-                  style={{ background: '#07294D', borderColor: '#07294D' }}
-                  onClick={() => setSelectedTranscript(null)}
-                >
-                  {isKhmer ? 'បិទផ្ទាំង' : 'Close'}
-                </button>
+              {/* Course & Examination Details Card */}
+              <div className="transcript-details-card">
+                <div className="transcript-info-grid">
+                  <div className="t-info-row">
+                    <span className="t-info-label">
+                      <BookOpen size={14} color="#1e73be" /> {isKhmer ? 'ជំនាញ / មហាវិទ្យាល័យ' : 'Major / Program'}
+                    </span>
+                    <span className="t-info-val highlight">{selectedTranscript.courseName}</span>
+                  </div>
+                  <div className="t-info-row">
+                    <span className="t-info-label">
+                      <FileText size={14} color="#1e73be" /> {isKhmer ? 'ការប្រឡង' : 'Examination'}
+                    </span>
+                    <span className="t-info-val">{selectedTranscript.examName}</span>
+                  </div>
+                  <div className="t-info-row">
+                    <span className="t-info-label">
+                      <Layers size={14} color="#1e73be" /> {isKhmer ? 'មុខវិជ្ជាប្រឡង' : 'Subject Module'}
+                    </span>
+                    <span className="t-info-val">{selectedTranscript.subject || (isKhmer ? 'មុខវិជ្ជាបច្ចេកទេសស្នូល' : 'Core Module')}</span>
+                  </div>
+                  <div className="t-info-row">
+                    <span className="t-info-label">
+                      <Calendar size={14} color="#1e73be" /> {isKhmer ? 'កាលបរិច្ឆេទប្រឡង' : 'Exam Date'}
+                    </span>
+                    <span className="t-info-val">{formatExamDate(selectedTranscript.examDate, isKhmer)}</span>
+                  </div>
+                </div>
               </div>
+
+              {/* Academic Performance Showcase (USEA Screen 15 Architecture) */}
+              <div className="transcript-performance-showcase">
+                <div className="t-perf-card">
+                  <span className="t-perf-label">{isKhmer ? 'ពិន្ទុទទួលបាន' : 'Marks Obtained'}</span>
+                  <div className="t-perf-value">
+                    {selectedTranscript.obtainedMarks || 100}
+                    <span className="t-perf-denom"> / {selectedTranscript.totalMarks || 100}</span>
+                  </div>
+                </div>
+
+                <div className="t-perf-card">
+                  <span className="t-perf-label">{isKhmer ? 'ភាគរយសរុប' : 'Percentage'}</span>
+                  <div className="t-perf-value text-primary-dark">
+                    {selectedTranscript.percentage || 100}%
+                  </div>
+                </div>
+
+                <div
+                  className="t-perf-card grade-card"
+                  style={{
+                    borderColor: getGradeStyle(selectedTranscript.grade).border,
+                    background: getGradeStyle(selectedTranscript.grade).bg
+                  }}
+                >
+                  <span className="t-perf-label" style={{ color: getGradeStyle(selectedTranscript.grade).text }}>
+                    {isKhmer ? 'និទ្ទេសផ្លូវការ' : 'Letter Grade'}
+                  </span>
+                  <div className="t-perf-grade" style={{ color: getGradeStyle(selectedTranscript.grade).pill }}>
+                    {selectedTranscript.grade || 'A'}
+                  </div>
+                </div>
+
+                <div className="t-perf-card status-card">
+                  <span className="t-perf-label">{isKhmer ? 'លទ្ធផលសិក្សា' : 'Academic Standing'}</span>
+                  <div className="t-perf-status">
+                    <CheckCircle2 size={16} color="#059669" />
+                    <span>{isKhmer ? 'ជាប់ជាស្ថាពរ' : 'PASSED'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Security & Verification Note */}
+              <div className="transcript-security-note mb-0">
+                <ShieldCheck size={16} color="#1e73be" />
+                <span>
+                  {isKhmer
+                    ? 'តារាងពិន្ទុផ្លូវការចេញផ្សាយដោយប្រព័ន្ធ TVET MIS នៃវិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប។ ឯកសារនេះមានសុពលភាពផ្លូវការ។'
+                    : 'Official transcript issued by TVET MIS of Regional Polytechnic Institute Techo Sen Siem Reap. This record is authentic.'}
+                </span>
+              </div>
+            </div>
+
+            {/* Modal Bottom Actions Footer */}
+            <div className="transcript-actions-bar">
+              <button
+                type="button"
+                className="btn btn-outline-secondary rounded-pill px-3 d-inline-flex align-items-center gap-2 transcript-print-btn"
+                onClick={() => window.print()}
+              >
+                <Printer size={15} />
+                <span>{isKhmer ? 'បោះពុម្ពតារាងពិន្ទុ' : 'Print Transcript'}</span>
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-primary rounded-pill px-4"
+                style={{ background: '#07294D', borderColor: '#07294D' }}
+                onClick={() => setSelectedTranscript(null)}
+              >
+                {isKhmer ? 'បិទផ្ទាំង' : 'Close'}
+              </button>
             </div>
           </div>
         </div>

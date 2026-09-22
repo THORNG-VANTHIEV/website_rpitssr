@@ -14,6 +14,7 @@ class User extends Authenticatable
     protected $table = 'users';
 
     const CREATED_AT = 'createdAt';
+
     const UPDATED_AT = 'updatedAt';
 
     protected $fillable = [
@@ -21,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'status',
         'studentId',
         'fullName',
         'className',
@@ -30,7 +32,21 @@ class User extends Authenticatable
 
     protected $hidden = [
         'password',
+        'remember_token',
     ];
+
+    protected static function booted(): void
+    {
+        static::updated(function (User $user): void {
+            if ($user->wasChanged(['password', 'role', 'status'])) {
+                $user->tokens()->delete();
+            }
+        });
+
+        static::deleting(function (User $user): void {
+            $user->tokens()->delete();
+        });
+    }
 
     protected function casts(): array
     {
@@ -42,6 +58,21 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->status === 'rejected';
     }
 
     public function isSubAdmin(): bool

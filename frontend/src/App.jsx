@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { Navbar } from './components/layout/Navbar';
@@ -7,6 +7,7 @@ import { BannerTicker } from './components/layout/BannerTicker';
 import { Footer } from './components/layout/Footer';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { ScrollToTop } from './components/common/ScrollToTop';
+import { WebsiteGuideModal } from './components/common/WebsiteGuideModal';
 
 // Public Pages
 import { HomePage } from './pages/HomePage';
@@ -26,10 +27,12 @@ import { OrganizationPage } from './pages/OrganizationPage';
 import { DownloadPage } from './pages/DownloadPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { AdmissionApplyPage } from './pages/AdmissionApplyPage';
 
 // Admin Shell & Pages
 import { AdminLayout } from './components/admin/AdminLayout';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
+import { AdminAdmissionsPage } from './pages/admin/AdminAdmissionsPage';
 import { AdminCoursesPage } from './pages/admin/AdminCoursesPage';
 import { AdminCourseCategoriesPage } from './pages/admin/AdminCourseCategoriesPage';
 import { AdminTeachersPage } from './pages/admin/AdminTeachersPage';
@@ -61,14 +64,17 @@ import { StudentDashboardPage } from './pages/student/StudentDashboardPage';
 
 // Layout wrapper for Public Pages (with Public Navbar, Ticker & Footer)
 const PublicLayout = () => {
+  const location = useLocation();
+
   return (
     <div className="super_container" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
       <BannerTicker />
-      <main style={{ flex: 1 }}>
+      <main key={location.pathname} className="rpitssr-page-transition" style={{ flex: 1 }}>
         <Outlet />
       </main>
       <Footer />
+      <WebsiteGuideModal />
     </div>
   );
 };
@@ -127,6 +133,9 @@ function App() {
               <Route path="/notices" element={<NoticePage />} />
               <Route path="/exam-result" element={<ExamResultsPage />} />
               <Route path="/exam-results" element={<ExamResultsPage />} />
+              <Route path="/apply" element={<AdmissionApplyPage />} />
+              <Route path="/admission" element={<AdmissionApplyPage />} />
+              <Route path="/admission-apply" element={<AdmissionApplyPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
             </Route>
@@ -136,6 +145,8 @@ function App() {
                 ========================================================= */}
             <Route path="/admin-panel" element={<ProtectedAdminRoute />}>
               <Route index element={<AdminDashboardPage />} />
+              <Route path="admissions" element={<AdminAdmissionsPage />} />
+              <Route path="admission-applications" element={<AdminAdmissionsPage />} />
               <Route path="users" element={<AdminUsersPage />} />
               <Route path="teachers" element={<AdminTeachersPage />} />
               <Route path="courses" element={<AdminCoursesPage />} />
