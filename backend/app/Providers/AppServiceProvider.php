@@ -76,6 +76,20 @@ class AppServiceProvider extends ServiceProvider
             (int) config('rate_limits.contact.attempts')
         )->by('contact:'.$request->ip()));
 
+        RateLimiter::for('admissions-apply', fn (Request $request): Limit => Limit::perMinutes(
+            (int) config('rate_limits.admissions.apply_decay_minutes', 10),
+            (int) config('rate_limits.admissions.apply_attempts', 5)
+        )->by('admissions-apply:'.$request->ip()));
+
+        RateLimiter::for('admissions-track', fn (Request $request): Limit => Limit::perMinute(
+            (int) config('rate_limits.admissions.track_per_minute', 15)
+        )->by('admissions-track:'.$request->ip()));
+
+        RateLimiter::for('admissions-upload', fn (Request $request): Limit => Limit::perMinutes(
+            (int) config('rate_limits.admissions.upload_decay_minutes', 10),
+            (int) config('rate_limits.admissions.upload_attempts', 10)
+        )->by('admissions-upload:'.$request->ip()));
+
         RateLimiter::for('authenticated', function (Request $request): Limit {
             $actorKey = $this->actorKey($request);
 

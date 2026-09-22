@@ -103,9 +103,13 @@ Route::middleware('throttle:public-content')->group(function () {
     // Promotions
     Route::get('/promotions', [PromotionController::class, 'index']);
 
-    // Online Admissions
-    Route::post('/admissions/apply', [AdmissionController::class, 'apply']);
-    Route::get('/admissions/track/{trackingCode}', [AdmissionController::class, 'track']);
+    // Online Admissions (Hardened with dedicated throttles & secure upload)
+    Route::post('/admissions/apply', [AdmissionController::class, 'apply'])
+        ->middleware('throttle:admissions-apply');
+    Route::get('/admissions/track/{trackingCode}', [AdmissionController::class, 'track'])
+        ->middleware('throttle:admissions-track');
+    Route::post('/admissions/upload-document', [AdmissionController::class, 'uploadDocument'])
+        ->middleware('throttle:admissions-upload');
     Route::get('/admissions/options', [AdmissionController::class, 'options']);
 
     // Documents / Downloads

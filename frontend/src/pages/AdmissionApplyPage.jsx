@@ -200,21 +200,27 @@ export const AdmissionApplyPage = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) {
-      alert(isKhmer ? 'ទំហំឯកសារមិនត្រូវលើសពី 10MB ឡើយ។' : 'File size must not exceed 10MB');
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+    if (!allowedTypes.includes(file.type)) {
+      alert(isKhmer ? 'ប្រភេទឯកសារមិនត្រឹមត្រូវ។ សូមបញ្ចូលតែរូបភាព (JPG, PNG, WEBP) ឬឯកសារ PDF ប៉ុណ្ណោះ។' : 'Invalid file type. Only JPG, PNG, WEBP images or PDF documents are permitted.');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert(isKhmer ? 'ទំហំឯកសារមិនត្រូវលើសពី 5MB ឡើយ។' : 'File size must not exceed 5MB');
       return;
     }
 
     setUploading(prev => ({ ...prev, [field]: true }));
     const data = new FormData();
     data.append('file', file);
-    data.append('subDir', 'admissions');
+    data.append('type', field);
 
     try {
-      const res = await api.post('/admin/upload', data, {
+      const res = await api.post('/admissions/upload-document', data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      const url = res.data?.url || res.data?.imageUrl;
+      const url = res.data?.url;
       if (url) {
         setFormData(prev => ({ ...prev, [`${field}Url`]: url }));
       }

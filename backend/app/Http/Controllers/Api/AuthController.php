@@ -36,7 +36,6 @@ class AuthController extends Controller
             ],
             'password' => 'required|string|min:8',
             'fullName' => 'nullable|string',
-            'studentId' => 'nullable|string|max:50',
             'className' => 'nullable|string',
             'semester' => 'nullable|string',
             'academicYear' => 'nullable|string',
@@ -59,7 +58,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->input('password')),
             'role' => 'student', // Security: Public registration is strictly restricted to students
             'status' => 'pending', // Security: Requires admin approval before login
-            'studentId' => $request->input('studentId'),
+            'studentId' => null, // Security: Official Student IDs are strictly assigned and verified by Registrar/Administration
             'fullName' => $request->input('fullName'),
             'className' => $request->input('className'),
             'semester' => $request->input('semester'),

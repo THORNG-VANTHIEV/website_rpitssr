@@ -21,6 +21,14 @@ return [
         'decay_minutes' => 10,
     ],
 
+    'admissions' => [
+        'apply_attempts' => 5,
+        'apply_decay_minutes' => 10,
+        'track_per_minute' => 15,
+        'upload_attempts' => 10,
+        'upload_decay_minutes' => 10,
+    ],
+
     'authenticated' => [
         'reads_per_minute' => 120,
         'writes_per_minute' => 20,

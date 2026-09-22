@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\CourseCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class AdmissionController extends Controller
@@ -41,10 +42,10 @@ class AdmissionController extends Controller
             $validated['courseType'] = in_array($validated['degreeLevel'], ['bachelor', 'higher_diploma']) ? 'long_term' : 'short_term';
         }
 
-        // Generate unique tracking code: APP-YYYY-XXXX
+        // Generate unique tracking code: APP-YYYY-XXXXXXXX (8 chars for strong entropy)
         $year = date('Y');
         do {
-            $random = strtoupper(Str::random(4));
+            $random = strtoupper(Str::random(8));
             $trackingCode = "APP-{$year}-{$random}";
         } while (Admission::where('trackingCode', $trackingCode)->exists());
 
@@ -58,6 +59,40 @@ class AdmissionController extends Controller
             'trackingCode' => $trackingCode,
             'message' => 'ការដាក់ពាក្យចូលរៀនទទួលបានជោគជ័យ! / Application submitted successfully!',
             'data' => $admission,
+        ], 201);
+    }
+
+    /**
+     * Upload an applicant document (photo, certificate, ID card, equity card) securely
+     */
+    public function uploadDocument(Request $request): JsonResponse
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:jpeg,jpg,png,webp,pdf|max:5120', // max 5MB
+            'type' => 'nullable|string|in:photo,certificate,idCard,equityCard',
+        ]);
+
+        $file = $request->file('file');
+        $rawExt = strtolower($file->extension() ?: $file->guessExtension() ?: 'jpg');
+        $allowedExtensions = ['jpeg', 'jpg', 'png', 'webp', 'pdf'];
+        $extension = in_array($rawExt, $allowedExtensions, true) ? $rawExt : 'jpg';
+
+        $type = $request->input('type', 'doc');
+        $prefix = preg_replace('/[^a-zA-Z0-9_-]/', '', $type) ?: 'doc';
+        // Cryptographically random 28-character filename to prevent discovery
+        $fileName = $prefix . '_' . Str::random(28) . '_' . time() . '.' . $extension;
+        $subDir = 'admissions';
+        $filePath = "uploads/{$subDir}/{$fileName}";
+
+        Storage::disk('public')->putFileAs("uploads/{$subDir}", $file, $fileName);
+
+        $url = "/storage/{$filePath}";
+
+        return response()->json([
+            'success' => true,
+            'url' => $url,
+            'fileName' => $fileName,
+            'filePath' => $filePath,
         ], 201);
     }
 

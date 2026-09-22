@@ -234,7 +234,7 @@ class AccountSecurityTest extends TestCase
         $this->assertDatabaseHas('users', [
             'email' => 'student@rpitssr.edu.kh',
             'role' => 'student',
-            'studentId' => 'ANOTHER-STUDENT-ID',
+            'studentId' => null,
         ]);
     }
 
