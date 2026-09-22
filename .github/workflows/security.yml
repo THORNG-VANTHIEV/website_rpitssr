@@ -27,11 +27,12 @@ jobs:
             printf 'Sensitive files must not be tracked:\n%s\n' "${forbidden_files}" >&2
             exit 1
           fi
-      - name: Check for exposed database dump in Git history
+      - name: Block exposed database dumps in Git history
         shell: bash
         run: |
           if git log --all --format=%H -- rpitssr_db.sql | grep -q .; then
-            echo '::warning::rpitssr_db.sql remains in Git history. Maintainers should execute history rewriting (e.g. git-filter-repo) when ready.'
+            echo 'rpitssr_db.sql remains in Git history. It must be permanently purged.' >&2
+            exit 1
           fi
       - name: Scan repository history for secrets
         uses: gitleaks/gitleaks-action@v3
