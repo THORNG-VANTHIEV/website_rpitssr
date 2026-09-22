@@ -238,6 +238,39 @@ class AccountSecurityTest extends TestCase
         ]);
     }
 
+    public function test_pending_student_cannot_login_until_approved_by_admin(): void
+    {
+        // 1. Student submits registration
+        $this->postJson('/api/auth/register', [
+            'username' => 'unapproved-student',
+            'email' => 'unapproved@rpitssr.edu.kh',
+            'password' => 'secret123456',
+        ])->assertCreated()->assertJsonPath('status', 'pending');
+
+        // 2. Attempt to login without admin acceptance -> Blocked with 403 Forbidden
+        $this->postJson('/api/auth/login', [
+            'email' => 'unapproved@rpitssr.edu.kh',
+            'password' => 'secret123456',
+        ])->assertForbidden()
+          ->assertJsonPath('status', 'pending');
+
+        // 3. Administrator approves the student account
+        $admin = User::factory()->create(['role' => 'admin']);
+        $adminToken = $admin->createToken('admin')->plainTextToken;
+        $student = User::where('email', 'unapproved@rpitssr.edu.kh')->first();
+
+        $this->requestWithToken($adminToken, 'PUT', "/api/admin/users/{$student->id}/approve")
+            ->assertOk();
+
+        // 4. Student can now log in successfully and receive authentication token
+        $loginRes = $this->postJson('/api/auth/login', [
+            'email' => 'unapproved@rpitssr.edu.kh',
+            'password' => 'secret123456',
+        ])->assertOk();
+
+        $this->assertNotEmpty($loginRes->json('token'));
+    }
+
     public static function roles(): array
     {
         return array_map(fn (string $role): array => [$role], ['student', 'teacher', 'sub_admin', 'admin']);
