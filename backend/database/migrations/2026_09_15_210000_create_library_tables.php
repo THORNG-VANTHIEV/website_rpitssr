@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Book Categories Table
-        if (!Schema::hasTable('book_categories')) {
+        if (! Schema::hasTable('book_categories')) {
             Schema::create('book_categories', function (Blueprint $table) {
                 $table->id();
                 $table->string('name_km');
@@ -26,7 +26,7 @@ return new class extends Migration
         }
 
         // 2. Books Table
-        if (!Schema::hasTable('books')) {
+        if (! Schema::hasTable('books')) {
             Schema::create('books', function (Blueprint $table) {
                 $table->id();
                 $table->string('title_km');
@@ -53,7 +53,7 @@ return new class extends Migration
         }
 
         // 3. Book Borrowings Table
-        if (!Schema::hasTable('borrowings')) {
+        if (! Schema::hasTable('borrowings')) {
             Schema::create('borrowings', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('book_id')->constrained('books')->cascadeOnDelete();

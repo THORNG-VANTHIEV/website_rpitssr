@@ -21,8 +21,8 @@ class AdminNoticeController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%");
+                    ->orWhere('content', 'like', "%{$search}%")
+                    ->orWhere('category', 'like', "%{$search}%");
             });
         }
 
@@ -39,7 +39,7 @@ class AdminNoticeController extends Controller
     {
         $notice = Notice::find($id);
 
-        if (!$notice) {
+        if (! $notice) {
             return response()->json(['error' => 'Notice not found'], 404);
         }
 
@@ -74,7 +74,7 @@ class AdminNoticeController extends Controller
     {
         $notice = Notice::find($id);
 
-        if (!$notice) {
+        if (! $notice) {
             return response()->json(['error' => 'Notice not found'], 404);
         }
 
@@ -96,7 +96,7 @@ class AdminNoticeController extends Controller
     {
         $notice = Notice::find($id);
 
-        if (!$notice) {
+        if (! $notice) {
             return response()->json(['error' => 'Notice not found'], 404);
         }
 

@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Book;
-use App\Models\BookCategory;
 use App\Models\BookBorrowing;
+use App\Models\BookCategory;
 use Illuminate\Database\Seeder;
 
 class LibrarySeeder extends Seeder

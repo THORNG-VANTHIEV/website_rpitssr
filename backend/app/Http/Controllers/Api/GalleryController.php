@@ -13,7 +13,7 @@ class GalleryController extends Controller
     {
         $query = GalleryImage::where('isActive', true);
 
-        if ($request->has('category') && !empty($request->category)) {
+        if ($request->has('category') && ! empty($request->category)) {
             $query->where('category', $request->category);
         }
 
@@ -27,7 +27,7 @@ class GalleryController extends Controller
     {
         $image = GalleryImage::find($id);
 
-        if (!$image) {
+        if (! $image) {
             return response()->json([
                 'success' => false,
                 'error' => 'Gallery image not found',

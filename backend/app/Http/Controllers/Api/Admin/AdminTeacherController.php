@@ -21,7 +21,7 @@ class AdminTeacherController extends Controller
     {
         $teacher = Teacher::find($id);
 
-        if (!$teacher) {
+        if (! $teacher) {
             return response()->json(['error' => 'Teacher not found'], 404);
         }
 
@@ -57,7 +57,7 @@ class AdminTeacherController extends Controller
     {
         $teacher = Teacher::find($id);
 
-        if (!$teacher) {
+        if (! $teacher) {
             return response()->json(['error' => 'Teacher not found'], 404);
         }
 
@@ -67,7 +67,7 @@ class AdminTeacherController extends Controller
             'designation' => 'nullable|string',
             'department' => 'nullable|string',
             'description' => 'nullable|string',
-            'email' => 'nullable|email|unique:teachers,email,' . $id,
+            'email' => 'nullable|email|unique:teachers,email,'.$id,
             'phone' => 'nullable|string',
             'skype' => 'nullable|string',
             'facebook' => 'nullable|string',
@@ -88,7 +88,7 @@ class AdminTeacherController extends Controller
     {
         $teacher = Teacher::find($id);
 
-        if (!$teacher) {
+        if (! $teacher) {
             return response()->json(['error' => 'Teacher not found'], 404);
         }
 

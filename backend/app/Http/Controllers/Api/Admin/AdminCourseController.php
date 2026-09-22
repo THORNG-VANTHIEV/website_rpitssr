@@ -13,11 +13,11 @@ class AdminCourseController extends Controller
     {
         $query = Course::with('category');
 
-        if ($request->has('search') && !empty($request->search)) {
+        if ($request->has('search') && ! empty($request->search)) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -31,7 +31,7 @@ class AdminCourseController extends Controller
     {
         $course = Course::with(['category', 'reviews'])->find($id);
 
-        if (!$course) {
+        if (! $course) {
             return response()->json(['error' => 'Course not found'], 404);
         }
 
@@ -62,7 +62,7 @@ class AdminCourseController extends Controller
     {
         $course = Course::find($id);
 
-        if (!$course) {
+        if (! $course) {
             return response()->json(['error' => 'Course not found'], 404);
         }
 
@@ -88,7 +88,7 @@ class AdminCourseController extends Controller
     {
         $course = Course::find($id);
 
-        if (!$course) {
+        if (! $course) {
             return response()->json(['error' => 'Course not found'], 404);
         }
 

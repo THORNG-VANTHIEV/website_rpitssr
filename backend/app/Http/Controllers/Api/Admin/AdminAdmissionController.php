@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AdmissionStatusUpdatedMail;
 use App\Models\Admission;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class AdminAdmissionController extends Controller
@@ -115,6 +118,14 @@ class AdminAdmissionController extends Controller
 
         $admission->update($validated);
 
+        try {
+            if (! empty($admission->email)) {
+                Mail::to($admission->email)->send(new AdmissionStatusUpdatedMail($admission));
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Failed to send admission status update email to {$admission->email}: ".$e->getMessage());
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'បានកែប្រែស្ថានភាពពាក្យសុំជោគជ័យ! / Status updated successfully!',
@@ -145,7 +156,7 @@ class AdminAdmissionController extends Controller
             if ($lastUser && preg_match('/STU-\d{4}-(\d+)/', $lastUser->studentId, $matches)) {
                 $nextSeq = intval($matches[1]) + 1;
             }
-            $studentId = sprintf("STU-%s-%03d", $year, $nextSeq);
+            $studentId = sprintf('STU-%s-%03d', $year, $nextSeq);
         }
 
         // Auto-generate username from Latin Name (e.g. "Sok Dara" -> "sok_dara")
@@ -174,10 +185,10 @@ class AdminAdmissionController extends Controller
             'role' => 'student',
             'status' => 'active',
             'studentId' => $studentId,
-            'fullName' => $admission->khmerName . ($admission->latinName ? " ({$admission->latinName})" : ''),
+            'fullName' => $admission->khmerName.($admission->latinName ? " ({$admission->latinName})" : ''),
             'className' => $request->input('className', $admission->major),
             'semester' => $request->input('semester', '1'),
-            'academicYear' => $request->input('academicYear', "{$year}-" . ($year + 1)),
+            'academicYear' => $request->input('academicYear', "{$year}-".($year + 1)),
         ]);
 
         // Link admission
@@ -185,8 +196,17 @@ class AdminAdmissionController extends Controller
             'status' => 'enrolled',
             'enrolledStudentId' => $studentId,
             'enrolledUserId' => $user->id,
-            'adminNotes' => ($admission->adminNotes ? $admission->adminNotes . "\n" : '') . "Enrolled as student [{$studentId}] on " . date('Y-m-d H:i:s'),
+            'adminNotes' => ($admission->adminNotes ? $admission->adminNotes."\n" : '')."Enrolled as student [{$studentId}] on ".date('Y-m-d H:i:s'),
         ]);
+
+        try {
+            $notifyEmail = ! empty($admission->email) ? $admission->email : $user->email;
+            if (! empty($notifyEmail)) {
+                Mail::to($notifyEmail)->send(new AdmissionStatusUpdatedMail($admission));
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Failed to send admission enrollment email to notify recipient: '.$e->getMessage());
+        }
 
         return response()->json([
             'success' => true,

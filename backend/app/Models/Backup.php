@@ -12,6 +12,7 @@ class Backup extends Model
     protected $table = 'backups';
 
     const CREATED_AT = 'createdAt';
+
     const UPDATED_AT = null;
 
     protected $fillable = [

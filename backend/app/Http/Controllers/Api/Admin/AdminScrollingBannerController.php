@@ -20,7 +20,7 @@ class AdminScrollingBannerController extends Controller
     {
         $banner = ScrollingBanner::find($id);
 
-        if (!$banner) {
+        if (! $banner) {
             return response()->json(['error' => 'Banner not found'], 404);
         }
 
@@ -48,7 +48,7 @@ class AdminScrollingBannerController extends Controller
     {
         $banner = ScrollingBanner::find($id);
 
-        if (!$banner) {
+        if (! $banner) {
             return response()->json(['error' => 'Banner not found'], 404);
         }
 
@@ -67,7 +67,7 @@ class AdminScrollingBannerController extends Controller
     {
         $banner = ScrollingBanner::find($id);
 
-        if (!$banner) {
+        if (! $banner) {
             return response()->json(['error' => 'Banner not found'], 404);
         }
 
@@ -80,12 +80,12 @@ class AdminScrollingBannerController extends Controller
     {
         $banner = ScrollingBanner::find($id);
 
-        if (!$banner) {
+        if (! $banner) {
             return response()->json(['error' => 'Banner not found'], 404);
         }
 
         $banner->update([
-            'is_active' => !$banner->is_active,
+            'is_active' => ! $banner->is_active,
         ]);
 
         return response()->json([

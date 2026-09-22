@@ -32,12 +32,12 @@ class DocumentSeeder extends Seeder
                 'required_docs_km' => [
                     'រូបថត ៤x៦ ចំនួន ៣ សន្លឹក (ផ្ទៃខាងក្រោយពណ៌ស ឬខៀវ)',
                     'ច្បាប់ចម្លងអត្តសញ្ញាណប័ណ្ណសញ្ជាតិខ្មែរ ឬសំបុត្រកំណើត (មានបញ្ជាក់)',
-                    'ច្បាប់ចម្លងប័ណ្ណសមធម៌ (ប័ណ្ណក្រីក្រ) ឬប័ណ្ណងាយរងហានិភ័យ (បើមាន)'
+                    'ច្បាប់ចម្លងប័ណ្ណសមធម៌ (ប័ណ្ណក្រីក្រ) ឬប័ណ្ណងាយរងហានិភ័យ (បើមាន)',
                 ],
                 'required_docs_en' => [
                     '3 passport-size photos (4x6 cm, white or blue background)',
                     'Certified copy of Cambodian National ID card or Birth Certificate',
-                    'Copy of IDPoor Card or Vulnerable Household Card (if applicable)'
+                    'Copy of IDPoor Card or Vulnerable Household Card (if applicable)',
                 ],
             ],
             [
@@ -58,12 +58,12 @@ class DocumentSeeder extends Seeder
                 'required_docs_km' => [
                     'សញ្ញាបត្រមធ្យមសិក្សាទុតិយភូមិ (បាក់ឌុប) ឬសញ្ញាបត្របច្ចេកទេសកម្រិត ៣ (C3)',
                     'ព្រឹត្តិបត្រពិន្ទុប្រឡងបាក់ឌុប ឬវិញ្ញាបនបត្របណ្តោះអាសន្ន',
-                    'រូបថត ៤x៦ ចំនួន ៤ សន្លឹក និងសៀវភៅស្នាក់នៅ ឬសៀវភៅគ្រួសារ'
+                    'រូបថត ៤x៦ ចំនួន ៤ សន្លឹក និងសៀវភៅស្នាក់នៅ ឬសៀវភៅគ្រួសារ',
                 ],
                 'required_docs_en' => [
                     'High School Diploma (BacII) certificate or TVET Level 3 (C3) Diploma',
                     'National BacII Exam Grade Slip or Provisional Graduation Letter',
-                    '4 passport photos (4x6 cm) and copy of Family Book / Residency Book'
+                    '4 passport photos (4x6 cm) and copy of Family Book / Residency Book',
                 ],
             ],
             [
@@ -84,12 +84,12 @@ class DocumentSeeder extends Seeder
                 'required_docs_km' => [
                     'សញ្ញាបត្រមធ្យមសិក្សាទុតិយភូមិ ឬសញ្ញាបត្រជាន់ខ្ពស់បច្ចេកទេស (សម្រាប់ថ្នាក់បន្ត)',
                     'ព្រឹត្តិបត្រពិន្ទុសិក្សា និងលិខិតបញ្ជាក់ការសិក្សាពីគ្រឹះស្ថានដើម',
-                    'រូបថត ៤x៦ ចំនួន ៤ សន្លឹក'
+                    'រូបថត ៤x៦ ចំនួន ៤ សន្លឹក',
                 ],
                 'required_docs_en' => [
                     'High School Diploma (BacII) or Higher Diploma (for transfer entrants)',
                     'Official academic transcripts and letter of completion from previous institution',
-                    '4 passport photos (4x6 cm)'
+                    '4 passport photos (4x6 cm)',
                 ],
             ],
             [
@@ -110,12 +110,12 @@ class DocumentSeeder extends Seeder
                 'required_docs_km' => [
                     'ពាក្យស្នើសុំស្នាក់នៅដែលមានហត្ថលេខាអាណាព្យាបាល',
                     'លិខិតបញ្ជាក់ទីលំនៅពីអាជ្ញាធរឃុំ/សង្កាត់',
-                    'កិច្ចសន្យាគោរពបទបញ្ជាផ្ទៃក្នុងអន្តេវាសិកដ្ឋាន'
+                    'កិច្ចសន្យាគោរពបទបញ្ជាផ្ទៃក្នុងអន្តេវាសិកដ្ឋាន',
                 ],
                 'required_docs_en' => [
                     'Dormitory request form endorsed by parent or legal guardian',
                     'Commune residency verification certificate',
-                    'Signed agreement adhering to campus dormitory code of conduct'
+                    'Signed agreement adhering to campus dormitory code of conduct',
                 ],
             ],
 
@@ -249,11 +249,11 @@ class DocumentSeeder extends Seeder
                 'submission_office' => 'ការិយាល័យសិក្សា និងកិច្ចការនិស្សិត (អគារ A, បន្ទប់ ១០៤)',
                 'required_docs_km' => [
                     'ច្បាប់ចម្លងកាតសិស្ស ឬបង្កាន់ដៃបង់ថ្លៃសិក្សា (បើមាន)',
-                    'រយៈពេលរង់ចាំដំណើរការឯកសារ៖ ៣ ទៅ ៥ ថ្ងៃនៃថ្ងៃធ្វើការ'
+                    'រយៈពេលរង់ចាំដំណើរការឯកសារ៖ ៣ ទៅ ៥ ថ្ងៃនៃថ្ងៃធ្វើការ',
                 ],
                 'required_docs_en' => [
                     'Copy of Student ID card or registration receipt',
-                    'Standard processing turnaround time: 3-5 working days'
+                    'Standard processing turnaround time: 3-5 working days',
                 ],
             ],
             [
@@ -273,11 +273,11 @@ class DocumentSeeder extends Seeder
                 'submission_office' => 'ការិយាល័យសិក្សា និងកិច្ចការនិស្សិត (អគារ A, បន្ទប់ ១០៤)',
                 'required_docs_km' => [
                     'វេជ្ជបញ្ជា ឬលិខិតបញ្ជាក់ពីមន្ទីរពេទ្យ (ករណីឈឺ)',
-                    'ហត្ថលេខាឯកភាពពីប្រធានដេប៉ាតឺម៉ង់ និងអាណាព្យាបាល'
+                    'ហត្ថលេខាឯកភាពពីប្រធានដេប៉ាតឺម៉ង់ និងអាណាព្យាបាល',
                 ],
                 'required_docs_en' => [
                     'Medical certificate or hospital letter (for health leaves)',
-                    'Department head endorsement and parental consent'
+                    'Department head endorsement and parental consent',
                 ],
             ],
             [
@@ -297,11 +297,11 @@ class DocumentSeeder extends Seeder
                 'submission_office' => 'ការិយាល័យសិក្សា និងកិច្ចការនិស្សិត (អគារ A, បន្ទប់ ១០៤)',
                 'required_docs_km' => [
                     'លិខិតបញ្ជាក់ការងារ (ករណីសុំប្តូរវេនយប់/ចុងសប្តាហ៍)',
-                    'ការយល់ព្រមពីប្រធានដេប៉ាតឺម៉ង់ទាំងសងខាង'
+                    'ការយល់ព្រមពីប្រធានដេប៉ាតឺម៉ង់ទាំងសងខាង',
                 ],
                 'required_docs_en' => [
                     'Employer work letter (if requesting transfer to weekend/evening shift)',
-                    'Mutual approval from both releasing and receiving department heads'
+                    'Mutual approval from both releasing and receiving department heads',
                 ],
             ],
         ];

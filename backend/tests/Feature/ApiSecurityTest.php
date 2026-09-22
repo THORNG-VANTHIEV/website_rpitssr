@@ -3,12 +3,15 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ApiSecurityTest extends TestCase
 {
     use RefreshDatabase;
+
     public function test_protected_api_returns_json_401_without_accept_header(): void
     {
         $this->get('/api/admin/users')
@@ -122,24 +125,24 @@ class ApiSecurityTest extends TestCase
 
     public function test_admission_document_upload_validates_types_and_size(): void
     {
-        \Illuminate\Support\Facades\Storage::fake('public');
+        Storage::fake('public');
 
         // Valid image
-        $validFile = \Illuminate\Http\UploadedFile::fake()->image('id_card.jpg', 600, 400)->size(1024);
+        $validFile = UploadedFile::fake()->image('id_card.jpg', 600, 400)->size(1024);
         $this->postJson('/api/admissions/upload-document', [
             'file' => $validFile,
             'type' => 'idCard',
         ])->assertCreated()->assertJsonPath('success', true);
 
         // Disallowed executable script disguised as jpg or plain php
-        $dangerousFile = \Illuminate\Http\UploadedFile::fake()->create('shell.php', 50, 'application/x-php');
+        $dangerousFile = UploadedFile::fake()->create('shell.php', 50, 'application/x-php');
         $this->postJson('/api/admissions/upload-document', [
             'file' => $dangerousFile,
             'type' => 'certificate',
         ])->assertUnprocessable();
 
         // Exceeding 5MB limit
-        $oversizedFile = \Illuminate\Http\UploadedFile::fake()->create('huge.pdf', 6000, 'application/pdf');
+        $oversizedFile = UploadedFile::fake()->create('huge.pdf', 6000, 'application/pdf');
         $this->postJson('/api/admissions/upload-document', [
             'file' => $oversizedFile,
             'type' => 'certificate',

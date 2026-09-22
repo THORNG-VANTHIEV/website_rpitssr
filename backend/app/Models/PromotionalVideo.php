@@ -30,10 +30,13 @@ class PromotionalVideo extends BaseModel
      */
     public static function extractYouTubeId(?string $url): ?string
     {
-        if (!$url) return null;
+        if (! $url) {
+            return null;
+        }
         if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/', $url, $matches)) {
             return $matches[1];
         }
+
         return null;
     }
 }

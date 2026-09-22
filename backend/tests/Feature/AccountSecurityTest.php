@@ -252,7 +252,7 @@ class AccountSecurityTest extends TestCase
             'email' => 'unapproved@rpitssr.edu.kh',
             'password' => 'secret123456',
         ])->assertForbidden()
-          ->assertJsonPath('status', 'pending');
+            ->assertJsonPath('status', 'pending');
 
         // 3. Administrator approves the student account
         $admin = User::factory()->create(['role' => 'admin']);

@@ -21,7 +21,7 @@ class NoticeController extends Controller
     {
         $notice = Notice::find($id);
 
-        if (!$notice) {
+        if (! $notice) {
             return response()->json([
                 'success' => false,
                 'error' => 'Notice not found',

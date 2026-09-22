@@ -26,7 +26,7 @@ class FaqController extends Controller
     {
         $faq = Faq::find($id);
 
-        if (!$faq) {
+        if (! $faq) {
             return response()->json([
                 'success' => false,
                 'error' => 'FAQ not found',

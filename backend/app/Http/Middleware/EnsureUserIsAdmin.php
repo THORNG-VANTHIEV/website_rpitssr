@@ -15,7 +15,7 @@ class EnsureUserIsAdmin
     {
         $user = $request->user();
 
-        if (!$user || !$user->isSubAdmin()) {
+        if (! $user || ! $user->isSubAdmin()) {
             return response()->json([
                 'success' => false,
                 'error' => 'Unauthorized. Admin access required.',

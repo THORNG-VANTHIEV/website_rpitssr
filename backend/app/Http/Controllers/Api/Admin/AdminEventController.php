@@ -21,9 +21,9 @@ class AdminEventController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('place', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('speakers', 'like', "%{$search}%");
+                    ->orWhere('place', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('speakers', 'like', "%{$search}%");
             });
         }
 
@@ -37,7 +37,7 @@ class AdminEventController extends Controller
     {
         $event = Event::with('category')->find($id);
 
-        if (!$event) {
+        if (! $event) {
             return response()->json(['error' => 'Event not found'], 404);
         }
 
@@ -70,7 +70,7 @@ class AdminEventController extends Controller
     {
         $event = Event::find($id);
 
-        if (!$event) {
+        if (! $event) {
             return response()->json(['error' => 'Event not found'], 404);
         }
 
@@ -98,7 +98,7 @@ class AdminEventController extends Controller
     {
         $event = Event::find($id);
 
-        if (!$event) {
+        if (! $event) {
             return response()->json(['error' => 'Event not found'], 404);
         }
 

@@ -22,12 +22,12 @@ class EventController extends Controller
             $query->where('date', '<', now()->toDateString());
         }
 
-        if ($request->has('search') && !empty($request->search)) {
+        if ($request->has('search') && ! empty($request->search)) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('place', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('place', 'like', "%{$search}%");
             });
         }
 
@@ -41,7 +41,7 @@ class EventController extends Controller
     {
         $event = Event::find($id);
 
-        if (!$event) {
+        if (! $event) {
             return response()->json(['error' => 'Event not found'], 404);
         }
 

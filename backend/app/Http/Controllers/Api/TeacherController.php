@@ -13,16 +13,16 @@ class TeacherController extends Controller
     {
         $query = Teacher::query();
 
-        if ($request->has('department') && !empty($request->department)) {
+        if ($request->has('department') && ! empty($request->department)) {
             $query->where('department', $request->department);
         }
 
-        if ($request->has('search') && !empty($request->search)) {
+        if ($request->has('search') && ! empty($request->search)) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('designation', 'like', "%{$search}%")
-                  ->orWhere('department', 'like', "%{$search}%");
+                    ->orWhere('designation', 'like', "%{$search}%")
+                    ->orWhere('department', 'like', "%{$search}%");
             });
         }
 
@@ -36,7 +36,7 @@ class TeacherController extends Controller
     {
         $teacher = Teacher::find($id);
 
-        if (!$teacher) {
+        if (! $teacher) {
             return response()->json([
                 'success' => false,
                 'error' => 'Teacher not found',

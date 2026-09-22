@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AdmissionSubmittedMail;
 use App\Models\Admission;
-use App\Models\Course;
 use App\Models\CourseCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -54,6 +56,14 @@ class AdmissionController extends Controller
 
         $admission = Admission::create($validated);
 
+        try {
+            if (! empty($admission->email)) {
+                Mail::to($admission->email)->send(new AdmissionSubmittedMail($admission));
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Failed to send admission confirmation email to {$admission->email}: ".$e->getMessage());
+        }
+
         return response()->json([
             'success' => true,
             'trackingCode' => $trackingCode,
@@ -80,7 +90,7 @@ class AdmissionController extends Controller
         $type = $request->input('type', 'doc');
         $prefix = preg_replace('/[^a-zA-Z0-9_-]/', '', $type) ?: 'doc';
         // Cryptographically random 28-character filename to prevent discovery
-        $fileName = $prefix . '_' . Str::random(28) . '_' . time() . '.' . $extension;
+        $fileName = $prefix.'_'.Str::random(28).'_'.time().'.'.$extension;
         $subDir = 'admissions';
         $filePath = "uploads/{$subDir}/{$fileName}";
 

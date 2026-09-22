@@ -12,6 +12,7 @@ class SystemLog extends Model
     protected $table = 'systemLogs';
 
     const CREATED_AT = 'createdAt';
+
     const UPDATED_AT = null;
 
     protected $fillable = [

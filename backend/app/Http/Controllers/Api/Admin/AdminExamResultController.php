@@ -13,32 +13,32 @@ class AdminExamResultController extends Controller
     {
         $query = ExamResult::query();
 
-        if ($request->has('courseName') && !empty($request->courseName)) {
+        if ($request->has('courseName') && ! empty($request->courseName)) {
             $query->where('courseName', $request->courseName);
         }
 
-        if ($request->has('semester') && !empty($request->semester)) {
+        if ($request->has('semester') && ! empty($request->semester)) {
             $query->where('semester', $request->semester);
         }
 
-        if ($request->has('generation') && !empty($request->generation)) {
+        if ($request->has('generation') && ! empty($request->generation)) {
             $query->where('generation', $request->generation);
         }
 
-        if ($request->has('year') && !empty($request->year)) {
+        if ($request->has('year') && ! empty($request->year)) {
             $query->where('year', $request->year);
         }
 
-        if ($request->has('studentId') && !empty($request->studentId)) {
+        if ($request->has('studentId') && ! empty($request->studentId)) {
             $query->where('studentId', $request->studentId);
         }
 
-        if ($request->has('search') && !empty($request->search)) {
+        if ($request->has('search') && ! empty($request->search)) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('studentName', 'like', "%{$search}%")
-                  ->orWhere('studentId', 'like', "%{$search}%")
-                  ->orWhere('courseName', 'like', "%{$search}%");
+                    ->orWhere('studentId', 'like', "%{$search}%")
+                    ->orWhere('courseName', 'like', "%{$search}%");
             });
         }
 
@@ -57,7 +57,7 @@ class AdminExamResultController extends Controller
     {
         $result = ExamResult::find($id);
 
-        if (!$result) {
+        if (! $result) {
             return response()->json(['error' => 'Exam result not found'], 404);
         }
 
@@ -99,7 +99,7 @@ class AdminExamResultController extends Controller
     {
         $result = ExamResult::find($id);
 
-        if (!$result) {
+        if (! $result) {
             return response()->json(['error' => 'Exam result not found'], 404);
         }
 
@@ -137,7 +137,7 @@ class AdminExamResultController extends Controller
     {
         $result = ExamResult::find($id);
 
-        if (!$result) {
+        if (! $result) {
             return response()->json(['error' => 'Exam result not found'], 404);
         }
 

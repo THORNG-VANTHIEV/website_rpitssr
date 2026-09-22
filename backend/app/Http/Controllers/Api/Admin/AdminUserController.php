@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AccountApprovedMail;
+use App\Mail\AccountRejectedMail;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class AdminUserController extends Controller
 {
@@ -123,6 +127,14 @@ class AdminUserController extends Controller
 
         $user->update(['status' => 'active']);
 
+        try {
+            if (! empty($user->email)) {
+                Mail::to($user->email)->send(new AccountApprovedMail($user));
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Failed to send account approval email to {$user->email}: ".$e->getMessage());
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'បានអនុម័តគណនីជោគជ័យ! / User account approved successfully.',
@@ -140,6 +152,14 @@ class AdminUserController extends Controller
         }
 
         $user->update(['status' => 'rejected']);
+
+        try {
+            if (! empty($user->email)) {
+                Mail::to($user->email)->send(new AccountRejectedMail($user));
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Failed to send account rejection email to {$user->email}: ".$e->getMessage());
+        }
 
         return response()->json([
             'success' => true,

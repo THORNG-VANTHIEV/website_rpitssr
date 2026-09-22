@@ -21,7 +21,7 @@ class AdminFaqController extends Controller
     {
         $faq = Faq::find($id);
 
-        if (!$faq) {
+        if (! $faq) {
             return response()->json(['error' => 'FAQ not found'], 404);
         }
 
@@ -46,7 +46,7 @@ class AdminFaqController extends Controller
     {
         $faq = Faq::find($id);
 
-        if (!$faq) {
+        if (! $faq) {
             return response()->json(['error' => 'FAQ not found'], 404);
         }
 
@@ -66,7 +66,7 @@ class AdminFaqController extends Controller
     {
         $faq = Faq::find($id);
 
-        if (!$faq) {
+        if (! $faq) {
             return response()->json(['error' => 'FAQ not found'], 404);
         }
 

@@ -13,7 +13,7 @@ class AdminGalleryController extends Controller
     {
         $query = GalleryImage::query();
 
-        if ($request->has('category') && !empty($request->category)) {
+        if ($request->has('category') && ! empty($request->category)) {
             $query->where('category', $request->category);
         }
 
@@ -21,8 +21,8 @@ class AdminGalleryController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('category', 'like', "%{$search}%");
             });
         }
 
@@ -36,7 +36,7 @@ class AdminGalleryController extends Controller
     {
         $image = GalleryImage::find($id);
 
-        if (!$image) {
+        if (! $image) {
             return response()->json(['error' => 'Gallery image not found'], 404);
         }
 
@@ -63,7 +63,7 @@ class AdminGalleryController extends Controller
     {
         $image = GalleryImage::find($id);
 
-        if (!$image) {
+        if (! $image) {
             return response()->json(['error' => 'Gallery image not found'], 404);
         }
 
@@ -85,7 +85,7 @@ class AdminGalleryController extends Controller
     {
         $image = GalleryImage::find($id);
 
-        if (!$image) {
+        if (! $image) {
             return response()->json(['error' => 'Gallery image not found'], 404);
         }
 

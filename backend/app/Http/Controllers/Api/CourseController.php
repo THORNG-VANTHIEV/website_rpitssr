@@ -14,15 +14,15 @@ class CourseController extends Controller
     {
         $query = Course::with('category')->orderBy('id', 'desc');
 
-        if ($request->has('categoryId') && !empty($request->categoryId)) {
+        if ($request->has('categoryId') && ! empty($request->categoryId)) {
             $query->where('categoryId', $request->categoryId);
         }
 
-        if ($request->has('search') && !empty($request->search)) {
+        if ($request->has('search') && ! empty($request->search)) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -37,7 +37,7 @@ class CourseController extends Controller
     {
         $course = Course::with(['category', 'reviews.user'])->find($id);
 
-        if (!$course) {
+        if (! $course) {
             return response()->json(['error' => 'Course not found'], 404);
         }
 
