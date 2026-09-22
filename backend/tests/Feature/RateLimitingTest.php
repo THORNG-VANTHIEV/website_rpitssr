@@ -102,6 +102,27 @@ class RateLimitingTest extends TestCase
         $this->postJson('/api/contact')->assertTooManyRequests();
     }
 
+    public function test_admissions_endpoints_have_independent_throttles(): void
+    {
+        config([
+            'rate_limits.admissions.apply_attempts' => 2,
+            'rate_limits.admissions.track_per_minute' => 2,
+            'rate_limits.admissions.upload_attempts' => 2,
+        ]);
+
+        $this->getJson('/api/admissions/track/APP-2026-TESTCODE')->assertNotFound();
+        $this->getJson('/api/admissions/track/APP-2026-TESTCODE')->assertNotFound();
+        $this->getJson('/api/admissions/track/APP-2026-TESTCODE')->assertTooManyRequests();
+
+        $this->postJson('/api/admissions/upload-document')->assertUnprocessable();
+        $this->postJson('/api/admissions/upload-document')->assertUnprocessable();
+        $this->postJson('/api/admissions/upload-document')->assertTooManyRequests();
+
+        $this->postJson('/api/admissions/apply')->assertUnprocessable();
+        $this->postJson('/api/admissions/apply')->assertUnprocessable();
+        $this->postJson('/api/admissions/apply')->assertTooManyRequests();
+    }
+
     public function test_authenticated_read_and_write_budgets_are_separate(): void
     {
         config([
