@@ -304,7 +304,7 @@ export const AdminLayout = () => {
       {/* Main Container */}
       <div className={`admin-main ${collapsed ? 'sidebar-collapsed' : ''}`}>
         {/* Topbar */}
-        <header className="admin-topbar">
+        <header className="admin-topbar" style={{ position: 'sticky', top: 0, zIndex: 950 }}>
           <div className="admin-topbar-left">
             <button
               className="admin-toggle-btn"
