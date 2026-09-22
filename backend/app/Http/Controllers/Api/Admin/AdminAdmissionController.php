@@ -323,7 +323,7 @@ class AdminAdmissionController extends Controller
         }
 
         $field = $type.'Url';
-        $storedValue = $admission->{$field};
+        $storedValue = (string) ($admission->getAttribute($field) ?? '');
 
         if (empty($storedValue)) {
             return response()->json(['error' => 'Document not found for this applicant.'], 404);
@@ -333,21 +333,24 @@ class AdminAdmissionController extends Controller
         if (str_starts_with($storedValue, 'private:')) {
             $relativePath = substr($storedValue, strlen('private:'));
             if (Storage::disk('local')->exists($relativePath)) {
-                return Storage::disk('local')->response($relativePath);
+                $fullPath = Storage::disk('local')->path($relativePath);
+                return response()->file($fullPath);
             }
         }
 
         // Case 2: Stored on private local disk without prefix
         if (str_starts_with($storedValue, 'admissions/private/')) {
             if (Storage::disk('local')->exists($storedValue)) {
-                return Storage::disk('local')->response($storedValue);
+                $fullPath = Storage::disk('local')->path($storedValue);
+                return response()->file($fullPath);
             }
         }
 
         // Case 3: Stored on public disk (legacy files or public documents)
-        $publicPath = preg_replace('#^/storage/#', '', $storedValue);
+        $publicPath = (string) preg_replace('#^/storage/#', '', $storedValue);
         if (Storage::disk('public')->exists($publicPath)) {
-            return Storage::disk('public')->response($publicPath);
+            $fullPath = Storage::disk('public')->path($publicPath);
+            return response()->file($fullPath);
         }
 
         return response()->json(['error' => 'Document file does not exist on disk.'], 404);
@@ -361,8 +364,8 @@ class AdminAdmissionController extends Controller
         $data = $admission->toArray();
 
         foreach (['idCardUrl' => 'idCard', 'equityCardUrl' => 'equityCard', 'certificateUrl' => 'certificate', 'photoUrl' => 'photo'] as $field => $type) {
-            if (! empty($admission->{$field})) {
-                $val = $admission->{$field};
+            $val = (string) ($admission->getAttribute($field) ?? '');
+            if (! empty($val)) {
                 if (str_starts_with($val, 'private:') || str_starts_with($val, '/storage/') || str_starts_with($val, 'uploads/')) {
                     $data[$field] = URL::temporarySignedRoute(
                         'admin.admissions.document',

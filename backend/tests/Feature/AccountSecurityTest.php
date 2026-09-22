@@ -322,8 +322,8 @@ class AccountSecurityTest extends TestCase
 
         // Assert file is stored on private local disk, NOT on public disk
         $localRelativePath = substr($url, strlen('private:'));
-        Storage::disk('local')->assertExists($localRelativePath);
-        Storage::disk('public')->assertMissing($localRelativePath);
+        $this->assertTrue(Storage::disk('local')->exists($localRelativePath));
+        $this->assertFalse(Storage::disk('public')->exists($localRelativePath));
 
         // 2. Create Admission record with this private document
         $admission = Admission::create([
