@@ -123,4 +123,34 @@ class StudentExtendedProfileTest extends TestCase
         $this->assertSame('New Display Name', $fresh->fullName);
         $this->assertSame('099333444', $fresh->phone);
     }
+
+    public function test_cannot_enroll_already_enrolled_admission(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $admission = Admission::create([
+            'khmerName' => 'សុខ ចិន្តា',
+            'latinName' => 'SOK CHINDA',
+            'gender' => 'female',
+            'dob' => '2001-05-20',
+            'phone' => '012999888',
+            'email' => 'sok.chinda@example.test',
+            'degreeLevel' => 'bachelor',
+            'major' => 'ព័ត៌មានវិទ្យា',
+            'trackingCode' => 'APP-2026-CHINDA01',
+            'status' => 'enrolled',
+            'enrolledStudentId' => 'STU-2026-088',
+            'enrolledUserId' => 999,
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->postJson("/api/admin/admissions/{$admission->id}/enroll", [
+            'generation' => '13',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('enrolledStudentId', 'STU-2026-088');
+    }
 }

@@ -8,6 +8,7 @@ use App\Models\Admission;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -147,6 +148,15 @@ class AdminAdmissionController extends Controller
             ], 404);
         }
 
+        // Prevent duplicate enrollment of already registered students
+        if ($admission->status === 'enrolled' || ! empty($admission->enrolledUserId)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'បេក្ខជននេះត្រូវបានចុះឈ្មោះជាសិស្សផ្លូវការរួចរាល់ហើយ / This applicant has already been enrolled.',
+                'enrolledStudentId' => $admission->enrolledStudentId,
+            ], 422);
+        }
+
         // Auto-generate or accept student ID
         $year = date('Y');
         $studentId = $request->input('studentId');
@@ -185,41 +195,54 @@ class AdminAdmissionController extends Controller
             $totalCredits = 30;
         }
 
-        // Create the user account with active status and full academic profile
-        $user = User::create([
-            'username' => $username,
-            'email' => $email,
-            'password' => Hash::make($password),
-            'role' => 'student',
-            'status' => 'active',
-            'studentId' => $studentId,
-            'fullName' => $admission->khmerName.($admission->latinName ? " ({$admission->latinName})" : ''),
-            'khmerName' => $admission->khmerName,
-            'latinName' => $admission->latinName,
-            'gender' => $admission->gender ?: 'male',
-            'dob' => $admission->dob,
-            'phone' => $admission->phone,
-            'avatarUrl' => $admission->photoUrl,
-            'className' => $request->input('className', $admission->major),
-            'semester' => $request->input('semester', '1'),
-            'academicYear' => $request->input('academicYear', "{$year}-".($year + 1)),
-            'generation' => $request->input('generation', '13'),
-            'shift' => $request->input('shift', $admission->shift ?: 'morning'),
-            'room' => $request->input('room', 'Building B - Lab 3'),
-            'degreeLevel' => $admission->degreeLevel,
-            'faculty' => $request->input('faculty', 'ដេប៉ាតឺម៉ង់បច្ចេកវិទ្យាព័ត៌មាន'),
-            'totalCredits' => $totalCredits,
-            'completedCredits' => 0,
-            'scholarshipType' => ! empty($admission->equityCardUrl) ? 'អាហារូបករណ៍ ១០០% សម្តេចតេជោ' : 'អាហារូបករណ៍ ១០០% TVET ឥតគិតថ្លៃ',
-        ]);
+        // Create the user account and update admission atomically inside a database transaction
+        $user = DB::transaction(function () use (
+            $admission,
+            $username,
+            $email,
+            $password,
+            $studentId,
+            $totalCredits,
+            $request,
+            $year
+        ): User {
+            $createdUser = User::create([
+                'username' => $username,
+                'email' => $email,
+                'password' => Hash::make($password),
+                'role' => 'student',
+                'status' => 'active',
+                'studentId' => $studentId,
+                'fullName' => $admission->khmerName.($admission->latinName ? " ({$admission->latinName})" : ''),
+                'khmerName' => $admission->khmerName,
+                'latinName' => $admission->latinName,
+                'gender' => $admission->gender ?: 'male',
+                'dob' => $admission->dob,
+                'phone' => $admission->phone,
+                'avatarUrl' => $admission->photoUrl,
+                'className' => $request->input('className', $admission->major),
+                'semester' => $request->input('semester', '1'),
+                'academicYear' => $request->input('academicYear', "{$year}-".($year + 1)),
+                'generation' => $request->input('generation', '13'),
+                'shift' => $request->input('shift', $admission->shift ?: 'morning'),
+                'room' => $request->input('room', 'Building B - Lab 3'),
+                'degreeLevel' => $admission->degreeLevel,
+                'faculty' => $request->input('faculty', 'ដេប៉ាតឺម៉ង់បច្ចេកវិទ្យាព័ត៌មាន'),
+                'totalCredits' => $totalCredits,
+                'completedCredits' => 0,
+                'scholarshipType' => ! empty($admission->equityCardUrl) ? 'អាហារូបករណ៍ ១០០% សម្តេចតេជោ' : 'អាហារូបករណ៍ ១០០% TVET ឥតគិតថ្លៃ',
+            ]);
 
-        // Link admission
-        $admission->update([
-            'status' => 'enrolled',
-            'enrolledStudentId' => $studentId,
-            'enrolledUserId' => $user->id,
-            'adminNotes' => ($admission->adminNotes ? $admission->adminNotes."\n" : '')."Enrolled as student [{$studentId}] on ".date('Y-m-d H:i:s'),
-        ]);
+            // Link admission atomically
+            $admission->update([
+                'status' => 'enrolled',
+                'enrolledStudentId' => $studentId,
+                'enrolledUserId' => $createdUser->id,
+                'adminNotes' => ($admission->adminNotes ? $admission->adminNotes."\n" : '')."Enrolled as student [{$studentId}] on ".date('Y-m-d H:i:s'),
+            ]);
+
+            return $createdUser;
+        });
 
         try {
             $notifyEmail = ! empty($admission->email) ? $admission->email : $user->email;

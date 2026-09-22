@@ -349,6 +349,25 @@ export const StudentDashboardPage = () => {
     ? `Grade ${examResults[0].grade}`
     : 'Grade A';
 
+  // Degree Credit Metrics (Safe Fallbacks)
+  const totalCredits = Number(student.totalCredits || stats.totalCredits || 120);
+  const completedCredits = Number(
+    student.completedCredits !== undefined && student.completedCredits !== null
+      ? student.completedCredits
+      : stats.completedCredits !== undefined && stats.completedCredits !== null
+      ? stats.completedCredits
+      : passedCount * 3
+  );
+  const creditPercent = Number(
+    student.creditPercentage !== undefined && student.creditPercentage !== null
+      ? student.creditPercentage
+      : stats.creditPercentage !== undefined && stats.creditPercentage !== null
+      ? stats.creditPercentage
+      : totalCredits > 0
+      ? Math.round((completedCredits / totalCredits) * 100)
+      : 0
+  );
+
   // Filtered Exam Results
   const filteredExamResults = examResults.filter((r) => {
     const matchesSearch =
@@ -4039,7 +4058,7 @@ export const StudentDashboardPage = () => {
               </div>
 
               {/* Actions */}
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
+              <div className="no-print" style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
                 <button
                   type="button"
                   onClick={() => window.print()}
