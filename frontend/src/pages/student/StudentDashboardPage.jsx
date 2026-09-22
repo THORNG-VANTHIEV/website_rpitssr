@@ -404,13 +404,15 @@ export const StudentDashboardPage = () => {
     <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: "'Inter', 'Kantumruy Pro', sans-serif" }}>
       {/* Top Navbar */}
       <header
+        className="student-portal-header"
         style={{
           backgroundColor: '#ffffff',
           borderBottom: '1px solid #e2e8f0',
           position: 'sticky',
           top: 0,
-          zIndex: 100,
-          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          zIndex: 1000,
+          boxShadow: '0 2px 10px rgba(7, 41, 77, 0.08)',
+          width: '100%',
         }}
       >
         <div
