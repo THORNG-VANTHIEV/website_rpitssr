@@ -177,7 +177,15 @@ class AdminAdmissionController extends Controller
         // Initial default password
         $password = $request->input('password', 'Rpitssr@2026');
 
-        // Create the user account with active status
+        // Total credits based on degree level
+        $totalCredits = 120;
+        if (in_array($admission->degreeLevel, ['higher_diploma'])) {
+            $totalCredits = 60;
+        } elseif (in_array($admission->degreeLevel, ['tvet_short', 'short_course', 'c1', 'c2', 'c3'])) {
+            $totalCredits = 30;
+        }
+
+        // Create the user account with active status and full academic profile
         $user = User::create([
             'username' => $username,
             'email' => $email,
@@ -186,9 +194,23 @@ class AdminAdmissionController extends Controller
             'status' => 'active',
             'studentId' => $studentId,
             'fullName' => $admission->khmerName.($admission->latinName ? " ({$admission->latinName})" : ''),
+            'khmerName' => $admission->khmerName,
+            'latinName' => $admission->latinName,
+            'gender' => $admission->gender ?: 'male',
+            'dob' => $admission->dob,
+            'phone' => $admission->phone,
+            'avatarUrl' => $admission->photoUrl,
             'className' => $request->input('className', $admission->major),
             'semester' => $request->input('semester', '1'),
             'academicYear' => $request->input('academicYear', "{$year}-".($year + 1)),
+            'generation' => $request->input('generation', '13'),
+            'shift' => $request->input('shift', $admission->shift ?: 'morning'),
+            'room' => $request->input('room', 'Building B - Lab 3'),
+            'degreeLevel' => $admission->degreeLevel,
+            'faculty' => $request->input('faculty', 'ដេប៉ាតឺម៉ង់បច្ចេកវិទ្យាព័ត៌មាន'),
+            'totalCredits' => $totalCredits,
+            'completedCredits' => 0,
+            'scholarshipType' => ! empty($admission->equityCardUrl) ? 'អាហារូបករណ៍ ១០០% សម្តេចតេជោ' : 'អាហារូបករណ៍ ១០០% TVET ឥតគិតថ្លៃ',
         ]);
 
         // Link admission

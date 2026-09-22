@@ -25,9 +25,23 @@ class User extends Authenticatable
         'status',
         'studentId',
         'fullName',
+        'khmerName',
+        'latinName',
+        'gender',
+        'dob',
+        'phone',
+        'avatarUrl',
         'className',
         'semester',
         'academicYear',
+        'generation',
+        'shift',
+        'room',
+        'degreeLevel',
+        'faculty',
+        'totalCredits',
+        'completedCredits',
+        'scholarshipType',
     ];
 
     protected $hidden = [
@@ -52,6 +66,9 @@ class User extends Authenticatable
     {
         return [
             'password' => 'hashed',
+            'dob' => 'date:Y-m-d',
+            'totalCredits' => 'integer',
+            'completedCredits' => 'integer',
         ];
     }
 
