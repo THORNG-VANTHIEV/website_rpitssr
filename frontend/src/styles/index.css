@@ -5483,6 +5483,14 @@ i {
   overflow-x: auto;
   padding-bottom: 2px;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.student-nav-tabs-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera, Edge */
+  width: 0;
+  height: 0;
 }
 
 .student-nav-tab-btn {

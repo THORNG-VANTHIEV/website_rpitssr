@@ -929,7 +929,13 @@ export const StudentDashboardPage = () => {
         </div>
 
         {/* Dashboard Navigation Tabs */}
-        <div className="student-nav-tabs-wrapper">
+        <div
+          className="student-nav-tabs-wrapper"
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
+        >
           {[
             { id: 'overview', label: 'ទិដ្ឋភាពទូទៅ (Overview)', icon: Layers },
             { id: 'exams', label: `លទ្ធផលប្រឡង (${examResults.length})`, icon: Award },
