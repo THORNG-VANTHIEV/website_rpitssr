@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
 class AdminAdmissionController extends Controller
@@ -65,10 +67,14 @@ class AdminAdmissionController extends Controller
         $perPage = $request->input('perPage', 50);
         $admissions = $query->paginate($perPage);
 
+        $formattedData = collect($admissions->items())->map(function (Admission $adm) {
+            return $this->formatAdmissionWithSecureDocuments($adm);
+        });
+
         return response()->json([
             'success' => true,
             'metrics' => $metrics,
-            'data' => $admissions->items(),
+            'data' => $formattedData,
             'pagination' => [
                 'currentPage' => $admissions->currentPage(),
                 'lastPage' => $admissions->lastPage(),
@@ -94,7 +100,7 @@ class AdminAdmissionController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $admission,
+            'data' => $this->formatAdmissionWithSecureDocuments($admission),
         ], 200);
     }
 
@@ -130,7 +136,7 @@ class AdminAdmissionController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'បានកែប្រែស្ថានភាពពាក្យសុំជោគជ័យ! / Status updated successfully!',
-            'data' => $admission,
+            'data' => $this->formatAdmissionWithSecureDocuments($admission),
         ], 200);
     }
 
@@ -287,5 +293,86 @@ class AdminAdmissionController extends Controller
             'success' => true,
             'message' => 'បានលុបពាក្យសុំដោយជោគជ័យ / Admission record deleted successfully',
         ], 200);
+    }
+
+    /**
+     * View or stream an applicant document securely via cryptographic signature or admin authentication
+     */
+    public function viewDocument(Request $request, $id, $type)
+    {
+        $hasValidSignature = $request->hasValidSignature();
+        $isAdmin = $request->user('sanctum')?->isSubAdmin();
+
+        if (! $hasValidSignature && ! $isAdmin) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Unauthorized or expired document access signature.',
+            ], 403);
+        }
+
+        $admission = Admission::find($id);
+
+        if (! $admission) {
+            return response()->json(['error' => 'Admission application not found.'], 404);
+        }
+
+        $allowedTypes = ['photo', 'certificate', 'idCard', 'equityCard'];
+
+        if (! in_array($type, $allowedTypes, true)) {
+            return response()->json(['error' => 'Invalid document type requested.'], 400);
+        }
+
+        $field = $type.'Url';
+        $storedValue = $admission->{$field};
+
+        if (empty($storedValue)) {
+            return response()->json(['error' => 'Document not found for this applicant.'], 404);
+        }
+
+        // Case 1: Stored on private local disk with "private:" prefix
+        if (str_starts_with($storedValue, 'private:')) {
+            $relativePath = substr($storedValue, strlen('private:'));
+            if (Storage::disk('local')->exists($relativePath)) {
+                return Storage::disk('local')->response($relativePath);
+            }
+        }
+
+        // Case 2: Stored on private local disk without prefix
+        if (str_starts_with($storedValue, 'admissions/private/')) {
+            if (Storage::disk('local')->exists($storedValue)) {
+                return Storage::disk('local')->response($storedValue);
+            }
+        }
+
+        // Case 3: Stored on public disk (legacy files or public documents)
+        $publicPath = preg_replace('#^/storage/#', '', $storedValue);
+        if (Storage::disk('public')->exists($publicPath)) {
+            return Storage::disk('public')->response($publicPath);
+        }
+
+        return response()->json(['error' => 'Document file does not exist on disk.'], 404);
+    }
+
+    /**
+     * Format admission model with temporary cryptographic signed URLs for sensitive documents
+     */
+    private function formatAdmissionWithSecureDocuments(Admission $admission): array
+    {
+        $data = $admission->toArray();
+
+        foreach (['idCardUrl' => 'idCard', 'equityCardUrl' => 'equityCard', 'certificateUrl' => 'certificate', 'photoUrl' => 'photo'] as $field => $type) {
+            if (! empty($admission->{$field})) {
+                $val = $admission->{$field};
+                if (str_starts_with($val, 'private:') || str_starts_with($val, '/storage/') || str_starts_with($val, 'uploads/')) {
+                    $data[$field] = URL::temporarySignedRoute(
+                        'admin.admissions.document',
+                        now()->addHours(2),
+                        ['id' => $admission->id, 'type' => $type]
+                    );
+                }
+            }
+        }
+
+        return $data;
     }
 }

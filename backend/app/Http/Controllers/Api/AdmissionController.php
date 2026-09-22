@@ -91,18 +91,28 @@ class AdmissionController extends Controller
         $prefix = preg_replace('/[^a-zA-Z0-9_-]/', '', $type) ?: 'doc';
         // Cryptographically random 28-character filename to prevent discovery
         $fileName = $prefix.'_'.Str::random(28).'_'.time().'.'.$extension;
-        $subDir = 'admissions';
-        $filePath = "uploads/{$subDir}/{$fileName}";
 
-        Storage::disk('public')->putFileAs("uploads/{$subDir}", $file, $fileName);
+        // Security: Store sensitive identity documents (national ID & equity cards) on private local storage
+        $isSensitive = in_array($type, ['idCard', 'equityCard'], true);
 
-        $url = "/storage/{$filePath}";
+        if ($isSensitive) {
+            $subDir = 'admissions/private';
+            $filePath = "{$subDir}/{$fileName}";
+            Storage::disk('local')->putFileAs($subDir, $file, $fileName);
+            $url = "private:{$filePath}";
+        } else {
+            $subDir = 'admissions';
+            $filePath = "uploads/{$subDir}/{$fileName}";
+            Storage::disk('public')->putFileAs("uploads/{$subDir}", $file, $fileName);
+            $url = "/storage/{$filePath}";
+        }
 
         return response()->json([
             'success' => true,
             'url' => $url,
             'fileName' => $fileName,
             'filePath' => $filePath,
+            'isPrivate' => $isSensitive,
         ], 201);
     }
 

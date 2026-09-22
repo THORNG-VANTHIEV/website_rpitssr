@@ -2,9 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Models\Admission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -269,6 +273,98 @@ class AccountSecurityTest extends TestCase
         ])->assertOk();
 
         $this->assertNotEmpty($loginRes->json('token'));
+    }
+
+    public function test_admin_cannot_demote_or_deactivate_self(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
+        $adminToken = $admin->createToken('admin')->plainTextToken;
+
+        // 1. Attempt to demote self to student -> Blocked with 422
+        $demoteRes = $this->requestWithToken($adminToken, 'PUT', "/api/admin/users/{$admin->id}", [
+            'role' => 'student',
+        ]);
+        $demoteRes->assertStatus(422)
+            ->assertJson(['error' => 'Action prohibited. You cannot demote your own administrator account.']);
+        $this->assertSame('admin', $admin->fresh()->role);
+
+        // 2. Attempt to deactivate self -> Blocked with 422
+        $deactivateRes = $this->requestWithToken($adminToken, 'PUT', "/api/admin/users/{$admin->id}", [
+            'status' => 'rejected',
+        ]);
+        $deactivateRes->assertStatus(422)
+            ->assertJson(['error' => 'Action prohibited. You cannot deactivate your own administrator account.']);
+        $this->assertSame('active', $admin->fresh()->status);
+
+        // 3. Updating normal profile fields (fullName) succeeds
+        $this->requestWithToken($adminToken, 'PUT', "/api/admin/users/{$admin->id}", [
+            'fullName' => 'Updated Super Admin Name',
+        ])->assertOk();
+        $this->assertSame('Updated Super Admin Name', $admin->fresh()->fullName);
+    }
+
+    public function test_sensitive_admission_document_storage_and_signed_url_protection(): void
+    {
+        Storage::fake('local');
+        Storage::fake('public');
+
+        // 1. Upload sensitive ID Card document via public endpoint
+        $file = UploadedFile::fake()->create('national_id.pdf', 500, 'application/pdf');
+        $uploadRes = $this->post('/api/admissions/upload-document', [
+            'file' => $file,
+            'type' => 'idCard',
+        ]);
+        $uploadRes->assertCreated()
+            ->assertJsonPath('isPrivate', true);
+
+        $url = $uploadRes->json('url');
+        $this->assertStringStartsWith('private:', $url);
+
+        // Assert file is stored on private local disk, NOT on public disk
+        $localRelativePath = substr($url, strlen('private:'));
+        Storage::disk('local')->assertExists($localRelativePath);
+        Storage::disk('public')->assertMissing($localRelativePath);
+
+        // 2. Create Admission record with this private document
+        $admission = Admission::create([
+            'trackingCode' => 'APP-2026-TESTDOC1',
+            'khmerName' => 'សុខ សប្បាយ',
+            'latinName' => 'SOK SABAY',
+            'gender' => 'male',
+            'phone' => '012345678',
+            'degreeLevel' => 'bachelor',
+            'major' => 'Information Technology',
+            'shift' => 'morning',
+            'idCardUrl' => $url,
+            'status' => 'pending',
+        ]);
+
+        // 3. Direct unauthenticated / unsigned access to document route is rejected
+        $this->getJson("/api/admissions/{$admission->id}/document/idCard")
+            ->assertForbidden()
+            ->assertJson(['error' => 'Unauthorized or expired document access signature.']);
+
+        // 4. Access with forged / invalid signature is rejected
+        $this->getJson("/api/admissions/{$admission->id}/document/idCard?signature=fake_invalid_sig")
+            ->assertForbidden();
+
+        // 5. Access with valid cryptographic signed URL succeeds
+        $validSignedUrl = URL::temporarySignedRoute(
+            'admin.admissions.document',
+            now()->addMinutes(30),
+            ['id' => $admission->id, 'type' => 'idCard']
+        );
+        $this->get($validSignedUrl)->assertOk();
+
+        // 6. Admin API list / show generates temporary signed route
+        $admin = User::factory()->create(['role' => 'admin']);
+        $adminToken = $admin->createToken('admin')->plainTextToken;
+
+        $showRes = $this->requestWithToken($adminToken, 'GET', "/api/admin/admissions/{$admission->id}");
+        $showRes->assertOk();
+
+        $returnedDocUrl = $showRes->json('data.idCardUrl');
+        $this->assertStringContainsString('signature=', $returnedDocUrl);
     }
 
     public static function roles(): array

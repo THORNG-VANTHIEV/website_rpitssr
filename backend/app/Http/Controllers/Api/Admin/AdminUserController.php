@@ -103,6 +103,22 @@ class AdminUserController extends Controller
             'academicYear' => 'nullable|string',
         ]);
 
+        $currentUser = $request->user();
+
+        // Security: Prevent Super Admin self-demotion or self-lockout
+        if ($currentUser && (int) $id === (int) $currentUser->id) {
+            if (isset($validated['role']) && $validated['role'] !== 'admin') {
+                return response()->json([
+                    'error' => 'Action prohibited. You cannot demote your own administrator account.',
+                ], 422);
+            }
+            if (isset($validated['status']) && $validated['status'] !== 'active') {
+                return response()->json([
+                    'error' => 'Action prohibited. You cannot deactivate your own administrator account.',
+                ], 422);
+            }
+        }
+
         if (! empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
         } else {

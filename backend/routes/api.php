@@ -111,6 +111,8 @@ Route::middleware('throttle:public-content')->group(function () {
     Route::post('/admissions/upload-document', [AdmissionController::class, 'uploadDocument'])
         ->middleware('throttle:admissions-upload');
     Route::get('/admissions/options', [AdmissionController::class, 'options']);
+    Route::get('/admissions/{id}/document/{type}', [AdminAdmissionController::class, 'viewDocument'])
+        ->name('admin.admissions.document');
 
     // Documents / Downloads
     Route::get('/documents', [DocumentController::class, 'index']);
