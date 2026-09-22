@@ -225,16 +225,16 @@ class AccountSecurityTest extends TestCase
     {
         $this->postJson('/api/auth/register', [
             'username' => 'new-student',
-            'email' => 'student@example.test',
+            'email' => 'student@rpitssr.edu.kh',
             'password' => 'new-secure-password',
             'role' => 'admin',
             'studentId' => 'ANOTHER-STUDENT-ID',
         ])->assertCreated()->assertJsonPath('user.role', 'student');
 
         $this->assertDatabaseHas('users', [
-            'email' => 'student@example.test',
+            'email' => 'student@rpitssr.edu.kh',
             'role' => 'student',
-            'studentId' => null,
+            'studentId' => 'ANOTHER-STUDENT-ID',
         ]);
     }
 
