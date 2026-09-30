@@ -21,21 +21,77 @@ class AdmissionController extends Controller
     public function apply(Request $request): JsonResponse
     {
         $validated = $request->validate([
+            // Core Identity (Khmer / Latin)
             'khmerName' => 'required|string|max:255',
             'latinName' => 'required|string|max:255',
             'gender' => 'required|in:male,female,other',
             'dob' => 'nullable|date',
+            'idCardNumber' => 'nullable|string|max:50',
+            'studentCardNo' => 'nullable|string|max:50',
+            'nationality' => 'nullable|string|max:50',
+            'ethnicity' => 'nullable|string|max:50',
+            'religion' => 'nullable|string|max:50',
+            'pob' => 'nullable|string|max:1000',
+
+            // Contact & Address
             'phone' => 'required|string|max:50',
             'telegram' => 'nullable|string|max:100',
             'email' => 'nullable|email|max:255',
             'currentAddress' => 'nullable|string|max:1000',
+            'permanentAddress' => 'nullable|string|max:1000',
+            'distanceKm' => 'nullable|numeric',
+            'familyMembersCount' => 'nullable|integer',
+            'maritalStatus' => 'nullable|string|max:50',
+            'commuteMethod' => 'nullable|string|max:100',
+
+            // Guardian Information
+            'guardianName' => 'nullable|string|max:255',
+            'guardianRelation' => 'nullable|string|max:100',
+            'guardianPhone' => 'nullable|string|max:50',
+            'guardianEmail' => 'nullable|string|max:255',
+            'guardianAddress' => 'nullable|string|max:1000',
+
+            // Academic Program & Study Choice
             'courseType' => 'nullable|in:long_term,short_term',
+            'studyType' => 'nullable|string|max:50', // scholarship | paying
+            'academicYear' => 'nullable|string|max:50',
             'degreeLevel' => 'required|string|max:100',
             'major' => 'required|string|max:255',
             'shift' => 'required|string|max:50',
+
+            // General Education & Previous Training
+            'educationLevel' => 'nullable|string|max:100',
+            'isStudyingGeneral' => 'nullable|boolean',
+            'previousSchool' => 'nullable|string|max:255',
+            'schoolGraduationYear' => 'nullable|string|max:20',
+            'previousTraining' => 'nullable|string|max:2000',
+
+            // Employment (TVET MIS)
+            'employmentStatus' => 'nullable|string|max:100',
+            'jobTitle' => 'nullable|string|max:255',
+            'incomeType' => 'nullable|string|max:100',
+            'personalIncome' => 'nullable|string|max:100',
+            'familyIncome' => 'nullable|string|max:100',
+            'employmentType' => 'nullable|string|max:100',
+
+            // Voluntary / Social Equity
+            'workObstacle' => 'nullable|string|max:255',
+            'hasDisability' => 'nullable|boolean',
+            'disabilityType' => 'nullable|string|max:100',
+            'disabilityTiming' => 'nullable|string|max:50',
+            'isIndigenous' => 'nullable|boolean',
+            'indigenousGroup' => 'nullable|string|max:100',
+            'isOrphan' => 'nullable|boolean',
+            'hasEquityCard' => 'nullable|boolean',
+            'equityCardNumber' => 'nullable|string|max:100',
+            'equityCardType' => 'nullable|string|max:50',
+
+            // Uploaded Documents
             'photoUrl' => 'nullable|string|max:500',
             'certificateUrl' => 'nullable|string|max:500',
             'idCardUrl' => 'nullable|string|max:500',
+            'familyBookUrl' => 'nullable|string|max:500',
+            'birthCertificateUrl' => 'nullable|string|max:500',
             'equityCardUrl' => 'nullable|string|max:500',
         ]);
 
@@ -43,6 +99,13 @@ class AdmissionController extends Controller
         if (empty($validated['courseType'])) {
             $validated['courseType'] = in_array($validated['degreeLevel'], ['bachelor', 'higher_diploma']) ? 'long_term' : 'short_term';
         }
+
+        // Defaults for standard Cambodian institutional admission form
+        $validated['nationality'] = $validated['nationality'] ?? 'កម្ពុជា';
+        $validated['ethnicity'] = $validated['ethnicity'] ?? 'ខ្មែរ';
+        $validated['religion'] = $validated['religion'] ?? 'ព្រះពុទ្ធ';
+        $validated['studyType'] = $validated['studyType'] ?? 'scholarship';
+        $validated['academicYear'] = $validated['academicYear'] ?? '2026-2027';
 
         // Generate unique tracking code: APP-YYYY-XXXXXXXX (8 chars for strong entropy)
         $year = date('Y');
@@ -73,13 +136,13 @@ class AdmissionController extends Controller
     }
 
     /**
-     * Upload an applicant document (photo, certificate, ID card, equity card) securely
+     * Upload an applicant document (photo, certificate, ID card, family book, equity card) securely
      */
     public function uploadDocument(Request $request): JsonResponse
     {
         $request->validate([
-            'file' => 'required|file|mimes:jpeg,jpg,png,webp,pdf|max:5120', // max 5MB
-            'type' => 'nullable|string|in:photo,certificate,idCard,equityCard',
+            'file' => 'required|file|mimes:jpeg,jpg,png,webp,pdf|max:10240', // max 10MB
+            'type' => 'nullable|string|in:photo,certificate,idCard,familyBook,birthCertificate,equityCard',
         ]);
 
         $file = $request->file('file');
@@ -92,8 +155,8 @@ class AdmissionController extends Controller
         // Cryptographically random 28-character filename to prevent discovery
         $fileName = $prefix.'_'.Str::random(28).'_'.time().'.'.$extension;
 
-        // Security: Store sensitive identity documents (national ID & equity cards) on private local storage
-        $isSensitive = in_array($type, ['idCard', 'equityCard'], true);
+        // Security: Store sensitive identity documents (national ID, family book, equity cards) on private local storage
+        $isSensitive = in_array($type, ['idCard', 'equityCard', 'familyBook', 'birthCertificate'], true);
 
         if ($isSensitive) {
             $subDir = 'admissions/private';
@@ -353,11 +416,61 @@ class AdmissionController extends Controller
             ],
         ];
 
+        // Standard FR02 Taxonomy Options
+        $indigenousGroups = [
+            'ព្រៅ (Brao)', 'ចារាយ (Jarai)', 'កាចាក (Kachac)', 'គ្រឹង (Kreung)',
+            'គួយ (Kuy)', 'លុន (Lun)', 'រូង (Roong)', 'ស្ទៀង (Stieng)',
+            'រាដេ (Rhade)', 'ខ្លឹង (Kleung)', 'ក្រោល (Kraol)', 'ក្រាវ៉ែត (Kravet)',
+            'មែល (Mel)', 'ភ្នង (Phnong)', 'ព័រ (Poar)', 'ទំពូន (Tampuon)',
+            'ថ្មូន (Thmaun)', 'ផ្សេងៗ (Other)',
+        ];
+
+        $disabilityTypes = [
+            ['id' => 'vision', 'nameKm' => 'ការមើល (ភ្នែក)', 'nameEn' => 'Visual / Sight'],
+            ['id' => 'speech', 'nameKm' => 'ការនិយាយ', 'nameEn' => 'Speech'],
+            ['id' => 'mobility', 'nameKm' => 'ការធ្វើចលនា (ដៃ/ជើង/ដងខ្លួន)', 'nameEn' => 'Physical / Mobility'],
+            ['id' => 'mental', 'nameKm' => 'សតិអារម្មណ៍', 'nameEn' => 'Cognitive / Mental'],
+            ['id' => 'hearing', 'nameKm' => 'ការស្តាប់ (ត្រចៀក)', 'nameEn' => 'Hearing'],
+            ['id' => 'other', 'nameKm' => 'ផ្សេងៗ', 'nameEn' => 'Other'],
+        ];
+
+        $commuteMethods = [
+            ['id' => 'own_motorcycle', 'nameKm' => 'ម៉ូតូផ្ទាល់ខ្លួន', 'nameEn' => 'Personal Motorcycle'],
+            ['id' => 'bicycle', 'nameKm' => 'កង់', 'nameEn' => 'Bicycle'],
+            ['id' => 'walk', 'nameKm' => 'ថ្មើរជើង', 'nameEn' => 'Walking'],
+            ['id' => 'public_transport', 'nameKm' => 'មធ្យោបាយធ្វើដំណើរឯកជន/សាធារណៈ', 'nameEn' => 'Public / Private Bus'],
+            ['id' => 'motodop', 'nameKm' => 'ម៉ូតូឌុប (ចំណាយលុយផ្ទាល់ខ្លួន)', 'nameEn' => 'Motodop / PassApp'],
+            ['id' => 'school_provided', 'nameKm' => 'មធ្យោបាយផ្តល់ដោយគ្រឹះស្ថាន (ឥតគិតថ្លៃ)', 'nameEn' => 'Provided by Institute (Free)'],
+            ['id' => 'community_provided', 'nameKm' => 'មធ្យោបាយផ្តល់ដោយសហគមន៍ (ឥតគិតថ្លៃ)', 'nameEn' => 'Provided by Community (Free)'],
+            ['id' => 'other', 'nameKm' => 'ផ្សេងៗ', 'nameEn' => 'Other'],
+        ];
+
+        $maritalStatuses = [
+            ['id' => 'single', 'nameKm' => 'នៅលីវ', 'nameEn' => 'Single'],
+            ['id' => 'married', 'nameKm' => 'រៀបការរួច', 'nameEn' => 'Married'],
+            ['id' => 'divorced', 'nameKm' => 'លែងលះ', 'nameEn' => 'Divorced'],
+            ['id' => 'widowed', 'nameKm' => 'មេម៉ាយ / ពោះម៉ាយ', 'nameEn' => 'Widowed'],
+        ];
+
+        $employmentStatuses = [
+            ['id' => 'unemployed', 'nameKm' => 'គ្មានការងារធ្វើ', 'nameEn' => 'Unemployed'],
+            ['id' => 'employed_full_time', 'nameKm' => 'មានការងារពេញម៉ោង', 'nameEn' => 'Full-Time Employed'],
+            ['id' => 'contract', 'nameKm' => 'ការងារជាប់កិច្ចសន្យា / ក្រៅម៉ោង', 'nameEn' => 'Contract / Part-Time'],
+            ['id' => 'self_employed', 'nameKm' => 'រកស៊ីដោយខ្លួនឯង / អាជីវកម្មផ្ទាល់ខ្លួន', 'nameEn' => 'Self-Employed / Business'],
+            ['id' => 'family_business', 'nameKm' => 'ជួយការងារគ្រួសារដោយគ្មានប្រាក់ឈ្នួល', 'nameEn' => 'Unpaid Family Worker'],
+            ['id' => 'other', 'nameKm' => 'ផ្សេងៗ', 'nameEn' => 'Other'],
+        ];
+
         return response()->json([
             'programTypes' => $programTypes,
             'degreeLevels' => $degreeLevels,
             'majors' => $majors,
             'shifts' => $shifts,
+            'indigenousGroups' => $indigenousGroups,
+            'disabilityTypes' => $disabilityTypes,
+            'commuteMethods' => $commuteMethods,
+            'maritalStatuses' => $maritalStatuses,
+            'employmentStatuses' => $employmentStatuses,
         ], 200);
     }
 }

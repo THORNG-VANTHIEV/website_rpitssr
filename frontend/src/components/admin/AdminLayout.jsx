@@ -132,9 +132,9 @@ export const AdminLayout = () => {
     }
   ];
 
-  // Initialize open groups based on current URL path
+  // Initialize open groups based on current URL path (academics open by default)
   const [openGroups, setOpenGroups] = useState(() => {
-    const initial = {};
+    const initial = { academics: true };
     navGroups.forEach(group => {
       if (group.items.some(item => item.path === location.pathname)) {
         initial[group.id] = true;

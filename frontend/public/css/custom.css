@@ -12,9 +12,36 @@ input, textarea, select, option,
     font-family: 'Kantumruy Pro', 'Inter', system-ui, -apple-system, sans-serif !important;
 }
 
-/* Ensure font loads properly for all text elements - EXCEPT icons */
+/* Ensure font loads properly for all text elements - EXCEPT icons and official printable forms */
 * {
     font-family: 'Kantumruy Pro', 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Preserve Khmer OS official font stack for institutional printable admission forms */
+.printable-modal-overlay,
+.printable-modal-overlay *:not(i):not([class*="fa-"]),
+[class*="fr02-"],
+[class*="fr02-"] *:not(i):not([class*="fa-"]) {
+    font-family: 'Khmer OS Battambang', 'Battambang', sans-serif !important;
+}
+.printable-modal-overlay .fr02-muol,
+.printable-modal-overlay .fr02-muol *,
+.printable-modal-overlay .fr02-header-gray,
+[class*="fr02-"] .fr02-muol,
+[class*="fr02-"] .fr02-muol *,
+[class*="fr02-"] .fr02-muol *:not(i):not([class*="fa-"]),
+[class*="fr02-"] .fr02-muol:not(i):not([class*="fa-"]),
+.printable-modal-overlay .fr02-muol:not(i):not([class*="fa-"]) {
+    font-family: 'Moul', 'Khmer OS Muol Light', 'Khmer OS Moul Light', 'Khmer OS Moul', serif !important;
+}
+.printable-modal-overlay .fr02-times,
+.printable-modal-overlay .fr02-times *,
+.printable-modal-overlay .fr02-times:not(i):not([class*="fa-"]),
+[class*="fr02-"] .fr02-times,
+[class*="fr02-"] .fr02-times *,
+[class*="fr02-"] .fr02-times:not(i):not([class*="fa-"]),
+[class*="fr02-"] .fr02-times *:not(i):not([class*="fa-"]) {
+    font-family: 'Times New Roman', Times, serif !important;
 }
 
 /* Preserve FontAwesome font for icon elements - CRITICAL FIX */

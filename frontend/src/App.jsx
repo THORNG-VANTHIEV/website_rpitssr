@@ -178,9 +178,23 @@ function App() {
               <Route path="plugins" element={<AdminPluginsPage />} />
             </Route>
 
-            {/* Legacy Admin Redirects */}
+            {/* Direct Admin Route Aliases & Fallbacks */}
+            <Route path="/admin-admission" element={<Navigate to="/admin-panel/admissions" replace />} />
+            <Route path="/admin-admissions" element={<Navigate to="/admin-panel/admissions" replace />} />
+            <Route path="/admin/admission" element={<Navigate to="/admin-panel/admissions" replace />} />
+            <Route path="/admin/admissions" element={<Navigate to="/admin-panel/admissions" replace />} />
+            <Route path="/admin-panel/admission" element={<Navigate to="/admin-panel/admissions" replace />} />
+            <Route path="/admin/users" element={<Navigate to="/admin-panel/users" replace />} />
+            <Route path="/admin/courses" element={<Navigate to="/admin-panel/courses" replace />} />
+            <Route path="/admin/teachers" element={<Navigate to="/admin-panel/teachers" replace />} />
+            <Route path="/admin/exam-results" element={<Navigate to="/admin-panel/exam-results" replace />} />
+            <Route path="/admin/events" element={<Navigate to="/admin-panel/events" replace />} />
+            <Route path="/admin/notices" element={<Navigate to="/admin-panel/notices" replace />} />
+            <Route path="/admin/downloads" element={<Navigate to="/admin-panel/downloads" replace />} />
+            <Route path="/admin/settings" element={<Navigate to="/admin-panel/settings" replace />} />
             <Route path="/admin" element={<Navigate to="/admin-panel" replace />} />
             <Route path="/admin/dashboard" element={<Navigate to="/admin-panel" replace />} />
+            <Route path="/admin/*" element={<Navigate to="/admin-panel" replace />} />
             {/* Student Dashboard Portal */}
             <Route path="/student-dashboard" element={<StudentRoute><StudentDashboardPage /></StudentRoute>} />
             <Route path="/student-dashboard/*" element={<StudentRoute><StudentDashboardPage /></StudentRoute>} />

@@ -99,8 +99,24 @@ export const AdminDashboardPage = () => {
   const sysInfo = summary?.systemInfo || {};
   const sysHealth = summary?.systemHealth || {};
 
-  // 8 Primary KPI Metrics
+  // 9 Primary KPI Metrics
   const stats = [
+    {
+      id: 'admissions',
+      labelKm: 'ពាក្យសុំចុះឈ្មោះចូលរៀន',
+      labelEn: 'Admissions & TVET',
+      value: counts.admissions ?? 3,
+      subKm: `${toKhmerNumber(counts.pendingAdmissions ?? 1)} រង់ចាំពិនិត្យ`,
+      subEn: `${counts.pendingAdmissions ?? 1} Pending Review`,
+      icon: GraduationCap,
+      color: '#ea580c',
+      bg: '#fff7ed',
+      borderColor: '#fed7aa',
+      tag: isKhmer ? 'ពាក្យសុំ' : 'Admissions',
+      tagBg: '#ffedd5',
+      tagColor: '#ea580c',
+      link: '/admin-panel/admissions'
+    },
     {
       id: 'users',
       labelKm: 'អ្នកប្រើប្រាស់ & និស្សិត',
@@ -557,6 +573,20 @@ export const AdminDashboardPage = () => {
             </div>
             <div className="admin-card-body p-3">
               <div className="admin-shortcuts-grid">
+                <Link to="/admin-panel/admissions" className="admin-action-tile">
+                  <div className="admin-action-tile-icon" style={{ background: '#eff6ff', color: '#1e73be', border: '1px solid #bfdbfe' }}>
+                    <GraduationCap size={20} />
+                  </div>
+                  <div className="admin-action-tile-body">
+                    <div className="admin-action-tile-title">
+                      {isKhmer ? 'ពាក្យសុំចុះឈ្មោះ' : 'Manage Admissions'}
+                    </div>
+                    <div className="admin-action-tile-desc">
+                      {isKhmer ? 'ពិនិត្យពាក្យសុំ & ចុះឈ្មោះសិស្ស' : 'Review & enroll candidates'}
+                    </div>
+                  </div>
+                </Link>
+
                 <Link to="/admin-panel/notices" className="admin-action-tile">
                   <div className="admin-action-tile-icon" style={{ background: '#fefce8', color: '#d97706', border: '1px solid #fef08a' }}>
                     <Bell size={20} />

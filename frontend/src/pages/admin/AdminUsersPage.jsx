@@ -827,7 +827,12 @@ export const AdminUsersPage = () => {
       )}
 
       {/* Header Banner */}
-      <div className="admin-users-header">
+      <div
+        className="admin-users-header"
+        style={{
+          marginBottom: '24px',
+        }}
+      >
         <div>
           <div
             style={{
@@ -858,14 +863,23 @@ export const AdminUsersPage = () => {
           >
             {isKhmer ? 'អ្នកប្រើប្រាស់ & តួនាទី' : 'User Accounts & Roles'}
           </h1>
-          <p style={{ margin: 0, fontSize: '0.9rem', color: '#64748b' }}>
+          <p style={{ margin: 0, fontSize: '0.9rem', color: '#64748b', lineHeight: '1.6' }}>
             {isKhmer
               ? 'គ្រប់គ្រង ត្រួតពិនិត្យ និងចាត់ចែងសិទ្ធិគណនីអ្នកគ្រប់គ្រង សាស្ត្រាចារ្យ និងនិស្សិត RPITSSR'
               : 'Centrally manage administrative officers, teaching faculty, and student portals.'}
           </p>
         </div>
 
-        <div className="admin-users-header-actions">
+        <div
+          className="admin-users-header-actions"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            marginTop: '16px',
+            flexWrap: 'wrap',
+          }}
+        >
           <button
             onClick={fetchData}
             className="admin-btn admin-btn-outline"

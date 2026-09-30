@@ -6,116 +6,151 @@ import { useLanguage } from '../context/LanguageContext';
 const LEADERSHIP_DATA = {
   director: {
     id: 'director',
-    nameKm: 'លោកជំទាវ/លោកស្រី ទេព កុសល',
-    nameEn: 'H.E. Tep Kosal',
+    nameKm: 'លោកស្រី ផង់ ពុទ្ធី',
+    nameEn: 'Mrs. Phong Puthy',
     titleKm: 'នាយិកាវិទ្យាស្ថាន',
     titleEn: 'Director of RPITSSR',
     category: 'executive',
     categoryLabelKm: 'គណៈនាយក',
     categoryLabelEn: 'Executive Leadership',
-    image: '/images/teachers/teacher-1.jpg',
+    image: '',
+    icon: 'fa-user-tie',
     email: 'director@rpitssr.edu.kh',
     phone: '(+855) 63 963 888',
     room: 'អគាររដ្ឋបាល A - បន្ទប់ ១០១ (Building A, Rm 101)',
-    bioKm: 'មានបទពិសោធន៍ជាង ២០ ឆ្នាំក្នុងការដឹកនាំវិស័យអប់រំបណ្តុះបណ្តាលបច្ចេកទេស និងវិជ្ជាជីវៈ (TVET) នៅកម្ពុជា។ ដឹកនាំ RPITSSR ឱ្យក្លាយជាវិទ្យាស្ថានពហុបច្ចេកទេសគំរូកម្រិតជាតិ។',
-    bioEn: 'Over 20 years of leadership in Technical and Vocational Education and Training (TVET) in Cambodia, steering RPITSSR as a premier regional polytechnic.',
+    bioKm: 'មានបទពិសោធន៍ទូលំទូលាយក្នុងការដឹកនាំ និងគ្រប់គ្រងវិស័យអប់រំបណ្តុះបណ្តាលបច្ចេកទេស និងវិជ្ជាជីវៈ (TVET)។ ដឹកនាំវិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប ឱ្យក្លាយជាគ្រឹះស្ថានអប់រំបណ្តុះបណ្តាលបច្ចេកទេសគំរូឈានមុខគេនៅភូមិភាគពាយ័ព្យ ស្របតាមគោលនយោបាយជាតិរបស់រាជរដ្ឋាភិបាល និងក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ។',
+    bioEn: 'Extensive leadership experience in Technical and Vocational Education and Training (TVET) in Cambodia, directing RPITSSR into a leading regional polytechnic institute under the Ministry of Labour and Vocational Training.',
     responsibilitiesKm: [
-      'ដឹកនាំ និងគ្រប់គ្រងទូទៅលើកិច្ចការរដ្ឋបាល បច្ចេកទេស និងហិរញ្ញវត្ថុរបស់វិទ្យាស្ថាន',
+      'ដឹកនាំ និងគ្រប់គ្រងទូទៅលើកិច្ចការរដ្ឋបាល បច្ចេកទេស ការបណ្តុះបណ្តាល និងហិរញ្ញវត្ថុរបស់វិទ្យាស្ថាន',
       'កំណត់ទិសដៅយុទ្ធសាស្ត្រ និងគោលនយោបាយអភិវឌ្ឍន៍ធនធានមនុស្ស ស្របតាមក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ (MLVT)',
-      'តំណាងវិទ្យាស្ថានក្នុងកិច្ចព្រមព្រៀងសហប្រតិបត្តិការជាតិ និងអន្តរជាតិ (MoU, Development Partners)'
+      'ជំរុញកម្មវិធីអាហារូបករណ៍បណ្តុះបណ្តាលជំនាញវិជ្ជាជីវៈ ១.៥ លាននាក់ និងលើកកម្ពស់ស្តង់ដារគុណវុឌ្ឍិអប់រំបច្ចេកទេស',
+      'តំណាងវិទ្យាស្ថានក្នុងកិច្ចព្រមព្រៀងសហប្រតិបត្តិការជាមួយដៃគូអភិវឌ្ឍន៍ វិស័យឯកជន និងស្ថាប័នជាតិ-អន្តរជាតិ'
     ],
     responsibilitiesEn: [
       'Overall leadership and institutional management across administrative, academic, and financial operations',
       'Strategic planning and human resource development aligned with MLVT policies',
+      'Driving nationwide 1.5M TVET scholarship programs and elevating technical training standards',
       'Institutional representation for national and international partnerships and MoUs'
     ],
-    qualificationsKm: 'បណ្ឌិតគ្រប់គ្រងអប់រំ និងគោលនយោបាយសាធារណៈ (Ph.D. in Educational Administration)',
-    qualificationsEn: 'Ph.D. in Educational Administration & Public Policy'
+    qualificationsKm: 'អនុបណ្ឌិត/បណ្ឌិតគ្រប់គ្រងអប់រំ និងគោលនយោបាយសាធារណៈ',
+    qualificationsEn: 'Master/Ph.D. in Educational Administration & Leadership'
   },
   deputies: [
     {
-      id: 'deputy-academic',
-      nameKm: 'លោក ហេង សុផល',
-      nameEn: 'Eng. Heng Sophal',
+      id: 'deputy-sunleap',
+      nameKm: 'លោក ហ៊រ ស៊ុនលាភ',
+      nameEn: 'Mr. Hor Sunleap',
       titleKm: 'នាយករងទទួលបន្ទុកកិច្ចការសិក្សា និងបណ្តុះបណ្តាល',
       titleEn: 'Deputy Director - Academic Affairs & Training',
       category: 'executive',
       categoryLabelKm: 'គណៈនាយក',
       categoryLabelEn: 'Executive Leadership',
-      image: '/images/teachers/teacher-2.jpg',
-      email: 'academic@rpitssr.edu.kh',
+      image: '',
+      icon: 'fa-user-graduate',
+      email: 'sunleap.hor@rpitssr.edu.kh',
       phone: '(+855) 12 345 601',
       room: 'អគាររដ្ឋបាល A - បន្ទប់ ១០២ (Building A, Rm 102)',
-      bioKm: 'ឯកទេសខាងការរៀបចំកម្មវិធីសិក្សាផ្អែកលើសមត្ថភាព (CBT) និងការគ្រប់គ្រងគុណវុឌ្ឍិជាតិ (CQF)។',
-      bioEn: 'Specialist in Competency-Based Training (CBT) curricula and Cambodian Qualifications Framework (CQF).',
+      bioKm: 'ឯកទេសខាងការរៀបចំកម្មវិធីសិក្សាផ្អែកលើសមត្ថភាព (CBT) ការគ្រប់គ្រងគុណវុឌ្ឍិជាតិ (CQF) និងការបណ្តុះបណ្តាលជំនាញវិជ្ជាជីវៈ TVET ជូនយុវជន។',
+      bioEn: 'Specialist in Competency-Based Training (CBT) curricula, Cambodian Qualifications Framework (CQF), and TVET technical education delivery.',
       responsibilitiesKm: [
-        'គ្រប់គ្រងកម្មវិធីសិក្សា TVET និងកម្រិតឧត្តមសិក្សាគ្រប់ដេប៉ាតឺម៉ង់',
-        'ត្រួតពិនិត្យការរៀបចំការប្រឡងឆមាស និងការវាយតម្លៃលទ្ធផលសិក្សារបស់និស្សិត',
-        'អភិវឌ្ឍន៍សមត្ថភាពគរុកោសល្យ និងជំនាញបច្ចេកវិទ្យារបស់គ្រូឧទ្ទេស'
+        'គ្រប់គ្រងការអនុវត្តកម្មវិធីសិក្សា TVET និងកម្រិតសញ្ញាបត្រជាន់ខ្ពស់បច្ចេកទេស/បរិញ្ញាបត្របច្ចេកវិទ្យាគ្រប់ដេប៉ាតឺម៉ង់',
+        'ត្រួតពិនិត្យការរៀបចំការប្រឡងឆមាស ការវាស់វែង និងវាយតម្លៃសមត្ថភាពជាក់ស្តែងរបស់សិស្ស-និស្សិត',
+        'ដឹកនាំការរៀបចំកម្មវិធីបណ្តុះបណ្តាលជំនាញវិជ្ជាជីវៈ និងបច្ចេកទេស ១.៥ លាននាក់របស់រាជរដ្ឋាភិបាល'
       ],
       responsibilitiesEn: [
-        'Supervision of TVET and higher-education curricula across all departments',
-        'Oversight of semester examinations, grading standards, and academic assessments',
-        'Pedagogical and technical capacity development for teaching faculty'
+        'Supervision of TVET diplomas and Bachelor of Technology curricula across all academic departments',
+        'Oversight of semester examinations, practical grading standards, and student competency assessments',
+        'Directing the implementation of the Royal Government 1.5M TVET vocational skills program'
       ],
-      qualificationsKm: 'អនុបណ្ឌិតវិស្វកម្មបច្ចេកវិទ្យា (Master of Engineering)',
+      qualificationsKm: 'អនុបណ្ឌិតវិស្វកម្ម និងអប់រំបច្ចេកទេស (Master of Engineering & Technical Education)',
       qualificationsEn: 'Master of Engineering & Technical Education'
     },
     {
-      id: 'deputy-admin',
-      nameKm: 'លោកស្រី គង់ សុខា',
-      nameEn: 'Mrs. Kong Sokha',
-      titleKm: 'នាយករងទទួលបន្ទុកកិច្ចការរដ្ឋបាល និងបុគ្គលិក',
-      titleEn: 'Deputy Director - Administration & HR',
+      id: 'deputy-chanthon',
+      nameKm: 'លោក ស៊ីម ចាន់ថន',
+      nameEn: 'Mr. Sim Chanthon',
+      titleKm: 'នាយករងទទួលបន្ទុកកិច្ចការរដ្ឋបាល បុគ្គលិក និងផែនការ',
+      titleEn: 'Deputy Director - Administration, HR & Planning',
       category: 'executive',
       categoryLabelKm: 'គណៈនាយក',
       categoryLabelEn: 'Executive Leadership',
-      image: '/images/teachers/teacher-3.jpg',
-      email: 'admin@rpitssr.edu.kh',
+      image: '',
+      icon: 'fa-user-graduate',
+      email: 'chanthon.sim@rpitssr.edu.kh',
       phone: '(+855) 12 345 602',
       room: 'អគាររដ្ឋបាល A - បន្ទប់ ១០៣ (Building A, Rm 103)',
-      bioKm: 'ជំនាញក្នុងការគ្រប់គ្រងធនធានមនុស្សក្នុងវិស័យសាធារណៈ និងផែនការថវិកាហិរញ្ញវត្ថុស្ថាប័ន។',
-      bioEn: 'Expertise in public-sector human resource management and institutional financial planning.',
+      bioKm: 'បទពិសោធន៍ក្នុងការដឹកនាំការងាររដ្ឋបាលទូទៅ ការគ្រប់គ្រងមន្ត្រីរាជការ បុគ្គលិក និងការកសាងផែនការថវិកាហិរញ្ញវត្ថុស្ថាប័នសាធារណៈ។',
+      bioEn: 'Extensive leadership experience in general institutional administration, civil service HR management, and public institutional budget planning.',
       responsibilitiesKm: [
-        'គ្រប់គ្រងបុគ្គលិក មន្ត្រីរាជការ និងបុគ្គលិកកិច្ចសន្យា',
-        'រៀបចំផែនការថវិកា គណនេយ្យ និងលទ្ធកម្មសម្ភារបច្ចេកទេស',
-        'គ្រប់គ្រងអគារសិក្សា បរិស្ថាន សន្តិសុខ និងទ្រព្យសម្បត្តិរដ្ឋ'
+        'គ្រប់គ្រងកិច្ចការរដ្ឋបាលទូទៅ លិខិតស្នាម និងការគ្រប់គ្រងមន្ត្រី បុគ្គលិក និងគ្រូជាប់កិច្ចសន្យា',
+        'រៀបចំផែនការថវិកាប្រចាំឆ្នាំ គណនេយ្យ របាយការណ៍ហិរញ្ញវត្ថុ និងលទ្ធកម្មសម្ភារបច្ចេកទេស',
+        'គ្រប់គ្រងហេដ្ឋារចនាសម្ព័ន្ធ អគារសិក្សា សន្តិសុខ សណ្តាប់ធ្នាប់ និងបរិស្ថានវិទ្យាស្ថាន'
       ],
       responsibilitiesEn: [
-        'Civil servant, staff, and contract personnel management and HR development',
-        'Budget planning, institutional accounting, and public procurement',
-        'Campus infrastructure, asset management, and occupational health & safety'
+        'Managing institutional administrative workflows, official correspondence, and personnel affairs',
+        'Annual budget planning, expenditure control, accounting, and technical procurement',
+        'Campus facilities, building infrastructure maintenance, security, and institutional environment'
       ],
       qualificationsKm: 'អនុបណ្ឌិតរដ្ឋបាលសាធារណៈ (Master of Public Administration)',
       qualificationsEn: 'Master of Public Administration (MPA)'
     },
     {
-      id: 'deputy-enterprise',
-      nameKm: 'លោក ស៊ាន ចាន់ថា',
-      nameEn: 'Mr. Sean Chantha',
-      titleKm: 'នាយករងទទួលបន្ទុកទំនាក់ទំនងសហគ្រាស និងធានាគុណភាព',
-      titleEn: 'Deputy Director - Enterprise & Quality Assurance',
+      id: 'deputy-bora',
+      nameKm: 'លោក លី បូរ៉ា',
+      nameEn: 'Mr. Ly Bora',
+      titleKm: 'នាយករងទទួលបន្ទុកទំនាក់ទំនងសហគ្រាស និងការងារនិស្សិត',
+      titleEn: 'Deputy Director - Enterprise Relations & Student Affairs',
       category: 'executive',
       categoryLabelKm: 'គណៈនាយក',
       categoryLabelEn: 'Executive Leadership',
-      image: '/images/teachers/teacher-4.jpg',
-      email: 'enterprise@rpitssr.edu.kh',
+      image: '',
+      icon: 'fa-user-graduate',
+      email: 'bora.ly@rpitssr.edu.kh',
       phone: '(+855) 12 345 603',
       room: 'អគាររដ្ឋបាល B - បន្ទប់ ២០១ (Building B, Rm 201)',
-      bioKm: 'បទពិសោធន៍ទូលំទូលាយក្នុងការកសាងបណ្តាញដៃគូឧស្សាហកម្ម សភាពាណិជ្ជកម្ម និងអង្គការអភិវឌ្ឍន៍អន្តរជាតិ។',
-      bioEn: 'Extensive track record in building enterprise networks, industry chambers, and development agency linkages.',
+      bioKm: 'ជំនាញក្នុងការកសាងបណ្តាញកិច្ចសហប្រតិបត្តិការជាមួយវិស័យឯកជន សភាពាណិជ្ជកម្ម សមាគមវិជ្ជាជីវៈ និងការគាំទ្រនិស្សិតចុះហាត់ការនិងការងារ។',
+      bioEn: 'Specialist in establishing private sector linkages, industry chambers, employer associations, internship placements, and graduate employment pathways.',
       responsibilitiesKm: [
-        'ជំរុញកិច្ចសហប្រតិបត្តិការជាមួយវិស័យឯកជន និងសហគ្រាសដៃគូ',
-        'រៀបចំកម្មវិធីចុះហាត់ការ (Internship) និងការស្វែងរកការងារជូននិស្សិតបញ្ចប់ការសិក្សា',
-        'ធានាគុណភាពផ្ទៃក្នុងស្ថាប័ន ស្របតាមស្តង់ដារគុណវុឌ្ឍិជាតិកម្ពុជា'
+        'កសាង និងពង្រីកកិច្ចសហប្រតិបត្តិការជាមួយសហគ្រាស រោងចក្រ និងក្រុមហ៊ុនដៃគូវិស័យឯកជន',
+        'សម្របសម្រួលការចុះកម្មសិក្សា (Internship) និងការស្វែងរកឱកាសការងារជូននិស្សិតបញ្ចប់ការសិក្សា',
+        'ដឹកនាំសកម្មភាពកីឡា សិល្បៈ សមាគមអតីតនិស្សិត និងសេវាគាំពារសុខុមាលភាពនិស្សិត'
       ],
       responsibilitiesEn: [
-        'Fostering private-sector partnerships, employer councils, and industry MoUs',
-        'Student internship placement and graduate employment assistance programs',
-        'Internal Quality Assurance (IQA) systems aligned with national accreditation'
+        'Expanding strategic industry partnerships, enterprise networks, and corporate MoUs',
+        'Coordinating student internship placements, career fairs, and graduate employment support',
+        'Overseeing student union, campus life, athletic events, alumni relations, and student welfare'
       ],
-      qualificationsKm: 'អនុបណ្ឌិតគ្រប់គ្រងធុរកិច្ច (MBA)',
+      qualificationsKm: 'អនុបណ្ឌិតគ្រប់គ្រងធុរកិច្ច (MBA) & អភិវឌ្ឍន៍សហគ្រាស',
       qualificationsEn: 'Master of Business Administration (MBA)'
+    },
+    {
+      id: 'deputy-nourath',
+      nameKm: 'លោក សួង នូរ័ត្ន',
+      nameEn: 'Mr. Soung Nourath',
+      titleKm: 'នាយករងទទួលបន្ទុកការធានាគុណភាព និងអភិវឌ្ឍន៍ស្ថាប័ន',
+      titleEn: 'Deputy Director - Quality Assurance & Institutional Development',
+      category: 'executive',
+      categoryLabelKm: 'គណៈនាយក',
+      categoryLabelEn: 'Executive Leadership',
+      image: '',
+      icon: 'fa-user-graduate',
+      email: 'nourath.soung@rpitssr.edu.kh',
+      phone: '(+855) 12 345 604',
+      room: 'អគាររដ្ឋបាល B - បន្ទប់ ២០២ (Building B, Rm 202)',
+      bioKm: 'ជំនាញក្នុងការគ្រប់គ្រងការធានាគុណភាពអប់រំផ្ទៃក្នុង (IQA) ស្តង់ដារទទួលស្គាល់គុណវុឌ្ឍិស្ថាប័ន និងការស្រាវជ្រាវនវានុវត្តន៍បច្ចេកវិទ្យា។',
+      bioEn: 'Expert in Internal Quality Assurance (IQA), institutional accreditation compliance, pedagogical monitoring, and applied research & innovation.',
+      responsibilitiesKm: [
+        'ដឹកនាំ និងត្រួតពិនិត្យប្រព័ន្ធធានាគុណភាពអប់រំផ្ទៃក្នុង (IQA) ស្របតាមស្តង់ដារជាតិ',
+        'រៀបចំឯកសារ និងនីតិវិធីសម្រាប់ការទទួលស្គាល់គុណវុឌ្ឍិស្ថាប័ន និងសវនកម្មគុណភាពអប់រំ',
+        'លើកកម្ពស់ការស្រាវជ្រាវអនុវត្តន៍ គម្រោងនវានុវត្តន៍ និងការអភិវឌ្ឍសមត្ថភាពបច្ចេកវិទ្យា ៤.០'
+      ],
+      responsibilitiesEn: [
+        'Directing and auditing Internal Quality Assurance (IQA) systems aligned with national guidelines',
+        'Institutional accreditation documentation, compliance audits, and academic quality assurance',
+        'Promoting applied research initiatives, innovation projects, and Industry 4.0 technical upgrades'
+      ],
+      qualificationsKm: 'អនុបណ្ឌិតធានាគុណភាពអប់រំ និងគ្រប់គ្រងបច្ចេកវិទ្យា',
+      qualificationsEn: 'Master in Educational Quality Assurance & Technology Management'
     }
   ],
   departments: [
@@ -418,6 +453,40 @@ const OrgLeaderAvatar = ({ image, name, size = 80, isTopLeader = false, icon = '
   );
 };
 
+// Formatter for room/office location: splits Khmer on line 1 and English (Building...) on line 2
+const formatRoomDisplay = (roomStr) => {
+  if (!roomStr) return { main: '', sub: null };
+  const match = roomStr.match(/^(.*?)\s*(\(.*?\))$/);
+  if (match) {
+    return {
+      main: match[1],
+      sub: match[2]
+    };
+  }
+  return {
+    main: roomStr,
+    sub: null
+  };
+};
+
+const renderRoomFormatted = (roomStr, iconClass = 'fas fa-door-open me-1 text-secondary') => {
+  if (!roomStr) return null;
+  const { main, sub } = formatRoomDisplay(roomStr);
+  return (
+    <div className="org-room-formatted">
+      <div className="d-inline-flex align-items-center justify-content-center">
+        {iconClass && <i className={iconClass}></i>}
+        <span>{main}</span>
+      </div>
+      {sub && (
+        <div className="org-room-sub text-muted" style={{ fontSize: '0.82rem', marginTop: '2px', lineHeight: 1.35 }}>
+          {sub}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const OrganizationPage = () => {
   const { t, language, currentLanguage } = useLanguage();
   const isKhmer = (currentLanguage || language) === 'km';
@@ -579,7 +648,7 @@ export const OrganizationPage = () => {
                 >
                   <i className="fas fa-users-cog"></i>
                 </div>
-                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>3</div>
+                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>{LEADERSHIP_DATA.deputies.length}</div>
                 <div className="fw-semibold text-dark small mt-1">{t('organization.stat_deputies')}</div>
                 <span
                   className="badge rounded-pill mt-2 px-2.5 py-1"
@@ -651,14 +720,14 @@ export const OrganizationPage = () => {
               </button>
             </div>
 
-            {/* In Tree View: Helpful Instruction badge */}
+            {/* In Tree View: Institutional Structure Summary Badge */}
             {viewMode === 'tree' && (
               <div
-                className="d-none d-md-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill"
-                style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.84rem' }}
+                className="d-none d-md-inline-flex align-items-center gap-2 px-3.5 py-1.5 rounded-pill"
+                style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', color: '#475569', fontSize: '0.84rem', fontWeight: 500 }}
               >
-                <i className="fas fa-mouse-pointer text-primary"></i>
-                <span>{t('organization.tree_hint')}</span>
+                <i className="fas fa-sitemap text-primary"></i>
+                <span>{isKhmer ? 'គណៈនាយក ៥ រូប • ៥ ដេប៉ាតឺម៉ង់ • ៣ ការិយាល័យ' : '5 Executive Directorate • 5 Departments • 3 Offices'}</span>
               </div>
             )}
 
@@ -722,9 +791,34 @@ export const OrganizationPage = () => {
           {/* VIEW 1: INTERACTIVE HIERARCHY TREE CHART */}
           {viewMode === 'tree' && (
             <div className="org-tree-container p-4 p-md-5 bg-white rounded-4 border shadow-sm">
-              <div className="text-center mb-4 text-muted small">
-                <i className="fas fa-info-circle me-1 text-primary"></i>
-                {t('organization.tree_hint')}
+              {/* Interactive Tree Guide Pill */}
+              <div className="d-flex justify-content-center pt-2 pt-md-3 mt-1 mt-md-2 mb-4 pb-2">
+                <div
+                  className="org-tree-guide-badge d-inline-flex align-items-center gap-2.5 px-4 py-2 rounded-pill shadow-xs"
+                  style={{
+                    backgroundColor: '#eff6ff',
+                    border: '1px solid #bfdbfe',
+                    color: '#1e40af',
+                    fontSize: '0.88rem',
+                    fontWeight: 500,
+                    letterSpacing: '0.1px',
+                    boxShadow: '0 2px 8px rgba(30, 115, 190, 0.08)'
+                  }}
+                >
+                  <span
+                    className="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                    style={{
+                      width: '22px',
+                      height: '22px',
+                      backgroundColor: '#1e73be',
+                      color: '#ffffff',
+                      fontSize: '0.72rem'
+                    }}
+                  >
+                    <i className="fas fa-hand-pointer"></i>
+                  </span>
+                  <span>{t('organization.tree_hint')}</span>
+                </div>
               </div>
 
               {/* TREE LEVEL 1: DIRECTOR (TOP) - CRISP WHITE DAYLIGHT CARD */}
@@ -764,9 +858,8 @@ export const OrganizationPage = () => {
                   </div>
 
                   {/* Room & Email */}
-                  <div className="text-muted small mb-1">
-                    <i className="fas fa-door-open me-1.5 text-secondary"></i>
-                    {LEADERSHIP_DATA.director.room}
+                  <div className="text-muted small mb-2 text-center" style={{ lineHeight: 1.35 }}>
+                    {renderRoomFormatted(LEADERSHIP_DATA.director.room, 'fas fa-door-open me-1.5 text-secondary')}
                   </div>
                   <div className="d-flex align-items-center justify-content-center gap-2 text-muted small mb-3">
                     <i className="fas fa-envelope text-primary"></i>
@@ -784,16 +877,16 @@ export const OrganizationPage = () => {
               {/* STEM CONNECTOR 1: FROM DIRECTOR TO HORIZONTAL CROSSBAR */}
               <div className="org-tree-stem-vertical mx-auto" style={{ width: '2px', height: '32px', backgroundColor: '#cbd5e1' }}></div>
 
-              {/* TREE LEVEL 2: DEPUTY DIRECTORS (3 DEPUTIES) */}
-              <div className="position-relative mb-4">
-                {/* Horizontal branch line spanning the 3 deputy columns */}
-                <div className="org-tree-crossbar d-none d-md-block mx-auto" style={{ height: '2px', width: '70%', backgroundColor: '#cbd5e1', marginBottom: '0' }}></div>
+              {/* TREE LEVEL 2: DEPUTY DIRECTORS (4 DEPUTIES) */}
+              <div className="position-relative mb-4 px-2 px-md-3 px-xl-4">
+                {/* Horizontal branch line spanning the 4 deputy columns on desktop */}
+                <div className="org-tree-crossbar d-none d-lg-block mx-auto" style={{ height: '2px', width: '75%', backgroundColor: '#cbd5e1', marginBottom: '0' }}></div>
 
-                <div className="row g-4 justify-content-center pt-3">
+                <div className="row g-3 g-xl-4 justify-content-center pt-3">
                   {LEADERSHIP_DATA.deputies.map((deputy) => (
-                    <div className="col-12 col-md-4" key={deputy.id}>
-                      {/* Vertical line connecting crossbar to each card */}
-                      <div className="org-tree-branch-vertical d-none d-md-block mx-auto" style={{ width: '2px', height: '16px', backgroundColor: '#cbd5e1', marginTop: '-16px' }}></div>
+                    <div className="col-12 col-sm-6 col-lg-3" key={deputy.id}>
+                      {/* Vertical line connecting crossbar to each card on desktop */}
+                      <div className="org-tree-branch-vertical d-none d-lg-block mx-auto" style={{ width: '2px', height: '16px', backgroundColor: '#cbd5e1', marginTop: '-16px' }}></div>
                       <div
                         className="org-tree-card org-deputy-card text-center h-100 d-flex flex-column align-items-center"
                         onClick={() => setSelectedLeader(deputy)}
@@ -815,9 +908,8 @@ export const OrganizationPage = () => {
                         <div className="text-primary small fw-semibold mb-2" style={{ lineHeight: '1.5' }}>
                           {isKhmer ? deputy.titleKm : deputy.titleEn}
                         </div>
-                        <div className="text-muted small mb-3">
-                          <i className="fas fa-door-open me-1 text-secondary"></i>
-                          {deputy.room}
+                        <div className="text-muted small mb-3 text-center" style={{ lineHeight: 1.35, minHeight: '40px' }}>
+                          {renderRoomFormatted(deputy.room, 'fas fa-door-open me-1 text-secondary')}
                         </div>
                         <div className="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 fw-semibold d-inline-flex align-items-center gap-1.5 mt-auto">
                           <i className="fas fa-id-card"></i>
@@ -1015,9 +1107,16 @@ export const OrganizationPage = () => {
 
                           <div className="d-flex flex-column gap-2 mb-4">
                             {item.room && (
-                              <div className="text-secondary small d-flex align-items-center gap-2" style={{ fontSize: '0.86rem', lineHeight: 1.45 }}>
-                                <i className="fas fa-map-marker-alt text-danger flex-shrink-0" style={{ width: '16px' }}></i>
-                                <span>{item.room}</span>
+                              <div className="text-secondary small d-flex align-items-start gap-2" style={{ fontSize: '0.86rem', lineHeight: 1.4 }}>
+                                <i className="fas fa-map-marker-alt text-danger flex-shrink-0 mt-1" style={{ width: '16px' }}></i>
+                                <div>
+                                  <div>{formatRoomDisplay(item.room).main}</div>
+                                  {formatRoomDisplay(item.room).sub && (
+                                    <div className="text-muted" style={{ fontSize: '0.8rem', marginTop: '1px' }}>
+                                      {formatRoomDisplay(item.room).sub}
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                             )}
 
@@ -1078,8 +1177,8 @@ export const OrganizationPage = () => {
                 </h4>
                 <p className="text-muted mb-4" style={{ lineHeight: '2.1', fontSize: '0.98rem' }}>
                   {isKhmer
-                    ? 'វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប (RPITSSR) ត្រូវដឹកនាំដោយនាយិកាវិទ្យាស្ថាន រួមជាមួយនាយករង ៣ រូប ទទួលបន្ទុកការងារតាមផ្នែកជំនាញ។ រចនាសម្ព័ន្ធនេះរៀបចំឡើងដើម្បីធានានូវអភិបាលកិច្ចប្រកបដោយគុណភាព ការបណ្តុះបណ្តាលស្របតាមតម្រូវការទីផ្សារការងារ និងការបម្រើសេវាសិស្ស-និស្សិតប្រកបដោយតម្លាភាព។'
-                    : 'RPITSSR is administered by the Institute Director supported by 3 Deputy Directors across designated functional areas. This governance model guarantees high pedagogical standards, market-responsive technical education, and transparent student-centered administration.'}
+                    ? 'វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប (RPITSSR) ត្រូវដឹកនាំដោយនាយិកាវិទ្យាស្ថាន រួមជាមួយនាយករង ៤ រូប ទទួលបន្ទុកការងារតាមផ្នែកជំនាញ។ រចនាសម្ព័ន្ធនេះរៀបចំឡើងដើម្បីធានានូវអភិបាលកិច្ចប្រកបដោយគុណភាព ការបណ្តុះបណ្តាលស្របតាមតម្រូវការទីផ្សារការងារ និងការបម្រើសេវាសិស្ស-និស្សិតប្រកបដោយតម្លាភាព។'
+                    : 'RPITSSR is administered by the Institute Director supported by 4 Deputy Directors across designated functional areas. This governance model guarantees high pedagogical standards, market-responsive technical education, and transparent student-centered administration.'}
                 </p>
                 <div className="d-flex flex-wrap justify-content-center justify-content-md-start gap-3 pt-2">
                   <Link to="/about" className="btn btn-outline-primary org-governance-btn">

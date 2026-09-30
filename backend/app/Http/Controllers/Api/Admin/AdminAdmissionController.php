@@ -316,7 +316,7 @@ class AdminAdmissionController extends Controller
             return response()->json(['error' => 'Admission application not found.'], 404);
         }
 
-        $allowedTypes = ['photo', 'certificate', 'idCard', 'equityCard'];
+        $allowedTypes = ['photo', 'certificate', 'idCard', 'familyBook', 'birthCertificate', 'equityCard'];
 
         if (! in_array($type, $allowedTypes, true)) {
             return response()->json(['error' => 'Invalid document type requested.'], 400);
@@ -363,7 +363,16 @@ class AdminAdmissionController extends Controller
     {
         $data = $admission->toArray();
 
-        foreach (['idCardUrl' => 'idCard', 'equityCardUrl' => 'equityCard', 'certificateUrl' => 'certificate', 'photoUrl' => 'photo'] as $field => $type) {
+        $secureDocFields = [
+            'idCardUrl' => 'idCard',
+            'equityCardUrl' => 'equityCard',
+            'certificateUrl' => 'certificate',
+            'photoUrl' => 'photo',
+            'familyBookUrl' => 'familyBook',
+            'birthCertificateUrl' => 'birthCertificate',
+        ];
+
+        foreach ($secureDocFields as $field => $type) {
             $val = (string) ($admission->getAttribute($field) ?? '');
             if (! empty($val)) {
                 if (str_starts_with($val, 'private:') || str_starts_with($val, '/storage/') || str_starts_with($val, 'uploads/')) {
@@ -378,4 +387,4 @@ class AdminAdmissionController extends Controller
 
         return $data;
     }
-}
+};

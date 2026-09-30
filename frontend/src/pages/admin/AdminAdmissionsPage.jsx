@@ -22,10 +22,12 @@ import {
   ArrowRight,
   ShieldCheck,
   RefreshCw,
-  Plus
+  Plus,
+  Printer
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import api from '../../api/client';
+import { PrintableAdmissionForm } from '../../components/common/PrintableAdmissionForm';
 
 export const AdminAdmissionsPage = () => {
   const { currentLanguage, language } = useLanguage();
@@ -50,6 +52,17 @@ export const AdminAdmissionsPage = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [statusNotes, setStatusNotes] = useState('');
   const [statusTarget, setStatusTarget] = useState('pending');
+
+  // Official Standard Printing State
+  const [printModalOpen, setPrintModalOpen] = useState(false);
+  const [printTargetAdmission, setPrintTargetAdmission] = useState(null);
+  const [printDefaultMode, setPrintDefaultMode] = useState('all');
+
+  const handleOpenPrint = (adm, mode = 'all') => {
+    setPrintTargetAdmission(adm);
+    setPrintDefaultMode(mode);
+    setPrintModalOpen(true);
+  };
 
   // Enroll Form
   const [enrollForm, setEnrollForm] = useState({
@@ -653,6 +666,27 @@ export const AdminAdmissionsPage = () => {
                           <span>{isKhmer ? 'ពិនិត្យ' : 'Review'}</span>
                         </button>
 
+                        <button
+                          onClick={() => handleOpenPrint(adm, 'all')}
+                          title={isKhmer ? 'បោះពុម្ពពាក្យសុំ FR02 (៥ ទំព័រ)' : 'Print Standard Form FR02'}
+                          style={{
+                            padding: '6px 10px',
+                            borderRadius: '8px',
+                            background: '#eff6ff',
+                            border: '1px solid #bfdbfe',
+                            color: '#1e73be',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            fontSize: '0.8rem',
+                            fontWeight: 700
+                          }}
+                        >
+                          <Printer size={14} />
+                          <span>{isKhmer ? 'បោះពុម្ព FR02' : 'Print FR02'}</span>
+                        </button>
+
                         {adm.status !== 'enrolled' && (
                           <button
                             onClick={() => handleOpenEnroll(adm)}
@@ -870,18 +904,60 @@ export const AdminAdmissionsPage = () => {
                   {selectedAdmission.trackingCode} — {selectedAdmission.khmerName}
                 </h3>
               </div>
-              <button
-                onClick={() => setReviewModalOpen(false)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  fontSize: '1.2rem',
-                  cursor: 'pointer',
-                  color: '#94a3b8'
-                }}
-              >
-                ✕
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => handleOpenPrint(selectedAdmission, 'all')}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 14px',
+                    borderRadius: '8px',
+                    background: '#eff6ff',
+                    border: '1px solid #bfdbfe',
+                    color: '#1e73be',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  <Printer size={14} />
+                  <span>{isKhmer ? 'បោះពុម្ព FR02 (៥ ទំព័រ)' : 'Print Form FR02 (5 Pages)'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleOpenPrint(selectedAdmission, 'voucher')}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 14px',
+                    borderRadius: '8px',
+                    background: '#f8fafc',
+                    border: '1px solid #cbd5e1',
+                    color: '#07294D',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  <FileText size={14} />
+                  <span>{isKhmer ? 'បង្កាន់ដៃ' : 'Voucher'}</span>
+                </button>
+                <button
+                  onClick={() => setReviewModalOpen(false)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    fontSize: '1.2rem',
+                    cursor: 'pointer',
+                    color: '#94a3b8'
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
             {/* Modal Body */}
@@ -939,26 +1015,111 @@ export const AdminAdmissionsPage = () => {
                   <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>{isKhmer ? 'វេនសិក្សា' : 'Shift'}</div>
                   <div style={{ fontWeight: 700, color: '#1e73be', fontSize: '0.9rem' }}>{selectedAdmission.shift}</div>
                 </div>
-              </div>
-
-              {/* Major & Address */}
-              <div style={{ marginBottom: '20px' }}>
-                <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#07294D', marginBottom: '4px' }}>
-                  {isKhmer ? 'ជំនាញជ្រើសរើស ៖' : 'Desired Major:'} <span style={{ color: '#1e73be', fontWeight: 800 }}>{selectedAdmission.major}</span>
-                </div>
-                {selectedAdmission.currentAddress && (
-                  <div style={{ fontSize: '0.84rem', color: '#64748b' }}>
-                    📍 {isKhmer ? 'អាសយដ្ឋាន ៖' : 'Address:'} {selectedAdmission.currentAddress}
+                {selectedAdmission.idCardNumber && (
+                  <div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>{isKhmer ? 'អត្តសញ្ញាណប័ណ្ណ' : 'ID Card #'}</div>
+                    <div style={{ fontWeight: 700, color: '#07294D', fontSize: '0.9rem' }}>{selectedAdmission.idCardNumber}</div>
+                  </div>
+                )}
+                {selectedAdmission.studyType && (
+                  <div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>{isKhmer ? 'ប្រភេទសិក្សា' : 'Study Type'}</div>
+                    <div style={{ fontWeight: 700, color: selectedAdmission.studyType === 'scholarship' ? '#16a34a' : '#07294D', fontSize: '0.9rem' }}>
+                      {selectedAdmission.studyType === 'scholarship' ? (isKhmer ? '🎁 អាហារូបករណ៍' : 'Scholarship') : (isKhmer ? 'បង់ថ្លៃ' : 'Paying')}
+                    </div>
                   </div>
                 )}
               </div>
+
+              {/* Major & Residence */}
+              <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '14px', border: '1px solid #e2e8f0', marginBottom: '18px' }}>
+                <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#07294D', marginBottom: '6px' }}>
+                  {isKhmer ? 'ជំនាញជ្រើសរើស ៖' : 'Desired Major:'} <span style={{ color: '#1e73be', fontWeight: 800 }}>{selectedAdmission.major}</span>
+                </div>
+                {selectedAdmission.pob && (
+                  <div style={{ fontSize: '0.84rem', color: '#475569', marginBottom: '4px' }}>
+                    📍 <strong>{isKhmer ? 'ទីកន្លែងកំណើត ៖ ' : 'POB: '}</strong> {selectedAdmission.pob}
+                  </div>
+                )}
+                {selectedAdmission.currentAddress && (
+                  <div style={{ fontSize: '0.84rem', color: '#475569', marginBottom: '4px' }}>
+                    🏠 <strong>{isKhmer ? 'អាសយដ្ឋានបច្ចុប្បន្ន ៖ ' : 'Address: '}</strong> {selectedAdmission.currentAddress}
+                  </div>
+                )}
+                {selectedAdmission.commuteMethod && (
+                  <div style={{ fontSize: '0.84rem', color: '#475569' }}>
+                    🛵 <strong>{isKhmer ? 'មធ្យោបាយធ្វើដំណើរ ៖ ' : 'Commute: '}</strong> {selectedAdmission.commuteMethod} {selectedAdmission.distanceKm ? `(${selectedAdmission.distanceKm} KM)` : ''}
+                  </div>
+                )}
+              </div>
+
+              {/* Guardian Info */}
+              {(selectedAdmission.guardianName || selectedAdmission.guardianPhone) && (
+                <div style={{ background: '#f8fafc', padding: '14px 16px', borderRadius: '14px', border: '1px solid #e2e8f0', marginBottom: '18px', fontSize: '0.86rem' }}>
+                  <div style={{ fontWeight: 800, color: '#07294D', marginBottom: '4px' }}>
+                    👨‍👩‍👧 {isKhmer ? 'ព័ត៌មានអាណាព្យាបាល (ផ្នែក A)' : 'Guardian Info (Section A)'}
+                  </div>
+                  <div style={{ color: '#475569' }}>
+                    {selectedAdmission.guardianName} {selectedAdmission.guardianRelation ? `(ត្រូវជា ${selectedAdmission.guardianRelation})` : ''} • 📞 {selectedAdmission.guardianPhone || 'N/A'}
+                  </div>
+                </div>
+              )}
+
+              {/* Education & Employment Summary (Sections B, C, D) */}
+              {(selectedAdmission.educationLevel || selectedAdmission.employmentStatus) && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '12px', marginBottom: '18px', fontSize: '0.84rem' }}>
+                  <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                    <strong style={{ color: '#07294D', display: 'block', marginBottom: '4px' }}>
+                      🎓 {isKhmer ? 'កម្រិតវប្បធម៌ទូទៅ (ផ្នែក B)' : 'General Education'}
+                    </strong>
+                    <div style={{ color: '#64748b' }}>
+                      {selectedAdmission.educationLevel || 'N/A'} {selectedAdmission.previousSchool ? `• ${selectedAdmission.previousSchool}` : ''}
+                    </div>
+                  </div>
+
+                  <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                    <strong style={{ color: '#07294D', display: 'block', marginBottom: '4px' }}>
+                      💼 {isKhmer ? 'ស្ថានភាពការងារ (ផ្នែក D)' : 'Employment Info'}
+                    </strong>
+                    <div style={{ color: '#64748b' }}>
+                      {selectedAdmission.employmentStatus || 'គ្មានការងារ'} {selectedAdmission.jobTitle ? `(${selectedAdmission.jobTitle})` : ''}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Social Equity Badges (Section E) */}
+              {(selectedAdmission.hasDisability || selectedAdmission.isIndigenous || selectedAdmission.hasEquityCard) && (
+                <div style={{ background: '#fffbeb', border: '1px solid #fde68a', padding: '12px 16px', borderRadius: '14px', marginBottom: '18px', fontSize: '0.84rem' }}>
+                  <strong style={{ color: '#92400e', display: 'block', marginBottom: '6px' }}>
+                    🤝 {isKhmer ? 'ព័ត៌មានសមធម៌សង្គម / គាំពារ (ផ្នែក E)' : 'Social Equity & Support (Section E)'}
+                  </strong>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {selectedAdmission.hasDisability && (
+                      <span style={{ padding: '3px 10px', borderRadius: '6px', background: '#eff6ff', color: '#1e73be', fontWeight: 700, border: '1px solid #bfdbfe' }}>
+                        ♿ ពិការភាព: {selectedAdmission.disabilityType || 'បាទ/ចាស'}
+                      </span>
+                    )}
+                    {selectedAdmission.isIndigenous && (
+                      <span style={{ padding: '3px 10px', borderRadius: '6px', background: '#f0fdf4', color: '#16a34a', fontWeight: 700, border: '1px solid #bbf7d0' }}>
+                        🌿 ជនជាតិដើមភាគតិច: {selectedAdmission.indigenousGroup || 'បាទ/ចាស'}
+                      </span>
+                    )}
+                    {selectedAdmission.hasEquityCard && (
+                      <span style={{ padding: '3px 10px', borderRadius: '6px', background: '#fef3c7', color: '#b45309', fontWeight: 700, border: '1px solid #fde68a' }}>
+                        💳 ប័ណ្ណសមធម៌: {selectedAdmission.equityCardNumber || 'មាន'} ({selectedAdmission.equityCardType || ''})
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Uploaded Documents */}
               <div style={{ marginBottom: '24px' }}>
                 <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#07294D', marginBottom: '12px' }}>
                   {isKhmer ? 'ឯកសារភ្ជាប់ (Uploaded Documents)' : 'Uploaded Documents'}
                 </h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))', gap: '12px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '12px' }}>
                   {/* Photo */}
                   <div style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '12px', textAlign: 'center', background: '#f8fafc' }}>
                     <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#07294D', marginBottom: '6px' }}>
@@ -994,6 +1155,34 @@ export const AdminAdmissionsPage = () => {
                     </div>
                     {selectedAdmission.idCardUrl ? (
                       <a href={selectedAdmission.idCardUrl} target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#1e73be', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <ExternalLink size={12} /> {isKhmer ? 'បើកមើល' : 'View'}
+                      </a>
+                    ) : (
+                      <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{isKhmer ? 'គ្មាន' : 'None'}</span>
+                    )}
+                  </div>
+
+                  {/* Family Book */}
+                  <div style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '12px', textAlign: 'center', background: '#f8fafc' }}>
+                    <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#07294D', marginBottom: '6px' }}>
+                      {isKhmer ? 'សៀវភៅគ្រួសារ' : 'Family Book'}
+                    </div>
+                    {selectedAdmission.familyBookUrl ? (
+                      <a href={selectedAdmission.familyBookUrl} target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#1e73be', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <ExternalLink size={12} /> {isKhmer ? 'បើកមើល' : 'View'}
+                      </a>
+                    ) : (
+                      <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{isKhmer ? 'គ្មាន' : 'None'}</span>
+                    )}
+                  </div>
+
+                  {/* Birth Certificate */}
+                  <div style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '12px', textAlign: 'center', background: '#f8fafc' }}>
+                    <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#07294D', marginBottom: '6px' }}>
+                      {isKhmer ? 'សំបុត្រកំណើត' : 'Birth Certificate'}
+                    </div>
+                    {selectedAdmission.birthCertificateUrl ? (
+                      <a href={selectedAdmission.birthCertificateUrl} target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#1e73be', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                         <ExternalLink size={12} /> {isKhmer ? 'បើកមើល' : 'View'}
                       </a>
                     ) : (
@@ -1338,6 +1527,14 @@ export const AdminAdmissionsPage = () => {
           </div>
         </div>
       )}
+
+      {/* Official Standard Printable Form & Voucher Lightbox Modal */}
+      <PrintableAdmissionForm
+        admission={printTargetAdmission}
+        isOpen={printModalOpen}
+        onClose={() => setPrintModalOpen(false)}
+        defaultMode={printDefaultMode}
+      />
     </div>
   );
 };

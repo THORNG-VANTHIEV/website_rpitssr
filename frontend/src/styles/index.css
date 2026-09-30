@@ -9817,7 +9817,7 @@ i {
   background: #ffffff !important;
   border: 1px solid #e2e8f0 !important;
   border-radius: 20px !important;
-  padding: 30px 24px 24px !important;
+  padding: 28px 18px 22px !important;
   box-shadow: 0 4px 18px rgba(7, 41, 77, 0.04) !important;
   position: relative !important;
   overflow: hidden !important;
@@ -9844,6 +9844,18 @@ i {
 
 .org-deputy-card:hover::before {
   opacity: 1;
+}
+
+.org-tree-guide-badge {
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: default;
+}
+
+.org-tree-guide-badge:hover {
+  transform: translateY(-2px);
+  border-color: #93c5fd !important;
+  box-shadow: 0 6px 16px rgba(30, 115, 190, 0.12) !important;
+  background-color: #e0f2fe !important;
 }
 
 /* Responsive adjustments for Organization Page */

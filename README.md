@@ -404,3 +404,4 @@ For behavior that could expose personal data or privileges, add Laravel feature 
 ## Findings not confirmed as exploitable in the audit
 
 The review did not confirm SQL injection, remote code execution through uploads, or stored XSS through the reviewed blog-content path. Keep existing validation and output sanitization in place, and re-test when upload, templating, or query code changes.
+

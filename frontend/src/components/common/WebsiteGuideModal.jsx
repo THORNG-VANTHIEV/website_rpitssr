@@ -109,6 +109,9 @@ export const WebsiteGuideModal = () => {
 
   // Auto-launch for first-time visitors
   useEffect(() => {
+    if (window.location.search.includes('test_print') || window.location.pathname.startsWith('/admin')) {
+      return;
+    }
     const hasSeenGuide = localStorage.getItem('rpitssr_website_guide_seen');
     if (!hasSeenGuide) {
       const timer = setTimeout(() => {

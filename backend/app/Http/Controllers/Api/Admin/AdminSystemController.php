@@ -37,6 +37,8 @@ class AdminSystemController extends Controller
             : now()->subDay()->toIso8601String();
 
         $counts = [
+            'admissions' => \App\Models\Admission::count(),
+            'pendingAdmissions' => \App\Models\Admission::where('status', 'pending')->count(),
             'courses' => Course::count(),
             'teachers' => Teacher::count(),
             'users' => User::count(),

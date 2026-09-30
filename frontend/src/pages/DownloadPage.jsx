@@ -37,6 +37,34 @@ const toKhmerNumber = (num) => {
 const OFFICIAL_DOCUMENTS = [
   // 1. ADMISSIONS & SCHOLARSHIPS
   {
+    id: 'doc-fr02-official-admission',
+    code: 'RPITSSR/ETO/PR01/FR02',
+    category: 'admissions',
+    fileType: 'pdf',
+    fileSize: '412 KB',
+    downloadUrl: '/forms/3-FR02-ពាក្យចូលរៀន.pdf',
+    updatedAt: '2026-03-16',
+    downloadsCount: 8960,
+    isPopular: true,
+    titleKm: 'ពាក្យសុំចុះឈ្មោះចូលរៀនស្ដង់ដារផ្លូវការ (RPITSSR/ETO/PR01/FR02 លើកទី៤)',
+    titleEn: 'Official Admission Application Form (RPITSSR/ETO/PR01/FR02 Rev 4)',
+    descriptionKm: 'ទម្រង់ពាក្យសុំចុះឈ្មោះចូលរៀនស្ដង់ដារផ្លូវការពេញលេញ ៥ ទំព័រ សម្រាប់ថ្នាក់បរិញ្ញាបត្របច្ចេកវិទ្យា, សញ្ញាបត្រជាន់ខ្ពស់បច្ចេកទេស និងវគ្គ TVET ១,៥ លាននាក់ ព្រមទាំងមានបង្កាន់ដៃទទួលពាក្យទំព័រទី ៥។',
+    descriptionEn: 'Standard 5-page institutional admission application form with bio data, TVET MIS indicators, and receipt voucher.',
+    submissionOffice: 'ការិយាល័យអប់រំ និងបណ្តុះបណ្តាល (ETO) / អគារ A បន្ទប់ ១០៤',
+    requiredDocsKm: [
+      'សញ្ញាបត្រ (កូពី) ចំនួន ០២ ច្បាប់',
+      'អត្តសញ្ញាណប័ណ្ណសញ្ជាតិខ្មែរ (កូពី) ចំនួន ០១ ច្បាប់',
+      'សំបុត្រកំណើត ឬសៀវភៅគ្រួសារ (កូពី) ចំនួន ០១ ច្បាប់',
+      'រូបថតថ្មីថតចំពីមុខ ៤x៦ ចំនួន ០១ សន្លឹក'
+    ],
+    requiredDocsEn: [
+      '2 certified copies of Diploma / Certificate',
+      '1 copy of Cambodian National ID Card',
+      '1 copy of Family Book or Birth Certificate',
+      '1 passport-size 4x6 photo'
+    ]
+  },
+  {
     id: 'doc-tvet-1-5m',
     code: 'FORM-TVET-01',
     category: 'admissions',
@@ -411,6 +439,20 @@ export const DownloadPage = () => {
         ? `ឯកសារ «${doc.code}» កំពុងទាញយកដោយជោគជ័យ!`
         : `Form "${doc.code}" download started successfully!`
     );
+
+    if (doc.downloadUrl) {
+      const element = document.createElement('a');
+      element.href = doc.downloadUrl;
+      element.download = `${doc.code.replace(/[^a-zA-Z0-9_-]/g, '_')}_RPITSSR.pdf`;
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+
+      setTimeout(() => {
+        setDownloadSuccessToast(null);
+      }, 4500);
+      return;
+    }
 
     // Create virtual download file for demo
     const element = document.createElement('a');
