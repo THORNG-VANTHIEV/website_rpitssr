@@ -15,8 +15,8 @@
        ▼  (ដំណើរការ GitHub Actions Runner ដោយឥតគិតថ្លៃ មាន RAM 8GB)
  ├── ១. Checkout កូដថ្មី
  ├── ២. Build React Frontend (`npm run build`)
- ├── ៣. Sync តែ folder `dist/` ទៅកាន់ Hostinger `public_html/web/`
- ├── ៤. Sync កូដ Laravel Backend ទៅកាន់ `domains/rpitssr.edu.kh/backend/`
+ ├── ៣. Sync តែ folder `dist/` ទៅកាន់ Hostinger `public_html/portal/`
+ ├── ៤. Sync កូដ Laravel Backend ទៅកាន់ Hostinger `public_html/backend_api/`
  └── ៥. SSH ចូល Hostinger រត់ `composer install`, `php artisan migrate`, `php artisan config:cache`
        │
        ▼

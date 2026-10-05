@@ -22,28 +22,28 @@
 ## 🗺️ រចនាសម្ព័ន្ធ Folder លើ Hostinger File Manager
 
 ```text
-/home/u123456789/domains/rpitssr.edu.kh/
+/home/u123456789/domains/rpitssr.edu.kh/public_html/
 │
-├── public_html/
-│   └── web/                         <-- [Frontend Document Root: web.rpitssr.edu.kh]
-│       ├── assets/
-│       ├── images/
-│       ├── fonts/
-│       ├── index.html
-│       └── .htaccess                <-- [SPA Routing & Rewrite Rules]
+├── portal/                          <-- [Frontend Document Root: web.rpitssr.edu.kh]
+│   ├── assets/
+│   ├── images/
+│   ├── fonts/
+│   ├── index.html
+│   └── .htaccess                    <-- [SPA Routing & Rewrite Rules]
 │
-└── backend/                         <-- [Laravel Core សុវត្ថិភាពនៅក្រៅ public_html]
+└── backend_api/                     <-- [Backend Document Root: api.rpitssr.edu.kh]
     ├── app/
     ├── bootstrap/
     ├── config/
     ├── database/
-    ├── public/                      <-- [Backend Document Root: api.rpitssr.edu.kh]
+    ├── public/                      <-- [Laravel Front Controller]
     │   ├── index.php
     │   ├── storage/                 <-- Symlink ទៅ storage/app/public
     │   └── .htaccess
     ├── routes/
     ├── storage/
     ├── vendor/
+    ├── .htaccess                    <-- [Forward Requests ទៅ public/ & Protect .env]
     └── .env                         <-- [ឯកសារ Config Production បង្កើតផ្ទាល់លើ Server]
 ```
 
@@ -58,12 +58,12 @@
    - **Subdomain ទី ១ (Frontend)**:
      - ឈ្មោះ Subdomain: `web` (ចេញជា `web.rpitssr.edu.kh`)
      - ធីកយក: *Custom folder for subdomain*
-     - បញ្ចូលឈ្មោះថត: `public_html/web`
+     - បញ្ចូលឈ្មោះថត: `public_html/portal`
      - ចុច **Create**
    - **Subdomain ទី ២ (Backend API)**:
      - ឈ្មោះ Subdomain: `api` (ចេញជា `api.rpitssr.edu.kh`)
      - ធីកយក: *Custom folder for subdomain*
-     - បញ្ចូលឈ្មោះថត: `backend/public` *(ចង្អុលផ្ទាល់ទៅ `backend/public` មិនប៉ះពាល់ source code ក្នុង root)*
+     - បញ្ចូលឈ្មោះថត: `public_html/backend_api`
      - ចុច **Create**
 3. ចូលទៅកាន់ Menu **SSL** ក្នុង hPanel៖
    - ដំឡើង **Free SSL (Let's Encrypt)** សម្រាប់ `web.rpitssr.edu.kh` និង `api.rpitssr.edu.kh` (ដើម្បីឱ្យមាន `https://` បៃតងទាំងពីរ)

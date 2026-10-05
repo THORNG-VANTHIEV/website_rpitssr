@@ -1,0 +1,19 @@
+# ==============================================================================
+# RPITSSR Laravel Root .htaccess for Subdomain Hosting (Hostinger / cPanel)
+# Routes requests seamlessly into public/ and protects sensitive root files
+# ==============================================================================
+
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Block direct web access to sensitive environment, git, and configuration files
+    RewriteRule ^(\.env|\.git|composer\.(json|lock)|package\.(json|lock)|phpunit\.xml) - [F,L,NC]
+
+    # If the request is not already in /public, transparently rewrite to public/
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

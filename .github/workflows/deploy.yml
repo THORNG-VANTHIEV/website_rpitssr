@@ -45,17 +45,29 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -p ${{ secrets.HOSTINGER_SSH_PORT || 65002 }} -H ${{ secrets.HOSTINGER_SSH_HOST }} >> ~/.ssh/known_hosts
 
-      # ៥. Sync Frontend (dist/) ទៅកាន់ public_html/web/
+      # ៥. Sync Frontend (dist/) ទៅកាន់ public_html/portal/
       - name: Deploy Frontend to Hostinger
         run: |
+          ssh -p ${{ secrets.HOSTINGER_SSH_PORT || 65002 }} \
+            ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} \
+            "mkdir -p domains/rpitssr.edu.kh/public_html/portal || mkdir -p public_html/portal"
+
           rsync -avz --delete \
             -e "ssh -p ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}" \
             ./frontend/dist/ \
-            ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:domains/rpitssr.edu.kh/public_html/web/
+            ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:domains/rpitssr.edu.kh/public_html/portal/ || \
+          rsync -avz --delete \
+            -e "ssh -p ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}" \
+            ./frontend/dist/ \
+            ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:public_html/portal/
 
-      # ៦. Sync Backend Code ទៅកាន់ backend/ (Exclude ឯកសារសម្ងាត់ និង Cache)
+      # ៦. Sync Backend Code ទៅកាន់ public_html/backend_api/
       - name: Deploy Backend to Hostinger
         run: |
+          ssh -p ${{ secrets.HOSTINGER_SSH_PORT || 65002 }} \
+            ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} \
+            "mkdir -p domains/rpitssr.edu.kh/public_html/backend_api || mkdir -p public_html/backend_api"
+
           rsync -avz \
             --exclude='.git*' \
             --exclude='.env*' \
@@ -71,7 +83,23 @@ jobs:
             --exclude='storage/app/admissions/private/*' \
             -e "ssh -p ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}" \
             ./backend/ \
-            ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:domains/rpitssr.edu.kh/backend/
+            ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:domains/rpitssr.edu.kh/public_html/backend_api/ || \
+          rsync -avz \
+            --exclude='.git*' \
+            --exclude='.env*' \
+            --exclude='tests/' \
+            --exclude='node_modules/' \
+            --exclude='*.sqlite*' \
+            --exclude='*.sql*' \
+            --exclude='storage/logs/*.log' \
+            --exclude='storage/framework/cache/*' \
+            --exclude='storage/framework/sessions/*' \
+            --exclude='storage/framework/views/*' \
+            --exclude='storage/app/backups/*' \
+            --exclude='storage/app/admissions/private/*' \
+            -e "ssh -p ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}" \
+            ./backend/ \
+            ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:public_html/backend_api/
 
       # ៧. ដំណើរការ Commands លើ Hostinger តាម SSH (Migrate, Cache, Permissions)
       - name: Execute Post-Deployment Commands on Hostinger
@@ -82,7 +110,11 @@ jobs:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           port: ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}
           script: |
-            cd domains/rpitssr.edu.kh/backend
+            if [ -d "domains/rpitssr.edu.kh/public_html/backend_api" ]; then
+              cd domains/rpitssr.edu.kh/public_html/backend_api
+            else
+              cd public_html/backend_api
+            fi
             composer install --no-dev --optimize-autoloader --no-interaction
             php artisan migrate --force
             php artisan storage:link || true
