@@ -1,0 +1,41 @@
+# ==============================================================================
+# RPITSSR React Single Page Application (SPA) .htaccess for Apache / LiteSpeed
+# Hostinger hPanel Compatible
+# ==============================================================================
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Forward /storage/* and /uploads/* requests to the Backend API subdomain
+  RewriteRule ^storage/(.*)$ https://api.rpitssr.edu.kh/storage/$1 [L,R=301]
+  RewriteRule ^uploads/(.*)$ https://api.rpitssr.edu.kh/uploads/$1 [L,R=301]
+
+  # 1. Do not rewrite existing physical files or directories
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # 2. Rewrite all Single Page Application (SPA) routes to index.html
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Security: Prevent browser directory listings
+Options -Indexes
+
+# Cache-Control: Do not cache index.html so users always get the latest version
+<FilesMatch "\.(html)$">
+  Header set Cache-Control "no-cache, no-store, must-revalidate"
+  Header set Pragma "no-cache"
+  Header set Expires 0
+</FilesMatch>
+
+# Cache-Control: Cache static hashed assets (JS/CSS/Fonts/Images) for high performance
+<FilesMatch "\.(js|css|webp|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
+  Header set Cache-Control "max-age=31536000, public, immutable"
+</FilesMatch>
+
+# Compression: Enable GZIP / Deflate for fast loading
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/plain text/html text/xml text/css application/xml application/xhtml+xml application/rss+xml application/javascript application/x-javascript application/json image/svg+xml
+</IfModule>

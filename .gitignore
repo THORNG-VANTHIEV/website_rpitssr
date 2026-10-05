@@ -31,6 +31,11 @@ backend/storage/framework/views/*
 frontend/node_modules/
 frontend/dist/
 frontend/*.local
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+backend/.env.*
+!backend/.env.example
 
 # Logs
 *.log
@@ -41,6 +46,11 @@ frontend/*.local
 backend/storage/app/backups/*
 !backend/storage/app/backups/.gitignore
 
-# folder
+# Scratch & temporary files
 sample mobie ui/
-admission_form
+admission_form/
+live_home_chunk*.js
+scratch/
+
+# Deployment artifacts
+hostinger-deploy/

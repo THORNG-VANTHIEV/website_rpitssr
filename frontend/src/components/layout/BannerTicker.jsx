@@ -24,16 +24,13 @@ export const BannerTicker = () => {
 
         if (activeBanners.length > 0) {
           const totalChars = activeBanners.reduce((acc, b) => acc + (b.message ? b.message.length : 0), 0);
-          const computedDuration = Math.max(25, Math.ceil(0.15 * totalChars));
+          const computedDuration = Math.max(30, Math.ceil(0.18 * totalChars));
           setDuration(computedDuration);
 
           const messages = activeBanners.map((b) => b.message.replace(/[\r\n]+/g, '   ').trim());
-          setItems([...messages, ...messages]);
+          setItems(messages);
         } else {
           setItems([
-            '🎓 វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប - TVET',
-            '🔥 [ថ្មី] ទស្សនាវីដេអូផ្សព្វផ្សាយ និងសកម្មភាពបណ្តុះបណ្តាលចុងក្រោយរបស់ RPITSSR លើ YouTube',
-            '🌟 កម្មវិធីបណ្តុះបណ្តាលជំនាញវិជ្ជាជីវៈ ១.៥ លាននាក់ ដោយឥតគិតថ្លៃ',
             '🎓 វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប - TVET',
             '🔥 [ថ្មី] ទស្សនាវីដេអូផ្សព្វផ្សាយ និងសកម្មភាពបណ្តុះបណ្តាលចុងក្រោយរបស់ RPITSSR លើ YouTube',
             '🌟 កម្មវិធីបណ្តុះបណ្តាលជំនាញវិជ្ជាជីវៈ ១.៥ លាននាក់ ដោយឥតគិតថ្លៃ'
@@ -52,19 +49,33 @@ export const BannerTicker = () => {
   return (
     <div className="scrolling-banner-wrapper">
       <div className="scrolling-banner-container">
+        {/* Track 1: Primary */}
         <div
-          className="scrolling-banner-content"
-          style={{ animation: `scroll-infinite ${duration}s linear infinite` }}
+          className="scrolling-banner-track"
+          style={{ animationDuration: `${duration}s` }}
         >
           {items.map((text, idx) => (
-            <div key={idx} className="scrolling-banner-item">
-              {text}
+            <div key={`track1-${idx}`} className="scrolling-banner-item">
+              <span>{text}</span>
+              <span className="scrolling-banner-bullet">✦</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Track 2: Seamless Mirror Clone (Eliminates all jump & jitter) */}
+        <div
+          className="scrolling-banner-track"
+          aria-hidden="true"
+          style={{ animationDuration: `${duration}s` }}
+        >
+          {items.map((text, idx) => (
+            <div key={`track2-${idx}`} className="scrolling-banner-item">
+              <span>{text}</span>
+              <span className="scrolling-banner-bullet">✦</span>
             </div>
           ))}
         </div>
       </div>
-      <div className="scrolling-banner-gradient-left"></div>
-      <div className="scrolling-banner-gradient-right"></div>
     </div>
   );
 };

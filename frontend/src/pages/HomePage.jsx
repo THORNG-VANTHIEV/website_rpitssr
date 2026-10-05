@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { courseService } from '../services/courseService';
 import { blogService } from '../services/blogService';
 import api from '../api/client';
 import { CourseCard } from '../components/common/CourseCard';
+import { MobileCoursesSlider } from '../components/common/MobileCoursesSlider';
+import { MobileEventsSlider } from '../components/common/MobileEventsSlider';
+import { MobileVideosSlider } from '../components/common/MobileVideosSlider';
 import { BlogCard } from '../components/common/BlogCard';
+import { MobileBlogsSlider } from '../components/common/MobileBlogsSlider';
 import { YouTubeVideoCard } from '../components/common/YouTubeVideoCard';
 import { EventCard } from '../components/common/EventCard';
 import {
@@ -21,7 +25,8 @@ import {
   ShieldCheck,
   Wrench,
   CheckCircle2,
-  BookOpen
+  BookOpen,
+  Edit3
 } from 'lucide-react';
 
 // Curated real promotional & activity videos from RPITSSR official YouTube channel (@rpitssr_edu)
@@ -219,13 +224,16 @@ export const HomePage = () => {
                 <span>{isKhmer ? 'ស្វែងយល់ពីជំនាញ' : 'Explore Programs'}</span>
                 <ArrowRight size={16} />
               </Link>
-              <Link to="/apply" className="home-hero-btn-secondary" onClick={scrollToTop}>
-                <span>{isKhmer ? 'ចុះឈ្មោះចូលរៀន' : 'Enroll Now'}</span>
-              </Link>
-              <Link to="/downloads" className="home-hero-btn-outline" onClick={scrollToTop}>
-                <FileDown size={16} />
-                <span>{isKhmer ? 'មជ្ឈមណ្ឌលទាញយក' : 'Download Center'}</span>
-              </Link>
+              <div className="home-hero-secondary-row">
+                <Link to="/apply" className="home-hero-btn-secondary" onClick={scrollToTop}>
+                  <Edit3 size={16} />
+                  <span>{isKhmer ? 'ចុះឈ្មោះចូលរៀន' : 'Enroll Now'}</span>
+                </Link>
+                <Link to="/downloads" className="home-hero-btn-outline" onClick={scrollToTop}>
+                  <FileDown size={16} />
+                  <span>{isKhmer ? 'មជ្ឈមណ្ឌលទាញយក' : 'Download Center'}</span>
+                </Link>
+              </div>
             </div>
 
             <div className="home-hero-trust-bar">
@@ -274,8 +282,13 @@ export const HomePage = () => {
             {/* Gateway 2: Download Center */}
             <Link to="/downloads" className="home-gateway-card" onClick={scrollToTop}>
               <div>
-                <div className="home-gateway-icon-wrap" style={{ background: '#ecfdf5', color: '#059669' }}>
-                  <FileDown size={24} />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <div className="home-gateway-icon-wrap" style={{ background: '#ecfdf5', color: '#059669', margin: 0 }}>
+                    <FileDown size={24} />
+                  </div>
+                  <span style={{ fontSize: '0.72rem', fontWeight: 700, background: '#fef3c7', color: '#b45309', border: '1px solid #fde68a', borderRadius: '50px', padding: '2px 8px' }}>
+                    {isKhmer ? 'ឆាប់ៗនេះ' : 'Coming Soon'}
+                  </span>
                 </div>
                 <h3 className="home-gateway-title">
                   {isKhmer ? 'មជ្ឈមណ្ឌលទាញយក' : 'Download Center'}
@@ -316,8 +329,13 @@ export const HomePage = () => {
             {/* Gateway 4: Online Admissions */}
             <Link to="/apply" className="home-gateway-card" onClick={scrollToTop}>
               <div>
-                <div className="home-gateway-icon-wrap" style={{ background: '#fdf2f8', color: '#db2777' }}>
-                  <GraduationCap size={24} />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <div className="home-gateway-icon-wrap" style={{ background: '#fdf2f8', color: '#db2777', margin: 0 }}>
+                    <GraduationCap size={24} />
+                  </div>
+                  <span style={{ fontSize: '0.72rem', fontWeight: 700, background: '#fef3c7', color: '#b45309', border: '1px solid #fde68a', borderRadius: '50px', padding: '2px 8px' }}>
+                    {isKhmer ? 'ឆាប់ៗនេះ' : 'Coming Soon'}
+                  </span>
                 </div>
                 <h3 className="home-gateway-title">
                   {isKhmer ? 'ចុះឈ្មោះចូលរៀនអនឡាញ' : 'Online Admission'}
@@ -500,7 +518,8 @@ export const HomePage = () => {
           </div>
 
           <div className="courses-wrapper">
-            <div className="row g-2 g-md-4">
+            {/* Desktop View: Institutional 4-Column Grid (Screens >= 992px) */}
+            <div className="row g-2 g-md-4 d-none d-lg-flex">
               {loading ? (
                 Array.from({ length: 4 }).map((_, s) => (
                   <div key={s} className="col-6 col-lg-3 col-sm-6 courses-col">
@@ -510,8 +529,8 @@ export const HomePage = () => {
                   </div>
                 ))
               ) : courses.length > 0 ? (
-                courses.map((course) => (
-                  <div key={course.id} className="col-6 col-lg-3 col-sm-6 courses-col">
+                courses.map((course, idx) => (
+                  <div key={course.id || idx} className="col-6 col-lg-3 col-sm-6 courses-col">
                     <CourseCard course={course} />
                   </div>
                 ))
@@ -519,6 +538,17 @@ export const HomePage = () => {
                 <div className="col-12 text-center">
                   <p>No courses available at the moment.</p>
                 </div>
+              )}
+            </div>
+
+            {/* Mobile & Tablet View: 3-Card Slideshow Sliding 1-by-1 (Screens < 992px) */}
+            <div className="d-block d-lg-none">
+              {loading ? (
+                <div className="single-courses mt-3 text-center py-5">
+                  <i className="fas fa-spinner fa-spin fa-2x text-primary"></i>
+                </div>
+              ) : (
+                <MobileCoursesSlider courses={courses} />
               )}
             </div>
 
@@ -638,66 +668,86 @@ export const HomePage = () => {
             </p>
           </div>
 
-          <div className="row g-4 align-items-stretch">
-            {/* Main Featured Video (Left Column) */}
-            <div className="col-lg-7">
-              {videos[0] && (
-                <YouTubeVideoCard video={videos[0]} featured={true} />
-              )}
-            </div>
-
-            {/* Compact Video Playlist (Right Column) */}
-            <div className="col-lg-5">
-              <div className="compact-video-list">
-                {videos.slice(1, 4).map((vid) => (
-                  <YouTubeVideoCard key={vid.id || vid.youtubeId} video={vid} featured={false} />
-                ))}
-              </div>
+          {/* Mobile & Tablet View: 3-Video Slideshow Sliding 1-by-1 (Screens < 992px) */}
+          <div className="d-block d-lg-none">
+            <MobileVideosSlider videos={videos} />
+            <div className="text-center mt-3">
+              <a
+                href="https://www.youtube.com/@rpitssr_edu"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mobile-video-channel-btn"
+              >
+                <i className="fab fa-youtube text-danger me-2"></i>
+                <span>{isKhmer ? 'ទស្សនាវីដេអូបន្ថែមលើ YouTube' : 'Watch more on YouTube'}</span>
+                <ArrowRight size={14} className="ms-1" />
+              </a>
             </div>
           </div>
 
-          {/* Expanded Video Grid (Remaining Videos) */}
-          {showAllVideos && videos.length > 4 && (
-            <div className="expanded-videos-grid">
-              <div className="row g-4">
-                {videos.slice(4).map((vid) => (
-                  <div key={vid.id || vid.youtubeId} className="col-lg-4 col-md-6 col-12">
-                    <YouTubeVideoCard video={vid} variant="grid" />
-                  </div>
-                ))}
+          {/* Desktop View: Featured Video & Playlist Grid (Screens >= 992px) */}
+          <div className="d-none d-lg-block">
+            <div className="row g-4 align-items-stretch">
+              {/* Main Featured Video (Left Column) */}
+              <div className="col-lg-7">
+                {videos[0] && (
+                  <YouTubeVideoCard video={videos[0]} featured={true} />
+                )}
+              </div>
+
+              {/* Compact Video Playlist (Right Column) */}
+              <div className="col-lg-5 home-video-playlist-col">
+                <div className="compact-video-list">
+                  {videos.slice(1, 4).map((vid) => (
+                    <YouTubeVideoCard key={vid.id || vid.youtubeId} video={vid} featured={false} />
+                  ))}
+                </div>
               </div>
             </div>
-          )}
 
-          {/* Show More / Show Less Toggle Button */}
-          {videos.length > 4 && (
-            <div className="video-show-more-wrap">
-              <button
-                type="button"
-                className="video-toggle-btn"
-                onClick={() => {
-                  if (showAllVideos) {
-                    const sectionEl = document.getElementById('promotional-videos-section');
-                    if (sectionEl) {
-                      sectionEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            {/* Expanded Video Grid (Remaining Videos) */}
+            {showAllVideos && videos.length > 4 && (
+              <div className="expanded-videos-grid">
+                <div className="row g-4">
+                  {videos.slice(4).map((vid) => (
+                    <div key={vid.id || vid.youtubeId} className="col-lg-4 col-md-6 col-12">
+                      <YouTubeVideoCard video={vid} variant="grid" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Show More / Show Less Toggle Button */}
+            {videos.length > 4 && (
+              <div className="video-show-more-wrap">
+                <button
+                  type="button"
+                  className="video-toggle-btn"
+                  onClick={() => {
+                    if (showAllVideos) {
+                      const sectionEl = document.getElementById('promotional-videos-section');
+                      if (sectionEl) {
+                        sectionEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
                     }
-                  }
-                  setShowAllVideos(!showAllVideos);
-                }}
-              >
-                <span>
-                  {showAllVideos
-                    ? (isKhmer ? 'បង្រួមវីដេអូវិញ' : 'Show Less')
-                    : (isKhmer ? '🎬 មើលវីដេអូផ្សព្វផ្សាយបន្ថែមទៀត' : '🎬 Show More Promotional Videos')}
-                </span>
-                <span className="toggle-count-badge">
-                  {showAllVideos
-                    ? (isKhmer ? '↑ បង្រួម' : '↑ Less')
-                    : `+${videos.length - 4} ${isKhmer ? 'វីដេអូ' : 'Videos'}`}
-                </span>
-              </button>
-            </div>
-          )}
+                    setShowAllVideos(!showAllVideos);
+                  }}
+                >
+                  <span>
+                    {showAllVideos
+                      ? (isKhmer ? 'បង្រួមវីដេអូវិញ' : 'Show Less')
+                      : (isKhmer ? '🎬 មើលវីដេអូផ្សព្វផ្សាយបន្ថែមទៀត' : '🎬 Show More Promotional Videos')}
+                  </span>
+                  <span className="toggle-count-badge">
+                    {showAllVideos
+                      ? (isKhmer ? '↑ បង្រួម' : '↑ Less')
+                      : `+${videos.length - 4} ${isKhmer ? 'វីដេអូ' : 'Videos'}`}
+                  </span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
@@ -751,46 +801,63 @@ export const HomePage = () => {
             </div>
           </div>
 
-          {/* Events Grid */}
-          <div className="event-grid-container mt-40">
-            <div className="row g-4">
-              {loading ? (
-                Array.from({ length: 4 }).map((_, s) => (
-                  <div key={s} className="col-xl-3 col-lg-6 col-md-6">
-                    <div className="modern-event-skeleton">
-                      <div className="skeleton-img"></div>
-                      <div className="skeleton-body">
-                        <div className="skeleton-line short"></div>
-                        <div className="skeleton-line title"></div>
-                        <div className="skeleton-line medium"></div>
+          {/* Mobile & Tablet View: 3-Event Slideshow Sliding 1-by-1 (Screens < 992px) */}
+          <div className="d-block d-lg-none mt-4">
+            {loading ? (
+              <div className="text-center py-4">
+                <i className="fas fa-spinner fa-spin fa-2x text-primary"></i>
+              </div>
+            ) : displayedEvents.length > 0 ? (
+              <MobileEventsSlider events={displayedEvents} />
+            ) : (
+              <div className="modern-no-events-card text-center py-4">
+                <p className="text-muted mb-0">មិនទាន់មានព្រឹត្តិការណ៍ក្នុងផ្នែកនេះនៅឡើយទេ</p>
+              </div>
+            )}
+          </div>
+
+          {/* Desktop View: Institutional 4-Column Grid (Screens >= 992px) */}
+          <div className="d-none d-lg-block">
+            <div className="event-grid-container mt-40">
+              <div className="row g-4">
+                {loading ? (
+                  Array.from({ length: 4 }).map((_, s) => (
+                    <div key={s} className="col-xl-3 col-lg-6 col-md-6 event-card-col">
+                      <div className="modern-event-skeleton">
+                        <div className="skeleton-img"></div>
+                        <div className="skeleton-body">
+                          <div className="skeleton-line short"></div>
+                          <div className="skeleton-line title"></div>
+                          <div className="skeleton-line medium"></div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
-              ) : displayedEvents.length > 0 ? (
-                displayedEvents.slice(0, 4).map((event) => (
-                  <div key={event.id} className="col-xl-3 col-lg-6 col-md-6 d-flex">
-                    <EventCard event={event} />
-                  </div>
-                ))
-              ) : (
-                <div className="col-12 text-center">
-                  <div className="modern-no-events-card">
-                    <div className="no-events-icon-wrap">
-                      <i className="fas fa-calendar-day"></i>
+                  ))
+                ) : displayedEvents.length > 0 ? (
+                  displayedEvents.slice(0, 4).map((event) => (
+                    <div key={event.id} className="col-xl-3 col-lg-6 col-md-6 d-flex event-card-col">
+                      <EventCard event={event} />
                     </div>
-                    <h4>មិនទាន់មានព្រឹត្តិការណ៍ក្នុងផ្នែកនេះនៅឡើយទេ</h4>
-                    <p>សូមរង់ចាំតាមដានកម្មវិធីថ្មីៗ ឬត្រឡប់ទៅមើលព្រឹត្តិការណ៍ទាំងអស់</p>
-                    <button
-                      type="button"
-                      className="btn-back-all-events"
-                      onClick={() => setActiveTab('all')}
-                    >
-                      <i className="fas fa-arrow-left me-1"></i> មើលព្រឹត្តិការណ៍ទាំងអស់
-                    </button>
+                  ))
+                ) : (
+                  <div className="col-12 text-center">
+                    <div className="modern-no-events-card">
+                      <div className="no-events-icon-wrap">
+                        <i className="fas fa-calendar-day"></i>
+                      </div>
+                      <h4>មិនទាន់មានព្រឹត្តិការណ៍ក្នុងផ្នែកនេះនៅឡើយទេ</h4>
+                      <p>សូមរង់ចាំតាមដានកម្មវិធីថ្មីៗ ឬត្រឡប់ទៅមើលព្រឹត្តិការណ៍ទាំងអស់</p>
+                      <button
+                        type="button"
+                        className="btn-back-all-events"
+                        onClick={() => setActiveTab('all')}
+                      >
+                        <i className="fas fa-arrow-left me-1"></i> មើលព្រឹត្តិការណ៍ទាំងអស់
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
 
@@ -810,30 +877,53 @@ export const HomePage = () => {
           <div className="row justify-content-center">
             <div className="col-lg-8 col-md-10">
               <div className="section-title-2 text-center">
-                <h2 className="title">{t('home.latestNews')}</h2>
-                <span className="line"></span>
-                <p>{t('home.latestNewsDescription')}</p>
+                <span className="video-section-badge mb-2" style={{ display: 'inline-flex' }}>
+                  <i className="far fa-newspaper me-1"></i> {isKhmer ? 'ព័ត៌មាន & សេចក្តីជូនដំណឹង' : 'News & Announcements'}
+                </span>
+                <h2 className="title" style={{ fontSize: '2rem', fontWeight: 800, color: '#07294D' }}>
+                  {t('home.latestNews')}
+                </h2>
+                <span className="line" style={{ margin: '10px auto 12px' }}></span>
+                <p style={{ color: '#64748b', fontSize: '0.98rem', maxWidth: '640px', margin: '0 auto' }}>
+                  {isKhmer 
+                    ? 'តាមដានព័ត៌មានថ្មីៗ សេចក្តីប្រកាសព័ត៌មាន សិក្ខាសាលា និងសកម្មភាពអភិវឌ្ឍន៍ស្ថាប័នរបស់ RPITSSR'
+                    : t('home.latestNewsDescription')}
+                </p>
               </div>
             </div>
           </div>
 
           <div className="blog-wrapper">
-            <div className="row blog-cards-row">
+            {/* Mobile & Tablet View: Center Mode Slideshow (Screens < 992px) */}
+            <div className="d-block d-lg-none mt-4">
               {loading ? (
-                Array.from({ length: 3 }).map((_, s) => (
-                  <div key={s} className="col-lg-4 col-md-6 blog-card-col">
-                    <div className="modern-blog-card text-center py-5">
-                      <i className="fas fa-spinner fa-spin fa-2x text-primary"></i>
-                    </div>
-                  </div>
-                ))
+                <div className="text-center py-4">
+                  <i className="fas fa-spinner fa-spin fa-2x text-primary"></i>
+                </div>
               ) : (
-                posts.slice(0, 3).map((post, s) => (
-                  <div key={post.id} className="col-lg-4 col-md-6 blog-card-col">
-                    <BlogCard post={post} featured={s === 0} />
-                  </div>
-                ))
+                <MobileBlogsSlider posts={posts} />
               )}
+            </div>
+
+            {/* Desktop View: Institutional 3-Column Grid (Screens >= 992px) */}
+            <div className="d-none d-lg-block">
+              <div className="row blog-cards-row">
+                {loading ? (
+                  Array.from({ length: 3 }).map((_, s) => (
+                    <div key={s} className="col-lg-4 col-md-6 blog-card-col">
+                      <div className="modern-blog-card text-center py-5">
+                        <i className="fas fa-spinner fa-spin fa-2x text-primary"></i>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  posts.slice(0, 3).map((post, s) => (
+                    <div key={post.id} className="col-lg-4 col-md-6 blog-card-col">
+                      <BlogCard post={post} featured={s === 0} />
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
 
             {posts.length > 3 && (

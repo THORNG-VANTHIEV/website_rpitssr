@@ -8,6 +8,7 @@ import { Footer } from './components/layout/Footer';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { ScrollToTop } from './components/common/ScrollToTop';
 import { WebsiteGuideModal } from './components/common/WebsiteGuideModal';
+import { MobileBottomNav } from './components/layout/MobileBottomNav';
 
 // Public Pages
 import { HomePage } from './pages/HomePage';
@@ -28,6 +29,8 @@ import { DownloadPage } from './pages/DownloadPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { AdmissionApplyPage } from './pages/AdmissionApplyPage';
+import { LibraryPage } from './pages/LibraryPage';
+import { UnderDevelopmentPage } from './pages/UnderDevelopmentPage';
 
 // Admin Shell & Pages
 import { AdminLayout } from './components/admin/AdminLayout';
@@ -75,6 +78,7 @@ const PublicLayout = () => {
       </main>
       <Footer />
       <WebsiteGuideModal />
+      <MobileBottomNav />
     </div>
   );
 };
@@ -115,9 +119,10 @@ function App() {
               <Route path="/organization" element={<OrganizationPage />} />
               <Route path="/leadership" element={<OrganizationPage />} />
               <Route path="/org-chart" element={<OrganizationPage />} />
-              <Route path="/downloads" element={<DownloadPage />} />
-              <Route path="/download-center" element={<DownloadPage />} />
-              <Route path="/forms" element={<DownloadPage />} />
+              {/* Features Under Development for Phase 1 Deployment */}
+              <Route path="/downloads" element={<UnderDevelopmentPage feature="downloads" />} />
+              <Route path="/download-center" element={<UnderDevelopmentPage feature="downloads" />} />
+              <Route path="/forms" element={<UnderDevelopmentPage feature="downloads" />} />
               <Route path="/blog" element={<BlogPage />} />
               <Route path="/blog/:slug" element={<BlogDetailPage />} />
               <Route path="/blog-details/:id" element={<BlogDetailPage />} />
@@ -131,13 +136,16 @@ function App() {
               <Route path="/contact-us" element={<ContactPage />} />
               <Route path="/notice" element={<NoticePage />} />
               <Route path="/notices" element={<NoticePage />} />
-              <Route path="/exam-result" element={<ExamResultsPage />} />
-              <Route path="/exam-results" element={<ExamResultsPage />} />
-              <Route path="/apply" element={<AdmissionApplyPage />} />
-              <Route path="/admission" element={<AdmissionApplyPage />} />
-              <Route path="/admission-apply" element={<AdmissionApplyPage />} />
+              <Route path="/exam-result" element={<UnderDevelopmentPage feature="exam-result" />} />
+              <Route path="/exam-results" element={<UnderDevelopmentPage feature="exam-result" />} />
+              <Route path="/apply" element={<UnderDevelopmentPage feature="admission" />} />
+              <Route path="/admission" element={<UnderDevelopmentPage feature="admission" />} />
+              <Route path="/admission-apply" element={<UnderDevelopmentPage feature="admission" />} />
+              <Route path="/library" element={<UnderDevelopmentPage feature="library" />} />
+              <Route path="/e-library" element={<UnderDevelopmentPage feature="library" />} />
+              <Route path="/books" element={<UnderDevelopmentPage feature="library" />} />
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/register" element={<UnderDevelopmentPage feature="register" />} />
             </Route>
 
             {/* =========================================================

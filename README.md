@@ -1,3 +1,174 @@
+# វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប (RPITSSR)
+### Institutional Portal & Management System
+
+---
+
+## 📌 សៀវភៅណែនាំអំពីការគ្រប់គ្រង និងបើកដំណើរការមុខងារឡើងវិញ (Feature Activation Guide)
+
+សម្រាប់ដំណាក់កាលត្រៀម Deploy ដំបូង (Phase 1 Production Launch) មុខងារចំនួន **៥** ត្រូវបានដាក់ស្ថិតនៅក្រោមទំព័រផ្លូវការ **«កំពុងអភិវឌ្ឍ / ឆាប់ៗនេះ» (UnderDevelopmentPage)** ដើម្បីរក្សាភាពស្អាតបាត ទំនុកចិត្តសាធារណៈ និងសុវត្ថិភាពទិន្នន័យនៃគេហទំព័រ។
+
+> [!NOTE]
+> **Component និងកូដដើមទាំងអស់ត្រូវបានរក្សាទុក ១០០% មិនមានការលុបបាត់ឡើយ:**
+> - `DownloadPage.jsx` (មជ្ឈមណ្ឌលទាញយកឯកសារ)
+> - `LibraryPage.jsx` (បណ្ណាល័យអេឡិចត្រូនិក)
+> - `ExamResultsPage.jsx` (ការពិនិត្យលទ្ធផលប្រឡង)
+> - `AdmissionApplyPage.jsx` (ការចុះឈ្មោះចូលរៀន)
+> - `RegisterPage.jsx` (ការចុះឈ្មោះគណនីសិស្ស)
+>
+> ឯកសារទាំងអស់នេះត្រូវបាន Import រួចជាស្រេចនៅក្នុង [frontend/src/App.jsx](frontend/src/App.jsx)។ នៅពេលអ្នកចង់បើកដំណើរការមុខងារណាមួយឡើងវិញ អ្នកគ្រាន់តែកែសម្រួលកូដតែ **១ បន្ទាត់** ក្នុង `App.jsx` ប៉ុណ្ណោះ។
+
+---
+
+### 🛠️ របៀបបើកដំណើរការមុខងារនីមួយៗឡើងវិញ (Step-by-Step Reactivation)
+
+បើកឯកសារ `frontend/src/App.jsx` ហើយស្វែងរកផ្នែក `PUBLIC WEBSITE ROUTES` (ចន្លោះបន្ទាត់ 120 - 150)៖
+
+#### ១. បើកដំណើរការ «មជ្ឈមណ្ឌលទាញយកឯកសារ (Download Center)»
+- **ទីតាំងក្នុង `frontend/src/App.jsx`**:
+  ```jsx
+  // បច្ចុប្បន្ន (Under Development):
+  <Route path="/downloads" element={<UnderDevelopmentPage feature="downloads" />} />
+  <Route path="/download-center" element={<UnderDevelopmentPage feature="downloads" />} />
+  <Route path="/forms" element={<UnderDevelopmentPage feature="downloads" />} />
+
+  // ប្តូរមកបើកដំណើរការពេញលេញវិញ (Active Page):
+  <Route path="/downloads" element={<DownloadPage />} />
+  <Route path="/download-center" element={<DownloadPage />} />
+  <Route path="/forms" element={<DownloadPage />} />
+  ```
+
+#### ២. បើកដំណើរការ «បណ្ណាល័យអេឡិចត្រូនិក (E-Library)»
+- **ទីតាំងក្នុង `frontend/src/App.jsx`**:
+  ```jsx
+  // បច្ចុប្បន្ន (Under Development):
+  <Route path="/library" element={<UnderDevelopmentPage feature="library" />} />
+  <Route path="/e-library" element={<UnderDevelopmentPage feature="library" />} />
+  <Route path="/books" element={<UnderDevelopmentPage feature="library" />} />
+
+  // ប្តូរមកបើកដំណើរការពេញលេញវិញ (Active Page):
+  <Route path="/library" element={<LibraryPage />} />
+  <Route path="/e-library" element={<LibraryPage />} />
+  <Route path="/books" element={<LibraryPage />} />
+  ```
+
+#### ៣. បើកដំណើរការ «ការពិនិត្យលទ្ធផលប្រឡង (Exam Results Lookup)»
+- **ទីតាំងក្នុង `frontend/src/App.jsx`**:
+  ```jsx
+  // បច្ចុប្បន្ន (Under Development):
+  <Route path="/exam-result" element={<UnderDevelopmentPage feature="exam-result" />} />
+  <Route path="/exam-results" element={<UnderDevelopmentPage feature="exam-result" />} />
+
+  // ប្តូរមកបើកដំណើរការពេញលេញវិញ (Active Page):
+  <Route path="/exam-result" element={<ExamResultsPage />} />
+  <Route path="/exam-results" element={<ExamResultsPage />} />
+  ```
+
+#### ៤. បើកដំណើរការ «ការចុះឈ្មោះចូលរៀនតាមអនឡាញ (Online Admissions)»
+- **ទីតាំងក្នុង `frontend/src/App.jsx`**:
+  ```jsx
+  // បច្ចុប្បន្ន (Under Development):
+  <Route path="/apply" element={<UnderDevelopmentPage feature="admission" />} />
+  <Route path="/admission" element={<UnderDevelopmentPage feature="admission" />} />
+  <Route path="/admission-apply" element={<UnderDevelopmentPage feature="admission" />} />
+
+  // ប្តូរមកបើកដំណើរការពេញលេញវិញ (Active Page):
+  <Route path="/apply" element={<AdmissionApplyPage />} />
+  <Route path="/admission" element={<AdmissionApplyPage />} />
+  <Route path="/admission-apply" element={<AdmissionApplyPage />} />
+  ```
+
+#### ៥. បើកដំណើរការ «ការចុះឈ្មោះគណនីសិស្សថ្មី (Student Registration)»
+- **ទីតាំងក្នុង `frontend/src/App.jsx`**:
+  ```jsx
+  // បច្ចុប្បន្ន (Under Development):
+  <Route path="/register" element={<UnderDevelopmentPage feature="register" />} />
+
+  // ប្តូរមកបើកដំណើរការពេញលេញវិញ (Active Page):
+  <Route path="/register" element={<RegisterPage />} />
+  ```
+
+---
+
+### 🏷️ របៀបដកផ្លាក «ឆាប់ៗនេះ» (Coming Soon Badges)
+
+នៅពេលបើកដំណើរការទំព័រណាមួយឡើងវិញ អ្នកអាចដកផ្លាកសម្គាល់ «ឆាប់ៗនេះ» ចេញពី Menu និងទំព័រដើមបានយ៉ាងងាយស្រួល៖
+
+1. **នៅក្នុង Menu ចំហៀងទូរស័ព្ទ (`frontend/src/components/layout/Navbar.jsx`)**:
+   - ស្វែងរក `<span className="drawer-badge-pill amber">{isKhmer ? 'ឆាប់ៗនេះ' : 'Coming Soon'}</span>`
+   - លុប ឬ comment បន្ទាត់នោះចេញពី Link ដែលបានបើកដំណើរការរួច។
+
+2. **នៅលើផ្ទាំងច្រកទ្វារកាត់លើទំព័រដើម (`frontend/src/pages/HomePage.jsx`)**:
+   - ស្វែងរក `badgeText: isKhmer ? 'ឆាប់ៗនេះ' : 'Coming Soon'` (ត្រង់ Gateway 2 Download Center ឬ Gateway 4 Online Admissions)
+   - ដក property `badgeText` ឬប្តូរទៅជា `null` ដើម្បីកុំឱ្យបង្ហាញផ្លាក។
+
+---
+
+### ⚡ បញ្ជាសំខាន់ៗសម្រាប់ដំណើរការ (Useful Commands)
+
+```bash
+# ដំណើរការ Frontend អំឡុងពេលអភិវឌ្ឍន៍ (Dev Server)
+cd frontend
+npm run dev
+
+# ដំណើរការ Backend API (Laravel Server)
+cd backend
+php artisan serve
+
+# Build Frontend សម្រាប់ដាក់លើ Production Server
+cd frontend
+npm run build
+```
+
+---
+
+## 🛡️ បញ្ជីឯកសារដែលមិនត្រូវ Deploy ទៅកាន់ Production (Files to Exclude from Deployment)
+
+ដើម្បីជៀសវាងការធ្លាយទិន្នន័យសម្ងាត់ (Data Leaks / Sensitive Data Exposure) និងការលេចធ្លាយ Source Code ពេលយក Website ទៅដាក់លើ Production Server លោកអ្នក **ដាច់ខាតមិនត្រូវ Copy ឬ Deploy ឯកសារ និង Folder ខាងក្រោមនេះទៅជាមួយឡើយ**៖
+
+### 🛑 ១. ក្រុមឯកសារផ្ទុកលេខសម្ងាត់ និង Configuration (Secret & Config Files)
+- **`backend/.env` (របស់ Local)**: ផ្ទុក Password Database ម៉ាស៊ីនផ្ទាល់ខ្លួន, Local App Key និង Debug mode។ *(នៅលើ Server ត្រូវបង្កើត `.env` ថ្មីផ្ទាល់លើ Server នោះ ដោយយកលំនាំតាម `backend/.env.production.example`)*
+- **`*.env.backup`, `*.env.old`, `*.env.production`**: ឯកសារ Backup ច្រើនតែ Web Server មិនស្គាល់ថាជា Config ហើយអាចអនុញ្ញាតឱ្យអ្នកក្រៅទាញយកតាម Browser បាន
+- **`backend/storage/*.key`**: ផ្ទុក Encryption Keys ឬ Private Keys របស់ local
+
+### 🛑 ២. ក្រុមឯកសារទិន្នន័យ និង Backup (Database Dumps & Backups)
+- **`*.sql`, `*.sql.gz`, `*.dump`** *(ឧ. `rpitssr_db.sql`)*: ផ្ទុកទិន្នន័យជាក់ស្តែង រួមទាំង Hash Password របស់ Admin និងទិន្នន័យសិស្ស
+- **`backend/database/*.sqlite*`** *(ឧ. `database.sqlite`)*: ឯកសារ Database SQLite ដែលតេស្តលើ local
+- **`backend/storage/app/backups/*`**: ឯកសារដែលប្រព័ន្ធ Admin បង្កើតពេលចុច Backup Database លើម៉ាស៊ីន local
+
+### 🛑 ៣. ក្រុមឯកសារ Version Control & Local Editors (VCS & Development Metadata)
+- **`.git/` (Folder Git ទាំងមូល)**: **គ្រោះថ្នាក់បំផុត!** ប្រសិនបើ Folder `.git` ធ្លាយតាម Web ជនអនាមិកអាចទាញយក Source Code និង Git History ទាំងអស់នៃគម្រោង
+- **`.agents/`, `.gemini/`, `.github/`**: ផ្ទុក logs និង scripts ជំនួយការអភិវឌ្ឍន៍
+- **`.idea/`, `.vscode/`, `.DS_Store`, `Thumbs.db`**: ឯកសារ Cache របស់កម្មវិធីសរសេរកូដ និង OS
+
+### 🛑 ៤. កូដប្រភពដើមរបស់ Frontend (Frontend Dev Source & Node Modules)
+- **`frontend/src/`**: ជាកូដ JSX/React ដើមដែលមិនទាន់ compile
+- **`frontend/node_modules/`**: មានទំហំធំរាប់រយ MBs និងផ្ទុក dev libraries ឥតប្រយោជន៍លើ production
+- **`frontend/vite.config.js`, `package.json`**: Configuration សម្រាប់ build
+- 👉 **ចំណាំសំខាន់:** នៅលើ Production Web Server ត្រូវយក **តែមាតិកានៅក្នុងថត `frontend/dist/` តែមួយគត់** ទៅដាក់លើ Web Root (Nginx/Apache)!
+
+### 🛑 ៥. ឯកសារ Logs, Tests និង Mock Data
+- **`backend/storage/logs/*.log`**: ផ្ទុក Error messages, API request payloads និង debug logs
+- **`backend/tests/`**: ឯកសារ Test Suite
+- **`backend/database/seeders/backup_mock_*.json`**: ឯកសារ dummy data
+- **`backend/storage/app/admissions/private/*`**: ឯកសារអត្តសញ្ញាណប័ណ្ណ/សៀវភៅគ្រួសារដែលបាន upload តេស្តក្នុង local
+
+### 🛡️ គំរូ Command `rsync` សម្រាប់ Deploy ដោយសុវត្ថិភាព
+```bash
+rsync -avz --delete \
+  --exclude='.git*' \
+  --exclude='.env*' \
+  --exclude='*.sql*' \
+  --exclude='*.sqlite*' \
+  --exclude='storage/logs/*.log' \
+  --exclude='storage/app/backups/*' \
+  --exclude='tests/' \
+  --exclude='vendor/' \
+  --exclude='node_modules/' \
+  ./backend/ user@server_ip:/var/www/rpitssr/backend/
+```
+
+---
+
 # RPITSSR Security Remediation Guide
 
 > **Purpose:** this is an implementation checklist for the security audit findings. Apply the items in priority order, test each change, and record the pull request or deployment that closes it.

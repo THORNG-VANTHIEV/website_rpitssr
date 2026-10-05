@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\CourseCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class CourseController extends Controller
 {
@@ -29,7 +30,6 @@ class CourseController extends Controller
         $limit = (int) $request->input('limit', 20);
         $courses = $query->paginate($limit);
 
-        // Frontend expects direct courses array or standard paginated response
         return response()->json($courses->items(), 200);
     }
 

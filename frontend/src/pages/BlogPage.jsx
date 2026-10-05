@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { BlogCard, getCategoryStyle, resolveCategoryName } from '../components/common/BlogCard';
 import { getCleanExcerpt } from '../utils/textUtils';
@@ -44,6 +44,12 @@ const SAMPLE_POSTS = [
   }
 ];
 
+export const toKhmerNumber = (num) => {
+  if (num === undefined || num === null) return '';
+  const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+  return num.toString().split('').map(char => khmerDigits[char] || char).join('');
+};
+
 // Helper for authentic Cambodian date formatting
 const formatKhmerDate = (dateStr, isKhmer) => {
   if (!dateStr) return isKhmer ? 'មិនមានកាលបរិច្ឆេទ' : 'N/A';
@@ -58,10 +64,6 @@ const formatKhmerDate = (dateStr, isKhmer) => {
     'មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា',
     'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'
   ];
-  const toKhmerNumber = (num) => {
-    const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
-    return num.toString().split('').map(char => khmerDigits[char] || char).join('');
-  };
 
   const day = toKhmerNumber(d.getDate());
   const month = khmerMonths[d.getMonth()];
@@ -69,18 +71,45 @@ const formatKhmerDate = (dateStr, isKhmer) => {
   return `${day} ${month} ${year}`;
 };
 
+export const getCategoryDisplayName = (cat, isKhmer) => {
+  if (!cat) return isKhmer ? 'ព័ត៌មានទូទៅ' : 'News';
+  const rawName = typeof cat === 'object' ? (cat.name || '') : String(cat);
+  if (rawName.includes('(') && rawName.includes(')')) {
+    const parts = rawName.split('(');
+    const khmerPart = parts[0].trim();
+    const enPart = parts[1].replace(')', '').trim();
+    return isKhmer ? khmerPart : enPart;
+  }
+  return rawName;
+};
+
 export const BlogPage = () => {
   const { t, language, currentLanguage } = useLanguage();
   const isKhmer = (currentLanguage || language) === 'km';
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialCategory = searchParams.get('category') || 'all';
 
   const [posts, setPosts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [searchQuery, setSearchQuery] = useState('');
   const pageSize = 6;
 
+  // Sync state if URL query param changes
   useEffect(() => {
+    const cat = searchParams.get('category');
+    if (cat && cat !== activeCategory) {
+      setActiveCategory(cat);
+      setCurrentPage(1);
+    } else if (!cat && activeCategory !== 'all') {
+      setActiveCategory('all');
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    // Fetch blog posts
     client.get('/blog-posts')
       .then(res => {
         const data = res.data?.posts || res.data?.data?.posts || res.data?.data || res.data || [];
@@ -97,31 +126,89 @@ export const BlogPage = () => {
         setPosts(SAMPLE_POSTS);
         setLoading(false);
       });
+
+    // Fetch real blog categories from API
+    client.get('/blog-categories')
+      .then(res => {
+        const cats = res.data?.categories || res.data?.data || res.data || [];
+        if (Array.isArray(cats) && cats.length > 0) {
+          setCategories(cats);
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching blog categories:', err);
+      });
   }, []);
 
-  // Category matching helper
-  const matchesCategory = (post, cat) => {
-    if (cat === 'all') return true;
-    const title = (post.title || '').toLowerCase();
-    const content = (post.content || post.summary || post.excerpt || '').toLowerCase();
-    const catName = (typeof post.category === 'object' ? post.category?.name : post.category || '').toLowerCase();
-    const tags = Array.isArray(post.tags) ? post.tags.join(' ').toLowerCase() : (post.tags || '').toLowerCase();
-    const allText = `${title} ${content} ${catName} ${tags}`;
+  // Precise category matching helper
+  const matchesCategory = (post, catKey) => {
+    if (!catKey || catKey === 'all') return true;
 
-    switch (cat) {
-      case 'scholarship':
-        return allText.includes('scholar') || allText.includes('អាហារូបករណ៍') || allText.includes('១០០%') || allText.includes('promotion');
-      case 'events':
-        return allText.includes('event') || allText.includes('ពិធី') || allText.includes('បវេសនកាល') || allText.includes('សិក្ខាសាលា');
-      case 'partnership':
-        return allText.includes('partner') || allText.includes('jica') || allText.includes('adb') || allText.includes('ដៃគូ') || allText.includes('mou');
-      case 'achievement':
-        return allText.includes('achieve') || allText.includes('iso') || allText.includes('គុណភាព') || allText.includes('ជ័យលាភី') || allText.includes('award');
-      case 'news':
-        return allText.includes('news') || allText.includes('campus') || allText.includes('ព័ត៌មាន') || allText.includes('ទូទៅ');
-      default:
-        return true;
+    // Direct category ID match
+    const pCatId = post.categoryId ?? (typeof post.category === 'object' ? post.category?.id : null);
+    if (pCatId !== null && pCatId !== undefined && String(pCatId) === String(catKey)) {
+      return true;
     }
+
+    // Category slug match
+    const pCatSlug = typeof post.category === 'object' ? post.category?.slug : null;
+    if (pCatSlug && String(pCatSlug).toLowerCase() === String(catKey).toLowerCase()) {
+      return true;
+    }
+
+    // Match by registered category
+    const targetCat = categories.find(c => String(c.id) === String(catKey) || c.slug === catKey);
+    if (targetCat) {
+      if (pCatId !== null && pCatId !== undefined && String(pCatId) === String(targetCat.id)) return true;
+      if (pCatSlug && targetCat.slug && pCatSlug === targetCat.slug) return true;
+      const catName = (typeof post.category === 'object' ? post.category?.name : post.category || '').toLowerCase();
+      if (targetCat.slug && catName.includes(targetCat.slug.toLowerCase())) return true;
+    }
+
+    return false;
+  };
+
+  // Compute category list with real-time post counts
+  const categoryList = useMemo(() => {
+    const list = [
+      {
+        key: 'all',
+        label: t('blog.filter_all') || (isKhmer ? 'ទាំងអស់' : 'All'),
+        count: posts.length
+      }
+    ];
+
+    const sourceCategories = categories.length > 0 ? categories : [
+      { id: 7, name: 'ព័ត៌មាន & ព្រឹត្តិការណ៍ (News & Events)', slug: 'news' },
+      { id: 9, name: 'អាហារូបករណ៍ & កម្មវិធី TVET (Scholarships)', slug: 'promotion' },
+      { id: 10, name: 'បច្ចេកវិទ្យា & នវានុវត្តន៍ ៤.០ (Tech & Innovation)', slug: 'tech-innovation' },
+      { id: 11, name: 'សកម្មភាពនិស្សិត & កីឡា (Student Life & Sports)', slug: 'student-life' },
+      { id: 12, name: 'កិច្ចសហប្រតិបត្តិការជាតិ-អន្តរជាតិ (Partnerships)', slug: 'partnerships' },
+      { id: 13, name: 'សមិទ្ធផល & ពានរង្វាន់ស្ថាប័ន (Awards & Honors)', slug: 'awards-honors' }
+    ];
+
+    sourceCategories.forEach(cat => {
+      const catKey = String(cat.id || cat.slug);
+      const count = posts.filter(p => matchesCategory(p, catKey)).length;
+      list.push({
+        key: catKey,
+        label: getCategoryDisplayName(cat, isKhmer),
+        count: count
+      });
+    });
+
+    return list;
+  }, [categories, posts, isKhmer, t]);
+
+  const handleCategoryChange = (key) => {
+    setActiveCategory(key);
+    setCurrentPage(1);
+    if (key === 'all') {
+      searchParams.delete('category');
+    } else {
+      searchParams.set('category', key);
+    }
+    setSearchParams(searchParams, { replace: true });
   };
 
   // Filtered posts based on category and search query
@@ -139,7 +226,7 @@ export const BlogPage = () => {
       }
       return true;
     });
-  }, [posts, activeCategory, searchQuery]);
+  }, [posts, activeCategory, searchQuery, categories]);
 
   // Handle Spotlight Featured Story
   const showSpotlight = currentPage === 1 && activeCategory === 'all' && !searchQuery.trim() && filteredPosts.length > 0;
@@ -150,15 +237,6 @@ export const BlogPage = () => {
   const totalPages = Math.ceil(listForPaging.length / pageSize) || 1;
   const startIndex = (currentPage - 1) * pageSize;
   const currentPosts = listForPaging.slice(startIndex, startIndex + pageSize);
-
-  const categories = [
-    { key: 'all', label: t('blog.filter_all') || 'ទាំងអស់' },
-    { key: 'news', label: t('blog.filter_news') || 'ព័ត៌មានទូទៅ' },
-    { key: 'scholarship', label: t('blog.filter_scholarship') || 'អាហារូបករណ៍' },
-    { key: 'events', label: t('blog.filter_events') || 'ព្រឹត្តិការណ៍ & សិក្ខាសាលា' },
-    { key: 'partnership', label: t('blog.filter_partnership') || 'កិច្ចសហប្រតិបត្តិការ' },
-    { key: 'achievement', label: t('blog.filter_achievement') || 'សមិទ្ធផល & គុណភាព' }
-  ];
 
   return (
     <div style={{ backgroundColor: '#ffffff', minHeight: '100vh' }}>
@@ -304,17 +382,32 @@ export const BlogPage = () => {
             <div className="row g-3 align-items-center justify-content-between">
               <div className="col-12 col-xl-8">
                 <div className="d-flex align-items-center gap-2 flex-wrap">
-                  {categories.map((cat) => (
+                  {categoryList.map((cat) => (
                     <button
                       key={cat.key}
                       type="button"
                       className={`blog-tab-btn ${activeCategory === cat.key ? 'active' : ''}`}
-                      onClick={() => {
-                        setActiveCategory(cat.key);
-                        setCurrentPage(1);
+                      onClick={() => handleCategoryChange(cat.key)}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '7px'
                       }}
                     >
-                      {cat.label}
+                      <span>{cat.label}</span>
+                      <span
+                        style={{
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          padding: '1px 8px',
+                          borderRadius: '50px',
+                          backgroundColor: activeCategory === cat.key ? 'rgba(255, 255, 255, 0.28)' : '#f1f5f9',
+                          color: activeCategory === cat.key ? '#ffffff' : '#64748b',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        {isKhmer ? toKhmerNumber(cat.count) : cat.count}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -355,19 +448,19 @@ export const BlogPage = () => {
               <span className="text-muted">{t('blog.showing_count') || 'បង្ហាញ'}</span>
               <strong style={{ color: '#07294D' }}>
                 {isKhmer
-                  ? filteredPosts.length.toString().split('').map(d => ['០','១','២','៣','៤','៥','៦','៧','៨','៩'][d] || d).join('')
+                  ? toKhmerNumber(filteredPosts.length)
                   : filteredPosts.length}
               </strong>
               <span className="text-muted">{t('blog.of_count') || 'នៃ'}</span>
               <strong style={{ color: '#07294D' }}>
                 {isKhmer
-                  ? posts.length.toString().split('').map(d => ['០','១','២','៣','៤','៥','៦','៧','៨','៩'][d] || d).join('')
+                  ? toKhmerNumber(posts.length)
                   : posts.length}
               </strong>
               <span className="text-muted">{t('blog.articles_count') || 'អត្ថបទ'}</span>
               {activeCategory !== 'all' && (
                 <span className="ms-2 badge bg-primary text-white rounded-pill px-2.5 py-1">
-                  {categories.find(c => c.key === activeCategory)?.label}
+                  {categoryList.find(c => c.key === activeCategory)?.label || activeCategory}
                 </span>
               )}
               {searchQuery && (
@@ -382,7 +475,7 @@ export const BlogPage = () => {
                 type="button"
                 className="btn btn-sm btn-link text-decoration-none text-primary p-0 fw-semibold small"
                 onClick={() => {
-                  setActiveCategory('all');
+                  handleCategoryChange('all');
                   setSearchQuery('');
                   setCurrentPage(1);
                 }}
@@ -428,7 +521,7 @@ export const BlogPage = () => {
                 type="button"
                 className="btn btn-outline-primary rounded-pill px-4 py-2 fw-semibold"
                 onClick={() => {
-                  setActiveCategory('all');
+                  handleCategoryChange('all');
                   setSearchQuery('');
                 }}
               >
@@ -448,7 +541,7 @@ export const BlogPage = () => {
                       <div className="row g-0 align-items-stretch">
                         <div className="col-lg-6">
                           <div className="blog-spotlight-img-wrap">
-                            <Link to={`/blog-details/${spotlightPost.id || spotlightPost.slug}`} className="d-block w-100 h-100">
+                            <Link to={`/blog-details/${spotlightPost.id}`} className="d-block w-100 h-100">
                               <img
                                 src={spotlightPost.imageUrl || spotlightPost.image_url || '/images/blog.webp'}
                                 alt={spotlightPost.title}
@@ -481,7 +574,7 @@ export const BlogPage = () => {
 
                           {/* Spotlight Title */}
                           <h3 className="blog-spotlight-title">
-                            <Link to={`/blog-details/${spotlightPost.id || spotlightPost.slug}`}>
+                            <Link to={`/blog-details/${spotlightPost.id}`}>
                               {spotlightPost.title}
                             </Link>
                           </h3>
@@ -494,7 +587,7 @@ export const BlogPage = () => {
                           {/* Action Footer */}
                           <div className="blog-spotlight-footer d-flex align-items-center justify-content-between flex-wrap gap-3">
                             <Link
-                              to={`/blog-details/${spotlightPost.id || spotlightPost.slug}`}
+                              to={`/blog-details/${spotlightPost.id}`}
                               className="blog-spotlight-btn"
                             >
                               <span>{t('blog.read_full_story') || 'អានព័ត៌មានលម្អិត'}</span>

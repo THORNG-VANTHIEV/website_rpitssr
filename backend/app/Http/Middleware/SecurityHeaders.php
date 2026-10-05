@@ -26,7 +26,16 @@ class SecurityHeaders
 
         if ($request->is('api/*')) {
             $response->headers->set('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'");
-            $response->headers->set('Cache-Control', 'no-store, private');
+
+            $isPublicCatalog = $request->isMethod('GET')
+                && ! $request->bearerToken()
+                && $request->is('api/courses*', 'api/course-categories*', 'api/events*', 'api/blog-posts*', 'api/teachers*', 'api/notices*', 'api/faqs*', 'api/promotional-videos*');
+
+            if ($isPublicCatalog) {
+                $response->headers->set('Cache-Control', 'public, max-age=120, stale-while-revalidate=600');
+            } else {
+                $response->headers->set('Cache-Control', 'no-store, private');
+            }
         } else {
             $header = config('security.csp_report_only')
                 ? 'Content-Security-Policy-Report-Only'

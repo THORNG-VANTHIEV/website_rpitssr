@@ -75,7 +75,9 @@ class BlogPostController extends Controller
             'facebookEmbed',
         ])->where('status', 'published');
 
-        $post = is_numeric($id) ? $query->find($id) : $query->where('slug', $id)->first();
+        $post = $query->where(function ($q) use ($id) {
+            $q->where('id', $id)->orWhere('slug', (string) $id);
+        })->first();
 
         if (! $post) {
             return response()->json([
@@ -109,8 +111,10 @@ class BlogPostController extends Controller
                     }]);
             },
             'facebookEmbed',
-        ])->where('slug', $slug)
-            ->where('status', 'published')
+        ])->where('status', 'published')
+            ->where(function ($q) use ($slug) {
+                $q->where('slug', (string) $slug)->orWhere('id', $slug);
+            })
             ->first();
 
         if (! $post) {

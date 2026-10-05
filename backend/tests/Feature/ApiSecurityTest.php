@@ -141,8 +141,8 @@ class ApiSecurityTest extends TestCase
             'type' => 'certificate',
         ])->assertUnprocessable();
 
-        // Exceeding 5MB limit
-        $oversizedFile = UploadedFile::fake()->create('huge.pdf', 6000, 'application/pdf');
+        // Exceeding 10MB limit (12MB)
+        $oversizedFile = UploadedFile::fake()->create('huge.pdf', 12000, 'application/pdf');
         $this->postJson('/api/admissions/upload-document', [
             'file' => $oversizedFile,
             'type' => 'certificate',

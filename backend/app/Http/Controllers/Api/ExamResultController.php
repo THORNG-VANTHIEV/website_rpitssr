@@ -11,6 +11,15 @@ class ExamResultController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        // Security & Privacy Hardening: Require studentId or search query to prevent bulk scraping
+        if (! $request->filled('studentId') && ! $request->filled('search')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'សូមបញ្ចូលអត្តលេខសិស្ស ឬពាក្យគន្លឹះដើម្បីស្វែងរកលទ្ធផលប្រឡង / Please provide a Student ID or search keyword to lookup exam results.',
+                'data' => [],
+            ], 422);
+        }
+
         $query = ExamResult::where('isPublished', true);
 
         if ($request->has('courseName') && ! empty($request->courseName)) {

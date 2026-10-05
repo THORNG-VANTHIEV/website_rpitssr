@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
-import { PageBanner } from '../components/common/PageBanner';
 import { useLanguage } from '../context/LanguageContext';
+import { getCategoryDisplayName } from './BlogPage';
 import client from '../api/client';
 
 export const BlogDetailPage = () => {
   const { id, slug } = useParams();
-  const { t } = useLanguage();
+  const { t, currentLanguage } = useLanguage();
+  const isKhmer = currentLanguage === 'km';
   const [post, setPost] = useState(null);
   const [recentPosts, setRecentPosts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -25,24 +26,12 @@ export const BlogDetailPage = () => {
         if (data && (data.id || data.title)) {
           setPost(data);
         } else {
-          throw new Error('No post data');
+          setPost(null);
         }
       })
-      .catch(() => {
-        // Sample post fallback with valid existing image
-        setPost({
-          id: postId,
-          title: 'RPITSSR Welcomes New Cohort of Technical Students for Academic Year 2026-2027',
-          publishedAt: '2026-08-28',
-          author: 'Administration',
-          category: 'Campus News',
-          imageUrl: '/images/gallery/school.jpg',
-          content: `
-            <p>The Regional Polytechnic Institute Techo Sen Siem Reap (RPITSSR) officially commenced its new academic year welcoming more than 800 students admitted across diverse engineering disciplines including Information Technology, Electrical & Electronics Automation, Civil Construction, Air Conditioning & Refrigeration, and Automotive Technology.</p>
-            <p>The orientation ceremony was presided over by the Institute Director along with representatives from provincial administration and partner enterprises in Siem Reap. During the ceremony, students were introduced to state-of-the-art laboratory facilities, workshop safety rules, scholarship programs, and internship opportunities provided through industrial partnerships.</p>
-            <p>RPITSSR continues to pioneer technical training adhering strictly to the ISO 9001:2015 Quality Management System, guaranteeing that all graduates satisfy high workplace readiness standards sought after by local and regional employers.</p>
-          `
-        });
+      .catch((err) => {
+        console.error('Error fetching blog post:', err);
+        setPost(null);
       })
       .finally(() => {
         setLoading(false);
@@ -92,11 +81,62 @@ export const BlogDetailPage = () => {
 
   return (
     <div>
-      {/* Top Banner with clean title matching rpitssr.edu.kh */}
-      <PageBanner
-        title={t('blog.blogDetails') || 'Blog Details'}
-        image="/images/blog-details.webp"
-      />
+      {/* 1. INSTITUTIONAL DAYLIGHT HERO (No Background Image - AGENTS.md Compliant) */}
+      <section className="gallery-page-hero" style={{ padding: '48px 0 38px' }}>
+        <div className="container">
+          <div className="row justify-content-center text-center">
+            <div className="col-lg-10">
+              {/* Breadcrumb & Official Badge */}
+              <div className="gallery-hero-meta-row">
+                <div className="gallery-breadcrumb">
+                  <Link to="/">
+                    <i className="fas fa-home me-1"></i>
+                    {isKhmer ? 'ទំព័រដើម' : 'Home'}
+                  </Link>
+                  <i className="fas fa-chevron-right text-muted" style={{ fontSize: '0.72rem' }}></i>
+                  <Link to="/blog">
+                    {isKhmer ? 'ព័ត៌មាន' : 'Blog'}
+                  </Link>
+                  <i className="fas fa-chevron-right text-muted" style={{ fontSize: '0.72rem' }}></i>
+                  <span>{isKhmer ? 'ព័ត៌មានលម្អិត' : 'Details'}</span>
+                </div>
+                <div className="gallery-hero-badge">
+                  <i className="fas fa-newspaper text-primary"></i>
+                  <span>{categoryName || (isKhmer ? 'ព័ត៌មាន និងសេចក្តីប្រកាសផ្លូវការ' : 'Official News & Announcements')}</span>
+                </div>
+              </div>
+
+              {/* Main Institutional Title */}
+              <h1 className="gallery-hero-title" style={{ fontSize: 'clamp(1.75rem, 3.2vw, 2.35rem)', marginBottom: '14px' }}>
+                {isKhmer ? 'ព័ត៌មានលម្អិត និងសេចក្តីប្រកាស' : 'Official News & Announcements'}
+              </h1>
+
+              {/* Subtitle */}
+              <p className="gallery-hero-subtitle" style={{ marginBottom: '22px' }}>
+                {isKhmer
+                  ? 'តាមដានសេចក្តីប្រកាសព័ត៌មានផ្លូវការ កម្មវិធីបណ្តុះបណ្តាល TVET កិច្ចសហប្រតិបត្តិការ និងព្រឹត្តិការណ៍នានារបស់វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប'
+                  : 'Explore official institute announcements, TVET educational updates, partnerships, and campus events at RPITSSR.'}
+              </p>
+
+              {/* Institutional Trust Badges */}
+              <div className="gallery-trust-pills">
+                <div className="gallery-trust-pill">
+                  <i className="fas fa-shield-alt text-primary"></i>
+                  <span>{isKhmer ? 'ព័ត៌មានផ្លូវការស្ថាប័ន' : 'Official Institute News'}</span>
+                </div>
+                <div className="gallery-trust-pill">
+                  <i className="fas fa-graduation-cap text-success"></i>
+                  <span>{isKhmer ? 'សកម្មភាពបណ្តុះបណ្តាល TVET' : 'TVET Training Activities'}</span>
+                </div>
+                <div className="gallery-trust-pill">
+                  <i className="fas fa-award text-warning"></i>
+                  <span>{isKhmer ? 'កាលបរិច្ឆេទ & ខ្លឹមសារពេញលេញ' : 'Verified & Full Content'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className="blog-details-page pt-5 pb-5" style={{ backgroundColor: '#f8fafc', minHeight: '80vh', padding: '40px 0 70px' }}>
         <div className="container" style={{ maxWidth: '1240px', padding: '0 20px' }}>
@@ -305,7 +345,7 @@ export const BlogDetailPage = () => {
                               to={`/blog?category=${cat.id}`}
                               style={{ color: '#333', textDecoration: 'none', fontWeight: '500' }}
                             >
-                              <i className="far fa-folder me-2 text-primary"></i> {cat.name}
+                              <i className="far fa-folder me-2 text-primary"></i> {getCategoryDisplayName(cat, isKhmer)}
                             </Link>
                             {cat.posts_count !== undefined && (
                               <span className="badge bg-light text-dark rounded-pill">
@@ -391,9 +431,34 @@ export const BlogDetailPage = () => {
               </>
             ) : (
               <div className="col-12 text-center py-5">
-                <h4>Article not found</h4>
-                <Link to="/blog" className="btn btn-primary mt-3">
-                  Back to News
+                <div
+                  className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                  style={{ width: '64px', height: '64px', backgroundColor: '#fef2f2', color: '#dc2626' }}
+                >
+                  <i className="fas fa-exclamation-circle" style={{ fontSize: '1.6rem' }}></i>
+                </div>
+                <h4 style={{ color: '#07294D', fontWeight: 800, marginBottom: '8px' }}>
+                  {isKhmer ? 'រកមិនឃើញអត្ថបទព័ត៌មាននេះឡើយ' : 'Article Not Found'}
+                </h4>
+                <p className="text-muted small mb-4">
+                  {isKhmer ? 'អត្ថបទនេះអាចត្រូវបានផ្លាស់ប្តូរ ឬដកចេញពីប្រព័ន្ធ។' : 'This article may have been moved or removed.'}
+                </p>
+                <Link
+                  to="/blog"
+                  style={{
+                    backgroundColor: '#07294D',
+                    color: '#ffffff',
+                    padding: '10px 24px',
+                    borderRadius: '50px',
+                    textDecoration: 'none',
+                    fontWeight: 700,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <i className="fas fa-arrow-left"></i>
+                  <span>{isKhmer ? 'ត្រឡប់ទៅព័ត៌មានទាំងអស់' : 'Back to All Articles'}</span>
                 </Link>
               </div>
             )}

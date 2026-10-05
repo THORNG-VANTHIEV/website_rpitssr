@@ -2,27 +2,18 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { Clock, ChevronRight, Edit3, Award, BookOpen } from 'lucide-react';
+import { resolveImageUrl } from '../../utils/imageUrl';
 
 export const CourseCard = ({ course }) => {
   const { t, currentLanguage, language } = useLanguage();
   const isKhmer = currentLanguage === 'km' || language === 'km';
   if (!course) return null;
 
-  const resolveImage = (url) => {
-    if (!url) return '/images/courses/Course 3.jpg';
-    const clean = url.replace(/\\/g, '/');
-    if (clean.startsWith('http://') || clean.startsWith('https://')) return clean;
-    if (clean.startsWith('/uploads/')) return clean;
-    if (clean.startsWith('uploads/')) return `/${clean}`;
-    if (clean.startsWith('/images/')) return clean;
-    if (clean.startsWith('images/')) return `/${clean}`;
-    return clean;
-  };
-
-  const imageUrl = resolveImage(course.imageUrl || course.image || course.image_url);
+  const courseTitle = course.title || (isKhmer ? 'ជំនាញ និងវគ្គបណ្តុះបណ្តាល' : 'Training Program');
+  const imageUrl = resolveImageUrl(course.imageUrl || course.image || course.image_url, '/images/courses/Course 3.jpg');
   const categoryTag = course.category
     ? (typeof course.category === 'object' ? course.category.name : course.category)
-    : (course.title ? course.title.split(' ')[0] : 'TVET');
+    : (courseTitle ? courseTitle.split(' ')[0] : 'TVET');
 
   const isFree = course.fee === '0' || course.fee === 0 || !course.fee || String(course.fee).toLowerCase() === 'free';
   const feeVal = isFree ? '0' : String(course.fee).replace('$', '');
@@ -34,7 +25,7 @@ export const CourseCard = ({ course }) => {
           <Link to={`/courses-details/${course.id}`} onClick={() => window.scrollTo(0, 0)}>
             <img
               src={imageUrl}
-              alt={course.title}
+              alt={courseTitle}
               onError={(e) => { e.target.src = '/images/courses/Course 3.jpg'; }}
               loading="lazy"
             />
@@ -55,7 +46,7 @@ export const CourseCard = ({ course }) => {
 
         <h4 className="courses-title">
           <Link to={`/courses-details/${course.id}`} onClick={() => window.scrollTo(0, 0)}>
-            {course.title}
+            {courseTitle}
           </Link>
         </h4>
 

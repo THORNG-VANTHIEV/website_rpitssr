@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class AdminCourseController extends Controller
 {
@@ -54,6 +55,7 @@ class AdminCourseController extends Controller
         ]);
 
         $course = Course::create($validated);
+        Cache::flush();
 
         return response()->json($course, 201);
     }
@@ -80,6 +82,7 @@ class AdminCourseController extends Controller
         ]);
 
         $course->update($validated);
+        Cache::flush();
 
         return response()->json($course, 200);
     }
@@ -93,6 +96,7 @@ class AdminCourseController extends Controller
         }
 
         $course->delete();
+        Cache::flush();
 
         return response()->json(['message' => 'Course deleted successfully'], 200);
     }

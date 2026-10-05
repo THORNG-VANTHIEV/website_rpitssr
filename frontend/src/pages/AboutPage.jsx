@@ -132,15 +132,15 @@ export const AboutPage = () => {
             {/* Institutional Trust Badges */}
             <div className="about-trust-pills">
               <div className="about-trust-pill">
-                <Award size={15} />
+                <Award size={15} style={{ color: '#1e73be' }} />
                 <span>{t('about.trust_subdecree') || 'អនុក្រឹត្យលេខ ១១៧ អនក្រ.បក'}</span>
               </div>
               <div className="about-trust-pill">
-                <ShieldCheck size={15} />
+                <ShieldCheck size={15} style={{ color: '#059669' }} />
                 <span>{t('about.trust_iso') || 'ស្តង់ដារគុណភាព ISO 9001:2015'}</span>
               </div>
               <div className="about-trust-pill">
-                <Building2 size={15} />
+                <Building2 size={15} style={{ color: '#ea580c' }} />
                 <span>{t('about.trust_ministry') || 'ក្រោមឱវាទក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ'}</span>
               </div>
             </div>

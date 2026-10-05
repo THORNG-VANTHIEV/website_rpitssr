@@ -91,10 +91,11 @@ export const AdmissionApplyPage = () => {
   };
 
   const testMode = (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('test_mode')) || 'all';
+  const isBlank = typeof window !== 'undefined' && window.location.search.includes('blank=true');
 
   // Official Standard Printable Document State
   const [printModalOpen, setPrintModalOpen] = useState(isTestPrint);
-  const [printTargetAdmission, setPrintTargetAdmission] = useState(isTestPrint ? mockAdmissionData : null);
+  const [printTargetAdmission, setPrintTargetAdmission] = useState(isTestPrint ? (isBlank ? {} : mockAdmissionData) : null);
   const [printDefaultMode, setPrintDefaultMode] = useState(isTestPrint ? testMode : 'voucher');
 
   const handleOpenPrint = (admData, mode = 'voucher') => {

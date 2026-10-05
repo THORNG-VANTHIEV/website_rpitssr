@@ -1,0 +1,93 @@
+name: Deploy to Hostinger Production
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch: # អនុញ្ញាតឱ្យចុច Run Workflow ដោយដៃលើ GitHub Actions ពេលណាដែលចង់
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    name: Build & Deploy to Hostinger
+
+    steps:
+      # ១. ទាញយក Source Code ពី GitHub
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # ២. ដំឡើង Node.js និង Build Frontend React
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build Frontend Application
+        working-directory: frontend
+        env:
+          VITE_API_URL: https://api.rpitssr.edu.kh/api
+        run: |
+          npm ci
+          npm run build
+
+      # ៣. ដំឡើង SSH Key សម្រាប់ភ្ជាប់ទៅ Hostinger
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
+
+      # ៤. បន្ថែម Hostinger Host Key ទៅកាន់ known_hosts (Port 65002 សម្រាប់ Hostinger)
+      - name: Add Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ secrets.HOSTINGER_SSH_PORT || 65002 }} -H ${{ secrets.HOSTINGER_SSH_HOST }} >> ~/.ssh/known_hosts
+
+      # ៥. Sync Frontend (dist/) ទៅកាន់ public_html/web/
+      - name: Deploy Frontend to Hostinger
+        run: |
+          rsync -avz --delete \
+            -e "ssh -p ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}" \
+            ./frontend/dist/ \
+            ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:domains/rpitssr.edu.kh/public_html/web/
+
+      # ៦. Sync Backend Code ទៅកាន់ backend/ (Exclude ឯកសារសម្ងាត់ និង Cache)
+      - name: Deploy Backend to Hostinger
+        run: |
+          rsync -avz \
+            --exclude='.git*' \
+            --exclude='.env*' \
+            --exclude='tests/' \
+            --exclude='node_modules/' \
+            --exclude='*.sqlite*' \
+            --exclude='*.sql*' \
+            --exclude='storage/logs/*.log' \
+            --exclude='storage/framework/cache/*' \
+            --exclude='storage/framework/sessions/*' \
+            --exclude='storage/framework/views/*' \
+            --exclude='storage/app/backups/*' \
+            --exclude='storage/app/admissions/private/*' \
+            -e "ssh -p ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}" \
+            ./backend/ \
+            ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:domains/rpitssr.edu.kh/backend/
+
+      # ៧. ដំណើរការ Commands លើ Hostinger តាម SSH (Migrate, Cache, Permissions)
+      - name: Execute Post-Deployment Commands on Hostinger
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}
+          script: |
+            cd domains/rpitssr.edu.kh/backend
+            composer install --no-dev --optimize-autoloader --no-interaction
+            php artisan migrate --force
+            php artisan storage:link || true
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            chmod -R 775 storage bootstrap/cache
+            echo "🚀 Deployment successfully completed!"

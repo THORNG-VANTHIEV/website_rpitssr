@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -38,10 +39,10 @@ const LEADERSHIP_DATA = {
   deputies: [
     {
       id: 'deputy-sunleap',
-      nameKm: 'លោក ហ៊រ ស៊ុនលាភ',
+      nameKm: 'លោក ហ៊ ស៊ុនលាភ',
       nameEn: 'Mr. Hor Sunleap',
-      titleKm: 'នាយករងទទួលបន្ទុកកិច្ចការសិក្សា និងបណ្តុះបណ្តាល',
-      titleEn: 'Deputy Director - Academic Affairs & Training',
+      titleKm: 'នាយករងវិទ្យាស្ថាន',
+      titleEn: 'Deputy Director',
       category: 'executive',
       categoryLabelKm: 'គណៈនាយក',
       categoryLabelEn: 'Executive Leadership',
@@ -66,40 +67,11 @@ const LEADERSHIP_DATA = {
       qualificationsEn: 'Master of Engineering & Technical Education'
     },
     {
-      id: 'deputy-chanthon',
-      nameKm: 'លោក ស៊ីម ចាន់ថន',
-      nameEn: 'Mr. Sim Chanthon',
-      titleKm: 'នាយករងទទួលបន្ទុកកិច្ចការរដ្ឋបាល បុគ្គលិក និងផែនការ',
-      titleEn: 'Deputy Director - Administration, HR & Planning',
-      category: 'executive',
-      categoryLabelKm: 'គណៈនាយក',
-      categoryLabelEn: 'Executive Leadership',
-      image: '',
-      icon: 'fa-user-graduate',
-      email: 'chanthon.sim@rpitssr.edu.kh',
-      phone: '(+855) 12 345 602',
-      room: 'អគាររដ្ឋបាល A - បន្ទប់ ១០៣ (Building A, Rm 103)',
-      bioKm: 'បទពិសោធន៍ក្នុងការដឹកនាំការងាររដ្ឋបាលទូទៅ ការគ្រប់គ្រងមន្ត្រីរាជការ បុគ្គលិក និងការកសាងផែនការថវិកាហិរញ្ញវត្ថុស្ថាប័នសាធារណៈ។',
-      bioEn: 'Extensive leadership experience in general institutional administration, civil service HR management, and public institutional budget planning.',
-      responsibilitiesKm: [
-        'គ្រប់គ្រងកិច្ចការរដ្ឋបាលទូទៅ លិខិតស្នាម និងការគ្រប់គ្រងមន្ត្រី បុគ្គលិក និងគ្រូជាប់កិច្ចសន្យា',
-        'រៀបចំផែនការថវិកាប្រចាំឆ្នាំ គណនេយ្យ របាយការណ៍ហិរញ្ញវត្ថុ និងលទ្ធកម្មសម្ភារបច្ចេកទេស',
-        'គ្រប់គ្រងហេដ្ឋារចនាសម្ព័ន្ធ អគារសិក្សា សន្តិសុខ សណ្តាប់ធ្នាប់ និងបរិស្ថានវិទ្យាស្ថាន'
-      ],
-      responsibilitiesEn: [
-        'Managing institutional administrative workflows, official correspondence, and personnel affairs',
-        'Annual budget planning, expenditure control, accounting, and technical procurement',
-        'Campus facilities, building infrastructure maintenance, security, and institutional environment'
-      ],
-      qualificationsKm: 'អនុបណ្ឌិតរដ្ឋបាលសាធារណៈ (Master of Public Administration)',
-      qualificationsEn: 'Master of Public Administration (MPA)'
-    },
-    {
       id: 'deputy-bora',
       nameKm: 'លោក លី បូរ៉ា',
       nameEn: 'Mr. Ly Bora',
-      titleKm: 'នាយករងទទួលបន្ទុកទំនាក់ទំនងសហគ្រាស និងការងារនិស្សិត',
-      titleEn: 'Deputy Director - Enterprise Relations & Student Affairs',
+      titleKm: 'នាយករងវិទ្យាស្ថាន',
+      titleEn: 'Deputy Director',
       category: 'executive',
       categoryLabelKm: 'គណៈនាយក',
       categoryLabelEn: 'Executive Leadership',
@@ -127,8 +99,8 @@ const LEADERSHIP_DATA = {
       id: 'deputy-nourath',
       nameKm: 'លោក សួង នូរ័ត្ន',
       nameEn: 'Mr. Soung Nourath',
-      titleKm: 'នាយករងទទួលបន្ទុកការធានាគុណភាព និងអភិវឌ្ឍន៍ស្ថាប័ន',
-      titleEn: 'Deputy Director - Quality Assurance & Institutional Development',
+      titleKm: 'នាយករងវិទ្យាស្ថាន',
+      titleEn: 'Deputy Director',
       category: 'executive',
       categoryLabelKm: 'គណៈនាយក',
       categoryLabelEn: 'Executive Leadership',
@@ -151,6 +123,50 @@ const LEADERSHIP_DATA = {
       ],
       qualificationsKm: 'អនុបណ្ឌិតធានាគុណភាពអប់រំ និងគ្រប់គ្រងបច្ចេកវិទ្យា',
       qualificationsEn: 'Master in Educational Quality Assurance & Technology Management'
+    },
+    {
+      id: 'deputy-chanthon',
+      nameKm: 'លោក ស៊ីម ចាន់ថន',
+      nameEn: 'Mr. Sim Chanthon',
+      titleKm: 'នាយករង និងជាប្រធានមជ្ឈមណ្ឌលវាយតម្លៃសមត្ថភាព',
+      titleEn: 'Deputy Director & Head of Assessment Center of Competency',
+      category: 'executive',
+      categoryLabelKm: 'គណៈនាយក',
+      categoryLabelEn: 'Executive Leadership',
+      dualRole: true,
+      dualRolesList: [
+        {
+          roleKm: 'នាយករងវិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប',
+          roleEn: 'Deputy Director of RPITSSR',
+          type: 'executive'
+        },
+        {
+          roleKm: 'ប្រធានមជ្ឈមណ្ឌលវាយតម្លៃសមត្ថភាព',
+          roleEn: 'Head of Assessment Center of Competency',
+          type: 'center'
+        }
+      ],
+      image: '',
+      icon: 'fa-user-graduate',
+      email: 'chanthon.sim@rpitssr.edu.kh',
+      phone: '(+855) 12 345 602',
+      room: 'អគាររដ្ឋបាល A - បន្ទប់ ១០៣ (Building A, Rm 103)',
+      bioKm: 'លោក ស៊ីម ចាន់ថន បំពេញតួនាទីទ្វេផ្លូវការជា នាយករងវិទ្យាស្ថាន និងជា ប្រធានមជ្ឈមណ្ឌលវាយតម្លៃសមត្ថភាព។ មានបទពិសោធន៍ខ្ពស់ក្នុងការគ្រប់គ្រងស្ថាប័នរដ្ឋបាលសាធារណៈ ការកសាងផែនការយុទ្ធសាស្ត្រ និងការដឹកនាំការវាស់វែងវាយតម្លៃសមត្ថភាពជំនាញវិជ្ជាជីវៈថ្នាក់ជាតិ ស្របតាមក្របខណ្ឌគុណវុឌ្ឍិជាតិកម្ពុជា (CQF) និងស្តង់ដារក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ។',
+      bioEn: 'Mr. Sim Chanthon holds dual official appointments as Institute Deputy Director and Head of the Assessment Center of Competency. He possesses extensive expertise in institutional management, strategic planning, and national vocational skill competency assessments under the Cambodian Qualifications Framework (CQF).',
+      responsibilitiesKm: [
+        'ដឹកនាំ និងគ្រប់គ្រងទូទៅក្នុងនាមជាគណៈនាយករង លើការងាររដ្ឋបាល ផែនការ និងការអភិវឌ្ឍស្ថាប័ន',
+        'ដឹកនាំ និងគ្រប់គ្រងមជ្ឈមណ្ឌលវាយតម្លៃសមត្ថភាព ក្នុងការរៀបចំការប្រឡងវាស់វែង និងវាយតម្លៃសមត្ថភាពជំនាញវិជ្ជាជីវៈថ្នាក់ជាតិ',
+        'អនុវត្តការទទួលស្គាល់ការសិក្សាពីមុន (Recognition of Prior Learning - RPL) និងការវាយតម្លៃសមត្ថភាពកម្រិតជាតិ',
+        'សហការជាមួយគណៈកម្មការវាយតម្លៃថ្នាក់ជាតិ នៃក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ ក្នុងការចេញវិញ្ញាបនបត្រស្តង់ដារសមត្ថភាព'
+      ],
+      responsibilitiesEn: [
+        'Executive institutional leadership as Deputy Director overseeing administration, planning, and institutional development',
+        'Directing the Assessment Center of Competency in organizing national vocational skill testing & assessments',
+        'Managing Recognition of Prior Learning (RPL) pathways and national competency standards',
+        'Collaborating with MLVT National Assessment Committee to certify and issue national competency credentials'
+      ],
+      qualificationsKm: 'អនុបណ្ឌិតរដ្ឋបាលសាធារណៈ និងអ្នកវាយតម្លៃសមត្ថភាពជាតិ TVET (Certified National TVET Assessor)',
+      qualificationsEn: 'Master of Public Administration (MPA) & Certified National TVET Assessor'
     }
   ],
   departments: [
@@ -158,8 +174,8 @@ const LEADERSHIP_DATA = {
       id: 'dept-it',
       nameKm: 'ដេប៉ាតឺម៉ង់ព័ត៌មានវិទ្យា',
       nameEn: 'Department of Information Technology',
-      headKm: 'អេង ឈៃ គីមហុង',
-      headEn: 'Eng. Chhay Kimhong',
+      headKm: 'លោក កុល សេរីរិទ្ធ',
+      headEn: 'Mr. Kol Sereyrith',
       headTitleKm: 'ប្រធានដេប៉ាតឺម៉ង់',
       headTitleEn: 'Head of Department',
       category: 'technical',
@@ -170,12 +186,12 @@ const LEADERSHIP_DATA = {
       email: 'ict@rpitssr.edu.kh',
       phone: '(+855) 12 778 890',
       room: 'អគារ Lab IT - ជាន់ទី២ (IT Lab Building, 2nd Fl)',
-      programsKm: 'បណ្តាញកុំព្យូទ័រ, ការអភិវឌ្ឍគេហទំព័រ & App, សន្តិសុខសាយប័រ',
-      programsEn: 'Network Systems, Web & App Development, Cybersecurity',
+      programsKm: 'វិទ្យាសាស្ត្រកុំព្យូទ័រ, បណ្តាញកុំព្យូទ័រ, ការអភិវឌ្ឍគេហទំព័រ & App, សន្តិសុខសាយប័រ',
+      programsEn: 'Computer Science, Computer Networks, Web & App Development, Cybersecurity',
       responsibilitiesKm: [
         'ដឹកនាំការបណ្តុះបណ្តាលមុខជំនាញ ICT កម្រិត C1 ដល់បរិញ្ញាបត្របច្ចេកវិទ្យា',
         'គ្រប់គ្រងបន្ទប់ Lab កុំព្យូទ័រចំនួន ៦ បន្ទប់ និងប្រព័ន្ធ Server សាលា',
-        'ជំរុញការបង្កើតគម្រោង Software និង Capstone Project ជាក់ស្តែង'
+        'ជំរុញការបង្កើតគម្រោង Software និង Capstone Project ឆ្លើយតបនឹងបដិវត្តន៍ឧស្សាហកម្ម ៤.០'
       ],
       responsibilitiesEn: [
         'Delivering TVET Certificate to Bachelor-level ICT programs',
@@ -187,10 +203,10 @@ const LEADERSHIP_DATA = {
     },
     {
       id: 'dept-electrical',
-      nameKm: 'ដេប៉ាតឺម៉ង់អគ្គិសនី និងថាមពល',
-      nameEn: 'Department of Electrical & Energy Engineering',
-      headKm: 'លោក ហេង សុខេង',
-      headEn: 'Mr. Heng Sokheng',
+      nameKm: 'ដេប៉ាតឺម៉ង់អគ្គិសនី និងអេឡិចត្រូនិច',
+      nameEn: 'Department of Electricity & Electronics',
+      headKm: 'លោក សោ សុបុណ្យ',
+      headEn: 'Mr. Sao Sobon',
       headTitleKm: 'ប្រធានដេប៉ាតឺម៉ង់',
       headTitleEn: 'Head of Department',
       category: 'technical',
@@ -201,10 +217,10 @@ const LEADERSHIP_DATA = {
       email: 'electrical@rpitssr.edu.kh',
       phone: '(+855) 12 667 788',
       room: 'រោងជាងអគ្គិសនី C (Electrical Workshop C)',
-      programsKm: 'អគ្គិសនីក្នុងអគារ, ស្វ័យប្រវត្តិកម្មឧស្សាហកម្ម, ថាមពលសូឡា',
-      programsEn: 'Building Electrical, Industrial Automation, Solar Energy Systems',
+      programsKm: 'អគ្គិសនីក្នុងអគារ, ស្វ័យប្រវត្តិកម្មឧស្សាហកម្ម, អេឡិចត្រូនិច, ថាមពលពន្លឺព្រះអាទិត្យ',
+      programsEn: 'Building Electrical, Industrial Automation, Electronics, Solar Energy Systems',
       responsibilitiesKm: [
-        'គ្រប់គ្រងរោងជាងអនុវត្តប្រព័ន្ធអគ្គិសនី និងស្វ័យប្រវត្តិកម្ម PLC',
+        'គ្រប់គ្រងរោងជាងអនុវត្តប្រព័ន្ធអគ្គិសនី និងស្វ័យប្រវត្តិកម្ម PLC និងអេឡិចត្រូនិច',
         'បណ្តុះបណ្តាលស្តង់ដារសុវត្ថិភាពអគ្គិសនី និងការតម្លើងសូឡាកកើតឡើងវិញ',
         'សហការជាមួយសហគ្រាសថាមពលសម្រាប់ការចុះកម្មសិក្សា'
       ],
@@ -217,192 +233,364 @@ const LEADERSHIP_DATA = {
       qualificationsEn: 'B.Eng. in Electrical Engineering & Industrial Control'
     },
     {
-      id: 'dept-mechanical',
-      nameKm: 'ដេប៉ាតឺម៉ង់មេកានិចទូទៅ និងយានយន្ត',
-      nameEn: 'Department of Mechanical & Automotive',
-      headKm: 'លោក ឡុង វិសាល',
-      headEn: 'Mr. Long Visal',
+      id: 'dept-machinery',
+      nameKm: 'ដេប៉ាតឺម៉ង់យន្តកម្ម និងគ្រឿងយន្តកសិកម្ម',
+      nameEn: 'Department of Vehicle & Agricultural Machinery',
+      headKm: 'លោក ម៉ត់ ច័ន្ធក្រឹស្នា',
+      headEn: 'Mr. Mot Chankrishna',
       headTitleKm: 'ប្រធានដេប៉ាតឺម៉ង់',
       headTitleEn: 'Head of Department',
       category: 'technical',
       categoryLabelKm: 'ដេប៉ាតឺម៉ង់បច្ចេកទេស',
       categoryLabelEn: 'Technical Department',
-      icon: 'fa-car',
+      icon: 'fa-tractor',
       accentColor: '#ef4444',
-      email: 'automotive@rpitssr.edu.kh',
+      email: 'machinery@rpitssr.edu.kh',
       phone: '(+855) 12 556 677',
-      room: 'រោងជាងយានយន្ត D (Automotive Workshop D)',
-      programsKm: 'ជួសជុលយានយន្តទំនើប, ប្រព័ន្ធអេឡិចត្រូនិករថយន្ត, ម៉ាស៊ីនត្រជាក់រថយន្ត',
-      programsEn: 'Modern Automotive Repair, Automotive Electronics, Auto Air Conditioning',
+      room: 'រោងជាងយានយន្ត និងគ្រឿងយន្តកសិកម្ម D (Workshop D)',
+      programsKm: 'ជួសជុលយានយន្តទំនើប, គ្រឿងយន្តកសិកម្ម, ប្រព័ន្ធអេឡិចត្រូនិករថយន្ត, ម៉ាស៊ីនត្រជាក់រថយន្ត',
+      programsEn: 'Modern Automotive Repair, Agricultural Machinery, Automotive Electronics, Auto Air Conditioning',
       responsibilitiesKm: [
-        'គ្រប់គ្រងរោងជាងជួសជុលយានយន្ត និងឧបករណ៍វិនិច្ឆ័យកុំព្យូទ័រ (OBD Scanner)',
-        'បណ្តុះបណ្តាលសិស្សកម្មវិធី TVET 1.5M ផ្នែកយានយន្តដោយឥតគិតថ្លៃ',
-        'ជំរុញការអនុវត្តលើម៉ាស៊ីនរថយន្តជាក់ស្តែង និងម៉ាស៊ីន Hybrid'
+        'គ្រប់គ្រងរោងជាងជួសជុលយានយន្ត និងគ្រឿងយន្តកសិកម្មទំនើប',
+        'បណ្តុះបណ្តាលសិស្សកម្មវិធី TVET 1.5M ផ្នែកយានយន្ត និងគ្រឿងយន្តដោយឥតគិតថ្លៃ',
+        'ជំរុញការអនុវត្តលើម៉ាស៊ីនរថយន្តជាក់ស្តែង ប្រព័ន្ធ Hybrid និងគ្រឿងយន្តកសិកម្ម'
       ],
       responsibilitiesEn: [
-        'Managing automotive overhaul bays and modern electronic diagnostics tools',
+        'Managing modern automotive overhaul bays and agricultural equipment workshops',
         'Delivering TVET 1.5M vocational automotive scholarship cohorts',
-        'Practical training on engine diagnostics, transmissions, and hybrid drivetrains'
+        'Practical training on engine diagnostics, transmissions, and farm equipment mechanics'
       ],
       qualificationsKm: 'វិស្វករមេកានិច និងយានយន្ត (B.Eng. Automotive Engineering)',
       qualificationsEn: 'B.Eng. in Mechanical & Automotive Engineering'
     },
     {
-      id: 'dept-civil',
-      nameKm: 'ដេប៉ាតឺម៉ង់សំណង់ស៊ីវិល',
-      nameEn: 'Department of Civil Engineering',
-      headKm: 'អ្នកគ្រូ កែវ ស្រីមុំ',
-      headEn: 'Ms. Keo Sreymom',
+      id: 'dept-production',
+      nameKm: 'ដេប៉ាតឺម៉ង់ផលិតកម្ម និងសេវាកម្ម',
+      nameEn: 'Department of Production & Services',
+      headKm: 'លោកស្រី ហម រ៉ូហ្សា',
+      headEn: 'Mrs. Horm Rosa',
       headTitleKm: 'ប្រធានដេប៉ាតឺម៉ង់',
       headTitleEn: 'Head of Department',
       category: 'technical',
       categoryLabelKm: 'ដេប៉ាតឺម៉ង់បច្ចេកទេស',
       categoryLabelEn: 'Technical Department',
-      icon: 'fa-drafting-compass',
+      icon: 'fa-industry',
       accentColor: '#10b981',
-      email: 'civil@rpitssr.edu.kh',
+      email: 'production@rpitssr.edu.kh',
       phone: '(+855) 12 445 566',
-      room: 'អគាររចនាប្លង់ E - បន្ទប់ ២០១ (Building E, Rm 201)',
-      programsKm: 'បច្ចេកវិទ្យាសំណង់, ការគូរប្លង់ស្ថាបត្យកម្ម AutoCAD/Revit, ការស្ទង់វាស់ដី',
-      programsEn: 'Construction Technology, Architectural CAD/Revit Drafting, Land Surveying',
+      room: 'មជ្ឈមណ្ឌលអនុវត្តផលិតកម្ម និងសេវាកម្ម F (Workshop F)',
+      programsKm: 'បច្ចេកវិទ្យាកែច្នៃចំណីអាហារ, ផលិតកម្មទូទៅ, សេវាកម្មបដិសណ្ឋារកិច្ច និងទេសចរណ៍',
+      programsEn: 'Food Processing Technology, Industrial Production, Hospitality & Service Management',
       responsibilitiesKm: [
-        'បណ្តុះបណ្តាលជំនាញគូរប្លង់ស្ថាបត្យកម្ម ការគណនាគ្រឿងបង្គុំ និងការដ្ឋានសំណង់',
-        'គ្រប់គ្រងបន្ទប់ពិសោធន៍បេតុង និងឧបករណ៍ស្ទង់ដី Total Station',
-        'ទំនាក់ទំនងជាមួយក្រុមហ៊ុនសំណង់ និងស្ថាបត្យកម្មក្នុងខេត្តសៀមរាប'
+        'គ្រប់គ្រងការបណ្តុះបណ្តាលជំនាញបច្ចេកវិទ្យាកែច្នៃ និងសេវាកម្មបដិសណ្ឋារកិច្ច',
+        'គ្រប់គ្រងបន្ទប់ពិសោធន៍ចំណីអាហារ និងផ្ទះបាយអនុវត្តស្តង់ដារអនាម័យ',
+        'កសាងកិច្ចសហការជាមួយសហគ្រាសផលិតកម្ម សណ្ឋាគារ និងភោជនីយដ្ឋានដៃគូ'
       ],
       responsibilitiesEn: [
-        'Curriculum delivery in CAD structural drafting, site management, and surveying',
-        'Managing concrete testing laboratory and Total Station geodetic equipment',
-        'Liaison with provincial architectural and construction firms'
+        'Leading curriculum delivery in food processing technology and hospitality services',
+        'Managing food science laboratories and professional standard training facilities',
+        'Collaborating with regional manufacturing plants, hotels, and restaurant partners'
       ],
-      qualificationsKm: 'អនុបណ្ឌិតវិស្វកម្មសំណង់ស៊ីវិល (M.Eng. Civil Engineering)',
-      qualificationsEn: 'M.Eng. in Structural & Civil Engineering'
+      qualificationsKm: 'អនុបណ្ឌិតគ្រប់គ្រងផលិតកម្ម និងសេវាកម្ម (Master of Production & Services)',
+      qualificationsEn: 'Master in Production Management & Service Industries'
     },
     {
-      id: 'dept-tourism',
-      nameKm: 'ដេប៉ាតឺម៉ង់ទេសចរណ៍ និងបដិសណ្ឋារកិច្ច',
-      nameEn: 'Department of Tourism & Hospitality',
-      headKm: 'លោកស្រី ម៉ៅ សុភ័ក្ត្រ',
-      headEn: 'Mrs. Mao Sopheak',
-      headTitleKm: 'ប្រធានដេប៉ាតឺម៉ង់',
+      id: 'dept-business',
+      nameKm: 'ដេប៉ាតឺម៉ង់គ្រប់គ្រងពាណិជ្ជកម្ម',
+      nameEn: 'Department of Business Management',
+      headKm: 'លោក ឡេង ណារ៉ុន',
+      headEn: 'Mr. Leng Naron',
+      headTitleKm: 'ថ្នាក់ដឹកនាំដេប៉ាតឺម៉ង់',
       headTitleEn: 'Head of Department',
       category: 'technical',
       categoryLabelKm: 'ដេប៉ាតឺម៉ង់បច្ចេកទេស',
       categoryLabelEn: 'Technical Department',
-      icon: 'fa-hotel',
+      icon: 'fa-chart-line',
       accentColor: '#8b5cf6',
-      email: 'hospitality@rpitssr.edu.kh',
+      email: 'business@rpitssr.edu.kh',
       phone: '(+855) 12 334 455',
-      room: 'មជ្ឈមណ្ឌលអនុវត្តបដិសណ្ឋារកិច្ច F (Hospitality Training Center F)',
-      programsKm: 'សេវាកម្មសណ្ឋាគារ, ការរៀបចំម្ហូបអាហារ, ការគ្រប់គ្រងទេសចរណ៍',
-      programsEn: 'Hotel Operations, Food & Beverage Production, Tourism Management',
+      room: 'អគារសិក្សា E - បន្ទប់ ២០១ (Building E, Rm 201)',
+      programsKm: 'គ្រប់គ្រងពាណិជ្ជកម្ម, គណនេយ្យ និងហិរញ្ញវត្ថុ, ទីផ្សារឌីជីថល, សហគ្រិនភាព TVET',
+      programsEn: 'Business Management, Accounting & Finance, Digital Marketing, TVET Entrepreneurship',
       responsibilitiesKm: [
-        'គ្រប់គ្រងបន្ទប់គំរូសណ្ឋាគារ (Mock Hotel Room) និងផ្ទះបាយស្តង់ដារអន្តរជាតិ',
-        'បណ្តុះបណ្តាលជំនាញបដិសណ្ឋារកិច្ចឆ្លើយតបនឹងទីផ្សារទេសចរណ៍ខេត្តសៀមរាប',
-        'រៀបចំការចុះហាត់ការនៅសណ្ឋាគារផ្កាយ ៥ និងរមណីយដ្ឋានដៃគូ'
+        'បណ្តុះបណ្តាលមុខវិជ្ជាគ្រប់គ្រងពាណិជ្ជកម្ម គណនេយ្យ និងសហគ្រិនភាព TVET',
+        'លើកកម្ពស់ការអនុវត្តជាក់ស្តែងលើកម្មវិធីគ្រប់គ្រងគណនេយ្យឌីជីថល និងទីផ្សារអនឡាញ',
+        'រៀបចំការតាំងពិព័រណ៍គំនិតអាជីវកម្ម និងការប្រកួតប្រជែងសហគ្រិនភាពយុវជន'
       ],
       responsibilitiesEn: [
-        'Supervising mock hotel suites, front-office simulators, and commercial training kitchens',
-        'Delivering industry-certified hospitality programs tailored for Siem Reap tourism',
-        'Coordinating internships with premier 5-star hotel chains and resorts'
+        'Delivering programs in business administration, accounting, and TVET entrepreneurship',
+        'Hands-on training in digital accounting software and e-commerce business operations',
+        'Organizing student business idea exhibitions and youth entrepreneurship initiatives'
       ],
-      qualificationsKm: 'អនុបណ្ឌិតគ្រប់គ្រងទេសចរណ៍ និងបដិសណ្ឋារកិច្ច (Master in Tourism)',
-      qualificationsEn: 'Master in International Hospitality & Tourism Management'
+      qualificationsKm: 'អនុបណ្ឌិតគ្រប់គ្រងធុរកិច្ច និងពាណិជ្ជកម្ម (Master of Business Administration)',
+      qualificationsEn: 'Master of Business Administration (MBA)'
+    },
+    {
+      id: 'dept-languages',
+      nameKm: 'ដេប៉ាតឺម៉ង់ភាសាបរទេស',
+      nameEn: 'Department of Foreign Languages',
+      headKm: 'លោក ជួន កុម្ភៈ',
+      headEn: 'Mr. Chhuon Kompheak',
+      headTitleKm: 'ថ្នាក់ដឹកនាំដេប៉ាតឺម៉ង់',
+      headTitleEn: 'Head of Department',
+      category: 'technical',
+      categoryLabelKm: 'ដេប៉ាតឺម៉ង់បច្ចេកទេស',
+      categoryLabelEn: 'Technical Department',
+      icon: 'fa-language',
+      accentColor: '#06b6d4',
+      email: 'languages@rpitssr.edu.kh',
+      phone: '(+855) 12 223 344',
+      room: 'អគារសិក្សា E - បន្ទប់ ២០២ (Building E, Rm 202)',
+      programsKm: 'ភាសាអង់គ្លេសបច្ចេកទេស និងពាណិជ្ជកម្ម, ភាសាចិនពាណិជ្ជកម្ម, ភាសាបរទេសសម្រាប់ការងារ',
+      programsEn: 'Technical & Business English, Commercial Chinese, Languages for Workplace Communication',
+      responsibilitiesKm: [
+        'បណ្តុះបណ្តាលភាសាអង់គ្លេសបច្ចេកទេសគាំទ្រគ្រប់មុខជំនាញវិស្វកម្ម និង TVET',
+        'បង្រៀនភាសាចិន និងភាសាបរទេសសម្រាប់ទំនាក់ទំនងការងារ និងបដិសណ្ឋារកិច្ច',
+        'គ្រប់គ្រងបន្ទប់ Lab ភាសា និងការបំពាក់បំប៉នជំនាញទំនាក់ទំនងអន្តរជាតិជូនសិស្ស-និស្សិត'
+      ],
+      responsibilitiesEn: [
+        'Delivering technical English programs tailored for engineering and TVET majors',
+        'Teaching professional Chinese and languages for workplace communication',
+        'Managing multimedia language laboratories and intercultural communication seminars'
+      ],
+      qualificationsKm: 'អនុបណ្ឌិតភាសាវិទ្យាអនុវត្តន៍ និងអប់រំភាសាបរទេស (MA in Applied Linguistics)',
+      qualificationsEn: 'Master of Arts in Applied Linguistics & TESOL'
     }
   ],
   offices: [
     {
-      id: 'office-academic',
-      nameKm: 'ការិយាល័យសិក្សា និងកិច្ចការនិស្សិត',
-      nameEn: 'Academic & Student Affairs Office',
-      headKm: 'លោក សំ វិបុល',
-      headEn: 'Mr. Sam Vibul',
+      id: 'office-admin-personnel',
+      nameKm: 'ការិយាល័យរដ្ឋបាល និងបុគ្គលិក',
+      nameEn: 'Administration and Personnel Office',
+      headKm: 'លោកស្រី ឃ្លាំង ចិន្តា',
+      headEn: 'Mrs. Khleang Chinda',
       headTitleKm: 'ប្រធានការិយាល័យ',
-      headTitleEn: 'Chief of Office',
+      headTitleEn: 'Chief of Administration & Personnel Office',
       category: 'offices',
       categoryLabelKm: 'ការិយាល័យជំនាញ',
       categoryLabelEn: 'Administrative Office',
-      icon: 'fa-user-graduate',
-      accentColor: '#0284c7',
-      email: 'student.affairs@rpitssr.edu.kh',
-      phone: '(+855) 63 963 801',
-      room: 'អគាររដ្ឋបាល A - បន្ទប់ ១០៤ (Building A, Rm 104)',
-      servicesKm: 'ការចុះឈ្មោះចូលរៀន, ព្រឹត្តិបត្រពិន្ទុ, លិខិតបញ្ជាក់ការសិក្សា, អន្តេវាសិកដ្ឋាន',
-      servicesEn: 'Admissions, Transcripts, Student Certifications, Dormitories',
-      responsibilitiesKm: [
-        'គ្រប់គ្រងការចុះឈ្មោះចូលរៀនរបស់សិស្ស-និស្សិតគ្រប់វគ្គសិក្សា',
-        'រៀបចំ និងចេញលិខិតបញ្ជាក់ការសិក្សា ព្រឹត្តិបត្រពិន្ទុ និងសញ្ញាបត្រ',
-        'គ្រប់គ្រងអាហារូបករណ៍រាជរដ្ឋាភិបាល និងសុខុមាលភាពនិស្សិតស្នាក់នៅអន្តេវាសិកដ្ឋាន'
-      ],
-      responsibilitiesEn: [
-        'Student admissions and enrollment registration across all vocational tracks',
-        'Issuing student status certificates, academic transcripts, and diplomas',
-        'Managing government scholarship allowances and campus dormitory welfare'
-      ],
-      qualificationsKm: 'បរិញ្ញាបត្រជាន់ខ្ពស់រដ្ឋបាលអប់រំ (M.Ed. Educational Management)',
-      qualificationsEn: 'Master of Educational Management'
-    },
-    {
-      id: 'office-admin-finance',
-      nameKm: 'ការិយាល័យរដ្ឋបាល គណនេយ្យ និងហិរញ្ញវត្ថុ',
-      nameEn: 'Administration, Accounting & Finance Office',
-      headKm: 'លោកស្រី នុត ដានី',
-      headEn: 'Mrs. Nuth Dany',
-      headTitleKm: 'ប្រធានការិយាល័យ',
-      headTitleEn: 'Chief of Office',
-      category: 'offices',
-      categoryLabelKm: 'ការិយាល័យជំនាញ',
-      categoryLabelEn: 'Administrative Office',
-      icon: 'fa-file-invoice-dollar',
+      icon: 'fa-users-cog',
       accentColor: '#059669',
-      email: 'finance@rpitssr.edu.kh',
+      email: 'admin.personnel@rpitssr.edu.kh',
       phone: '(+855) 63 963 802',
       room: 'អគាររដ្ឋបាល A - បន្ទប់ ១០៥ (Building A, Rm 105)',
-      servicesKm: 'បៀវត្ស និងថវិកា, លិខិតរដ្ឋបាលចូល-ចេញ, លទ្ធកម្មសម្ភារៈ',
-      servicesEn: 'Payroll & Budget, Inward/Outward Memos, Public Procurement',
+      servicesKm: 'ការងាររដ្ឋបាលទូទៅ, គ្រប់គ្រងបុគ្គលិក មន្ត្រី និងគ្រូបង្រៀន, លិខិតស្នាមចូល-ចេញ, សុខុមាលភាពមន្ត្រី',
+      servicesEn: 'General Administration, HR Management, Official Correspondence, Staff Welfare',
       responsibilitiesKm: [
-        'ចាត់ចែងលិខិតរដ្ឋបាល ចរាចរឯកសារផ្លូវការ និងការងារបុគ្គលិក',
-        'រៀបចំគណនេយ្យចំណូល-ចំណាយ និងរបាយការណ៍ហិរញ្ញវត្ថុជូនក្រសួង',
-        'គ្រប់គ្រងការផ្គត់ផ្គង់សម្ភារៈសិក្សា និងឧបករណ៍អនុវត្តក្នុងរោងជាង'
+        'ចាត់ចែងការងាររដ្ឋបាលទូទៅ ចរាចរលិខិតផ្លូវការ និងការតម្កល់ទុកឯកសារគតិយុត្ត',
+        'គ្រប់គ្រងស្ថិតិមន្ត្រីរាជការ បុគ្គលិកជាប់កិច្ចសន្យា និងគ្រូបង្រៀន',
+        'សម្របសម្រួលរបបបៀវត្ស ការលើកទឹកចិត្ត និងការវាយតម្លៃការងារបុគ្គលិកប្រចាំឆ្នាំ'
       ],
       responsibilitiesEn: [
-        'Official correspondence, archive documentation, and personnel registry',
-        'Institutional revenue/expenditure accounting and statutory ministerial reporting',
-        'Procurement of teaching materials, machinery consumables, and office supplies'
+        'Managing institutional administrative workflows, official correspondence, and archival records',
+        'Maintaining personnel registry for civil servants, contract staff, and teaching faculty',
+        'Coordinating payroll operations, employee evaluations, and institutional staff welfare'
       ],
-      qualificationsKm: 'បរិញ្ញាបត្រគណនេយ្យ និងហិរញ្ញវត្ថុ (B.Acc. Accounting & Finance)',
-      qualificationsEn: 'B.Acc. in Accounting & Financial Management'
+      qualificationsKm: 'បរិញ្ញាបត្រជាន់ខ្ពស់រដ្ឋបាលសាធារណៈ (Master of Public Administration)',
+      qualificationsEn: 'Master of Public Administration (MPA)'
     },
     {
-      id: 'office-career',
-      nameKm: 'ការិយាល័យទំនាក់ទំនងសហគ្រាស និងការងារ',
-      nameEn: 'Enterprise Liaison & Job Placement Office',
-      headKm: 'លោក ព្រុំ សុផាត',
-      headEn: 'Mr. Prum Sophat',
+      id: 'office-education-dev',
+      nameKm: 'ការិយាល័យអភិវឌ្ឍន៍ និងបណ្តុះបណ្តាល',
+      nameEn: 'Education & Training Development Office',
+      headKm: 'លោក ឆែម រ័ត្ន',
+      headEn: 'Mr. Chhem Rath',
       headTitleKm: 'ប្រធានការិយាល័យ',
-      headTitleEn: 'Chief of Office',
+      headTitleEn: 'Head of Education & Training Development Office',
+      category: 'offices',
+      categoryLabelKm: 'ការិយាល័យជំនាញ',
+      categoryLabelEn: 'Administrative Office',
+      icon: 'fa-graduation-cap',
+      accentColor: '#0284c7',
+      email: 'training.dev@rpitssr.edu.kh',
+      phone: '(+855) 63 963 804',
+      room: 'អគាររដ្ឋបាល A - បន្ទប់ ១០៤ (Building A, Rm 104)',
+      servicesKm: 'ការអភិវឌ្ឍកម្មវិធីបណ្តុះបណ្តាល, ផែនការសិក្សា, ការបណ្តុះបណ្តាលគរុកោសល្យគ្រូ, កម្មវិធី CBT',
+      servicesEn: 'Curriculum Development, Training Plans, Pedagogical Training, CBT Standards',
+      responsibilitiesKm: [
+        'រៀបចំ និងអភិវឌ្ឍន៍កម្មវិធីសិក្សាផ្អែកលើសមត្ថភាព (CBT) ស្របតាមស្តង់ដារជាតិ',
+        'រៀបចំផែនការបណ្តុះបណ្តាលប្រចាំឆ្នាំ និងការបំពាក់បំប៉នគរុកោសល្យជូនលោកគ្រូ-អ្នកគ្រូ',
+        'សហការជាមួយក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈក្នុងការធ្វើបច្ចុប្បន្នភាពកញ្ចប់សម្ភារបង្រៀន'
+      ],
+      responsibilitiesEn: [
+        'Developing and refining Competency-Based Training (CBT) curricula aligned with national standards',
+        'Formulating annual institutional training schedules and teacher pedagogical upgrades',
+        'Collaborating with MLVT to update instructional packages and competency standards'
+      ],
+      qualificationsKm: 'អនុបណ្ឌិតអភិវឌ្ឍន៍កម្មវិធីអប់រំបច្ចេកទេស (Master of TVET Curriculum Development)',
+      qualificationsEn: 'Master of Technical Education & Curriculum Development'
+    },
+    {
+      id: 'office-education-training',
+      nameKm: 'ការិយាល័យអប់រំបណ្ដុះបណ្ដាល',
+      nameEn: 'Education and Training Office',
+      headKm: 'លោក តូ សុផាណារ៉ា',
+      headEn: 'Mr. To Sophanara',
+      headTitleKm: 'ថ្នាក់ដឹកនាំការិយាល័យ',
+      headTitleEn: 'Officer / Education & Training Office',
+      category: 'offices',
+      categoryLabelKm: 'ការិយាល័យជំនាញ',
+      categoryLabelEn: 'Administrative Office',
+      icon: 'fa-book-reader',
+      accentColor: '#0ea5e9',
+      email: 'academic.affairs@rpitssr.edu.kh',
+      phone: '(+855) 63 963 801',
+      room: 'អគាររដ្ឋបាល A - បន្ទប់ ១០៦ (Building A, Rm 106)',
+      servicesKm: 'ការចុះឈ្មោះចូលរៀន, ការគ្រប់គ្រងវគ្គសិក្សា, ការប្រឡង, ការចេញព្រឹត្តិបត្រពិន្ទុ និងសញ្ញាបត្រ',
+      servicesEn: 'Student Admissions, Course Management, Exam Administration, Transcripts & Diplomas',
+      responsibilitiesKm: [
+        'គ្រប់គ្រងការចុះឈ្មោះចូលរៀន ការផ្តល់លេខកូដសិស្ស និងការរៀបចំបញ្ជីវត្តមាន',
+        'រៀបចំកាលវិភាគសិក្សា ការប្រឡងឆមាស និងការបូកសរុបលទ្ធផលពិន្ទុសិស្ស-និស្សិត',
+        'រៀបចំបែបបទចេញលិខិតបញ្ជាក់ការសិក្សា ព្រឹត្តិបត្រពិន្ទុ និងសញ្ញាបត្រផ្លូវការ'
+      ],
+      responsibilitiesEn: [
+        'Managing student enrollment, admissions registrations, and student attendance logs',
+        'Coordinating timetable scheduling, semester exams, and official grading records',
+        'Processing student certificates of completion, academic transcripts, and diplomas'
+      ],
+      qualificationsKm: 'បរិញ្ញាបត្រគ្រប់គ្រងអប់រំ (B.Ed. Educational Management)',
+      qualificationsEn: 'Bachelor of Educational Administration & Management'
+    },
+    {
+      id: 'office-research-industry',
+      nameKm: 'ការិយាល័យស្រាវជ្រាវ និងទំនាក់ទំនងឧស្សាហកម្ម',
+      nameEn: 'Occupational Research & Liaison Industry Office',
+      headKm: 'លោក នូ ហ៊ត់',
+      headEn: 'Mr. Nu Hot',
+      headTitleKm: 'ប្រធានការិយាល័យ',
+      headTitleEn: 'Head of Occupational Research & Liaison Industry Office',
+      category: 'offices',
+      categoryLabelKm: 'ការិយាល័យជំនាញ',
+      categoryLabelEn: 'Administrative Office',
+      icon: 'fa-industry',
+      accentColor: '#d97706',
+      email: 'industry.liaison@rpitssr.edu.kh',
+      phone: '(+855) 63 963 803',
+      room: 'អគាររដ្ឋបាល B - បន្ទប់ ១០១ (Building B, Rm 101)',
+      servicesKm: 'កិច្ចសហការសហគ្រាស និងដៃគូវិស័យឯកជន, ការចុះអនុស្សរណៈយោគយល់ (MoU), ការផ្សារភ្ជាប់ឧស្សាហកម្ម',
+      servicesEn: 'Enterprise Partnerships, Corporate MoUs, Industry Linkages, Technical Cooperation',
+      responsibilitiesKm: [
+        'កសាងទំនាក់ទំនង និងចុះកិច្ចព្រមព្រៀងសហប្រតិបត្តិការ (MoU) ជាមួយសហគ្រាស និងរោងចក្រ',
+        'ជំរុញការចូលរួមរបស់វិស័យឯកជនក្នុងការអភិវឌ្ឍជំនាញបច្ចេកទេស និងការគាំទ្រសម្ភារបច្ចេកទេស',
+        'រៀបចំវេទិកាពិភាក្សា និងសិក្ខាសាលារវាងវិទ្យាស្ថាន និងសហគ្រាសដៃគូ'
+      ],
+      responsibilitiesEn: [
+        'Building partnerships and signing Memorandums of Understanding (MoUs) with industrial enterprises',
+        'Promoting private sector involvement in technical skill development and equipment sponsorship',
+        'Organizing institute-industry dialogue forums and technological partnership roundtables'
+      ],
+      qualificationsKm: 'អនុបណ្ឌិតគ្រប់គ្រងឧស្សាហកម្ម និងទំនាក់ទំនងសហគ្រាស',
+      qualificationsEn: 'Master in Industrial Management & Enterprise Relations'
+    },
+    {
+      id: 'office-research-career',
+      nameKm: 'ការិយាល័យស្រាវជ្រាវមុខរបរ និងទំនាក់ទំនងឧស្សាហកម្ម',
+      nameEn: 'Occupational Research & Industry Linkages Office',
+      headKm: 'លោក មាស ដារ៉ាវុត',
+      headEn: 'Mr. Meas Daravuth',
+      headTitleKm: 'ថ្នាក់ដឹកនាំការិយាល័យ',
+      headTitleEn: 'Officer / Occupational Research & Liaison Industry Office',
       category: 'offices',
       categoryLabelKm: 'ការិយាល័យជំនាញ',
       categoryLabelEn: 'Administrative Office',
       icon: 'fa-briefcase',
-      accentColor: '#d97706',
-      email: 'career@rpitssr.edu.kh',
-      phone: '(+855) 63 963 803',
-      room: 'អគាររដ្ឋបាល B - បន្ទប់ ១០១ (Building B, Rm 101)',
-      servicesKm: 'ពិព័រណ៍ការងារ, កម្មវិធីហាត់ការ, ការប្រឹក្សាយោបល់អាជីព, ការតាមដានអតីតនិស្សិត',
-      servicesEn: 'Job Fairs, Internships, Career Counseling, Alumni Tracking',
+      accentColor: '#b45309',
+      email: 'career.research@rpitssr.edu.kh',
+      phone: '(+855) 63 963 805',
+      room: 'អគាររដ្ឋបាល B - បន្ទប់ ១០២ (Building B, Rm 102)',
+      servicesKm: 'ការស្រាវជ្រាវទីផ្សារមុខរបរ, កម្មសិក្សាការងារ (Internship), ការស្វែងរកការងារ និងការតាមដានអតីតនិស្សិត',
+      servicesEn: 'Labor Market Research, Student Internships, Job Placements, Alumni Employment Tracking',
       responsibilitiesKm: [
-        'សម្របសម្រួលជាមួយសហគ្រាសក្នុងការបញ្ជូនសិស្សចុះហាត់ការជាក់ស្តែង',
-        'រៀបចំពិព័រណ៍ការងារប្រចាំឆ្នាំ និងសិក្ខាសាលាតម្រង់ទិសអាជីពការងារ',
-        'តាមដានអត្រាមានការងារធ្វើរបស់និស្សិតបញ្ចប់ការសិក្សា (Employability Rate)'
+        'សិក្សាស្រាវជ្រាវតម្រូវការទីផ្សារការងារ និងមុខរបរដែលកំពុងត្រូវការក្នុងតំបន់សៀមរាប និងភូមិភាគពាយ័ព្យ',
+        'សម្របសម្រួលការបញ្ជូនសិស្ស-និស្សិតចុះធ្វើកម្មសិក្សា (Internship) នៅតាមក្រុមហ៊ុន និងសហគ្រាស',
+        'រៀបចំពិព័រណ៍ការងារ និងតាមដានការមានការងារធ្វើរបស់និស្សិតបញ្ចប់ការសិក្សា'
       ],
       responsibilitiesEn: [
-        'Facilitating student workplace internships with partner industries',
-        'Organizing annual campus job fairs and industry orientation workshops',
-        'Tracking graduate employment outcomes and industry skill demand'
+        'Researching occupational skill demands in Siem Reap and the northwestern economic corridor',
+        'Facilitating student workplace internships and apprentice placements with employer partners',
+        'Organizing annual career fairs and tracking graduate employability outcomes'
       ],
-      qualificationsKm: 'បរិញ្ញាបត្រគ្រប់គ្រងធនធានមនុស្ស (BBA Human Resource Management)',
-      qualificationsEn: 'BBA in Human Resource Management & Industry Relations'
+      qualificationsKm: 'បរិញ្ញាបត្រគ្រប់គ្រងធនធានមនុស្ស និងទីផ្សារការងារ',
+      qualificationsEn: 'Bachelor of Human Resource Management & Labour Economics'
+    },
+    {
+      id: 'office-qa',
+      nameKm: 'ការិយាល័យធានាគុណភាព',
+      nameEn: 'Quality Assurance Office',
+      headKm: 'លោក ហេង បូរ៉ាម៉ី',
+      headEn: 'Mr. Heng Boramy',
+      headTitleKm: 'ប្រធានការិយាល័យ',
+      headTitleEn: 'Chief of Quality Assurance Office',
+      category: 'offices',
+      categoryLabelKm: 'ការិយាល័យជំនាញ',
+      categoryLabelEn: 'Administrative Office',
+      icon: 'fa-award',
+      accentColor: '#7c3aed',
+      email: 'qa@rpitssr.edu.kh',
+      phone: '(+855) 63 963 806',
+      room: 'អគាររដ្ឋបាល B - បន្ទប់ ២០៣ (Building B, Rm 203)',
+      servicesKm: 'ការធានាគុណភាពផ្ទៃក្នុង (IQA), ការវាយតម្លៃស្តង់ដារអប់រំ, សវនកម្មគុណភាព, ការទទួលស្គាល់គុណវុឌ្ឍិស្ថាប័ន',
+      servicesEn: 'Internal Quality Assurance (IQA), Educational Standards Audit, Institutional Accreditation',
+      responsibilitiesKm: [
+        'ដឹកនាំការអនុវត្តប្រព័ន្ធធានាគុណភាពអប់រំផ្ទៃក្នុង (IQA) គ្រប់ដេប៉ាតឺម៉ង់ និងការិយាល័យ',
+        'រៀបចំការវាយតម្លៃស្វ័យត្រួតពិនិត្យ (Self-Assessment) និងសវនកម្មគុណភាពអប់រំបច្ចេកទេស',
+        'រៀបចំឯកសារគតិយុត្តគាំទ្រការទទួលស្គាល់គុណវុឌ្ឍិ និងស្តង់ដារគ្រឹះស្ថាន TVET ពីគណៈកម្មាធិការជាតិ'
+      ],
+      responsibilitiesEn: [
+        'Implementing Internal Quality Assurance (IQA) systems across all technical departments and offices',
+        'Conducting periodic self-assessments, teaching quality evaluations, and educational audits',
+        'Preparing compliance dossiers for institutional accreditation under National TVET Quality Standards'
+      ],
+      qualificationsKm: 'អនុបណ្ឌិតធានាគុណភាពអប់រំ (Master of Educational Quality Assurance)',
+      qualificationsEn: 'Master in Educational Quality Assurance & Assessment'
+    },
+    {
+      id: 'center-assessment',
+      nameKm: 'មជ្ឈមណ្ឌលវាយតម្លៃសមត្ថភាព',
+      nameEn: 'Assessment Center of Competency',
+      headKm: 'លោក ស៊ីម ចាន់ថន',
+      headEn: 'Mr. Sim Chanthon',
+      headTitleKm: 'ប្រធានមជ្ឈមណ្ឌល (នាយករងវិទ្យាស្ថាន)',
+      headTitleEn: 'Head of Assessment Center (Deputy Director)',
+      category: 'offices',
+      categoryLabelKm: 'មជ្ឈមណ្ឌលជំនាញ',
+      categoryLabelEn: 'Specialized Center',
+      icon: 'fa-clipboard-check',
+      accentColor: '#2563eb',
+      email: 'assessment@rpitssr.edu.kh',
+      phone: '(+855) 12 345 602',
+      room: 'អគាររដ្ឋបាល A - បន្ទប់ ១០៣ (Building A, Rm 103)',
+      servicesKm: 'ការវាយតម្លៃសមត្ថភាពជំនាញវិជ្ជាជីវៈ, ការប្រឡងបញ្ជាក់សមត្ថភាពជាតិ (CQF / RPL), ការចេញវិញ្ញាបនបត្រស្តង់ដារសមត្ថភាព',
+      servicesEn: 'Competency-Based Assessments, National CQF / RPL Testing, Official Skill Certifications',
+      dualRole: true,
+      dualRoleBadgeKm: 'តួនាទីទ្វេ៖ នាយករង & ប្រធានមជ្ឈមណ្ឌល',
+      dualRoleBadgeEn: 'Dual Role: Deputy Director & Center Head',
+      dualRolesList: [
+        {
+          roleKm: 'នាយករងវិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប',
+          roleEn: 'Deputy Director of RPITSSR',
+          type: 'executive'
+        },
+        {
+          roleKm: 'ប្រធានមជ្ឈមណ្ឌលវាយតម្លៃសមត្ថភាព',
+          roleEn: 'Head of Assessment Center of Competency',
+          type: 'center'
+        }
+      ],
+      responsibilitiesKm: [
+        'ដឹកនាំ និងគ្រប់គ្រងមជ្ឈមណ្ឌលវាយតម្លៃសមត្ថភាព ស្របតាមគោលការណ៍ណែនាំរបស់ក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ',
+        'រៀបចំការប្រឡងវាស់វែង និងវាយតម្លៃសមត្ថភាពជាក់ស្តែងរបស់សិស្ស-និស្សិត និងកម្មករ-និយោជិតក្នុងវិស័យឧស្សាហកម្ម',
+        'អនុវត្តដំណើរការទទួលស្គាល់ការសិក្សាពីមុន (Recognition of Prior Learning - RPL) ជូនពលរដ្ឋ និងកម្មករជំនាញ',
+        'សហការជាមួយគណៈកម្មការវាយតម្លៃជាតិ ក្នុងការចេញវិញ្ញាបនបត្របញ្ជាក់សមត្ថភាពស្របតាមក្របខណ្ឌគុណវុឌ្ឍិជាតិកម្ពុជា (CQF)'
+      ],
+      responsibilitiesEn: [
+        'Directing and managing the Assessment Center of Competency under MLVT regulatory guidelines',
+        'Organizing practical competency assessments for TVET students and industrial workers',
+        'Administering Recognition of Prior Learning (RPL) pathways for experienced skilled workers',
+        'Coordinating with the National Assessment Committee to issue official national CQF competency certificates'
+      ],
+      qualificationsKm: 'អនុបណ្ឌិតរដ្ឋបាលសាធារណៈ និងអ្នកវាយតម្លៃសមត្ថភាពជាតិ TVET (Certified National TVET Assessor)',
+      qualificationsEn: 'Master of Public Administration (MPA) & Certified National TVET Assessor'
     }
   ]
 };
@@ -574,15 +762,15 @@ export const OrganizationPage = () => {
             <div className="org-hero-meta-row">
               <nav className="org-breadcrumb" aria-label="breadcrumb">
                 <Link to="/">
-                  <i className="fas fa-home"></i>
+                  <i className="fas fa-home me-1"></i>
                   <span>{isKhmer ? 'ទំព័រដើម' : 'Home'}</span>
                 </Link>
-                <span className="separator">›</span>
+                <i className="fas fa-chevron-right text-muted separator" style={{ fontSize: '0.72rem' }}></i>
                 <span className="current">{t('organization.pageTitle')}</span>
               </nav>
 
               <span className="org-hero-badge">
-                <i className="fas fa-landmark"></i>
+                <i className="fas fa-landmark text-primary me-1"></i>
                 <span>{t('organization.badge_governance')}</span>
               </span>
             </div>
@@ -600,15 +788,15 @@ export const OrganizationPage = () => {
             {/* Institutional Trust Badges */}
             <div className="org-trust-pills">
               <span className="org-trust-pill">
-                <i className="fas fa-scroll"></i>
+                <i className="fas fa-scroll text-primary"></i>
                 <span>{t('organization.trust_subdecree')}</span>
               </span>
               <span className="org-trust-pill">
-                <i className="fas fa-award"></i>
+                <i className="fas fa-award text-success"></i>
                 <span>{t('organization.trust_ministry')}</span>
               </span>
               <span className="org-trust-pill">
-                <i className="fas fa-sitemap"></i>
+                <i className="fas fa-sitemap text-warning"></i>
                 <span>{t('organization.trust_structure')}</span>
               </span>
             </div>
@@ -667,7 +855,7 @@ export const OrganizationPage = () => {
                 >
                   <i className="fas fa-laptop-code"></i>
                 </div>
-                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>5</div>
+                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>{LEADERSHIP_DATA.departments.length}</div>
                 <div className="fw-semibold text-dark small mt-1">{t('organization.stat_departments')}</div>
                 <span
                   className="badge rounded-pill mt-2 px-2.5 py-1"
@@ -686,7 +874,7 @@ export const OrganizationPage = () => {
                 >
                   <i className="fas fa-building"></i>
                 </div>
-                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>3</div>
+                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>{LEADERSHIP_DATA.offices.length}</div>
                 <div className="fw-semibold text-dark small mt-1">{t('organization.stat_offices')}</div>
                 <span
                   className="badge rounded-pill mt-2 px-2.5 py-1"
@@ -727,7 +915,7 @@ export const OrganizationPage = () => {
                 style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', color: '#475569', fontSize: '0.84rem', fontWeight: 500 }}
               >
                 <i className="fas fa-sitemap text-primary"></i>
-                <span>{isKhmer ? 'គណៈនាយក ៥ រូប • ៥ ដេប៉ាតឺម៉ង់ • ៣ ការិយាល័យ' : '5 Executive Directorate • 5 Departments • 3 Offices'}</span>
+                <span>{isKhmer ? `គណៈនាយក ៥ រូប • ${LEADERSHIP_DATA.departments.length} ដេប៉ាតឺម៉ង់ • ${LEADERSHIP_DATA.offices.length} ការិយាល័យ & មជ្ឈមណ្ឌល` : `5 Executive Directorate • ${LEADERSHIP_DATA.departments.length} Departments • ${LEADERSHIP_DATA.offices.length} Offices & Center`}</span>
               </div>
             )}
 
@@ -905,6 +1093,21 @@ export const OrganizationPage = () => {
                         <h5 className="fw-bold mb-1" style={{ color: '#07294D', fontSize: '1.1rem' }}>
                           {isKhmer ? deputy.nameKm : deputy.nameEn}
                         </h5>
+                        {deputy.dualRole && (
+                          <span
+                            className="badge rounded-pill mb-2 px-2.5 py-1"
+                            style={{
+                              backgroundColor: '#fffbeb',
+                              color: '#b45309',
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              border: '1px solid #fde68a'
+                            }}
+                          >
+                            <i className="fas fa-award me-1 text-warning"></i>
+                            {isKhmer ? 'មាន ២ តួនាទីផ្លូវការ' : 'Dual Roles'}
+                          </span>
+                        )}
                         <div className="text-primary small fw-semibold mb-2" style={{ lineHeight: '1.5' }}>
                           {isKhmer ? deputy.titleKm : deputy.titleEn}
                         </div>
@@ -926,7 +1129,7 @@ export const OrganizationPage = () => {
 
               {/* TREE LEVEL 3: TWO PILLARS - TECHNICAL DEPTS & ADMINISTRATIVE OFFICES */}
               <div className="row g-4">
-                {/* Pillar Left: 5 Technical Departments */}
+                {/* Pillar Left: 6 Technical Departments */}
                 <div className="col-12 col-lg-7">
                   <div className="p-3 p-md-4 rounded-4 bg-light border h-100">
                     <div className="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
@@ -938,7 +1141,9 @@ export const OrganizationPage = () => {
                           {isKhmer ? 'ដេប៉ាតឺម៉ង់បច្ចេកទេស (Technical Departments)' : 'Technical Departments'}
                         </h5>
                       </div>
-                      <span className="badge bg-primary text-white rounded-pill">5 ដេប៉ាតឺម៉ង់</span>
+                      <span className="badge bg-primary text-white rounded-pill">
+                        {LEADERSHIP_DATA.departments.length} {isKhmer ? 'ដេប៉ាតឺម៉ង់' : 'Departments'}
+                      </span>
                     </div>
 
                     <div className="d-flex flex-column gap-3">
@@ -986,7 +1191,7 @@ export const OrganizationPage = () => {
                   </div>
                 </div>
 
-                {/* Pillar Right: 3 Administrative Offices */}
+                {/* Pillar Right: 7 Administrative Offices & Assessment Center */}
                 <div className="col-12 col-lg-5">
                   <div className="p-3 p-md-4 rounded-4 bg-light border h-100">
                     <div className="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
@@ -995,10 +1200,12 @@ export const OrganizationPage = () => {
                           <i className="fas fa-building"></i>
                         </div>
                         <h5 className="fw-bold mb-0" style={{ color: '#07294D' }}>
-                          {isKhmer ? 'ការិយាល័យជំនាញ (Offices)' : 'Administrative Offices'}
+                          {isKhmer ? 'ការិយាល័យ & មជ្ឈមណ្ឌល' : 'Offices & Assessment Center'}
                         </h5>
                       </div>
-                      <span className="badge bg-success text-white rounded-pill">3 ការិយាល័យ</span>
+                      <span className="badge bg-success text-white rounded-pill">
+                        {LEADERSHIP_DATA.offices.length} {isKhmer ? 'អង្គភាព' : 'Units'}
+                      </span>
                     </div>
 
                     <div className="d-flex flex-column gap-3">
@@ -1031,7 +1238,22 @@ export const OrganizationPage = () => {
                               <div className="text-muted small">
                                 <span className="fw-semibold text-dark">{isKhmer ? office.headKm : office.headEn}</span> ({isKhmer ? office.headTitleKm : office.headTitleEn})
                               </div>
-                              <div className="text-muted small" style={{ fontSize: '0.8rem' }}>
+                              {office.dualRole && (
+                                <span
+                                  className="badge rounded-pill mt-1 px-2.5 py-0.5"
+                                  style={{
+                                    backgroundColor: '#eff6ff',
+                                    color: '#1e73be',
+                                    fontSize: '0.72rem',
+                                    fontWeight: 600,
+                                    border: '1px solid #bfdbfe'
+                                  }}
+                                >
+                                  <i className="fas fa-id-badge me-1"></i>
+                                  {isKhmer ? 'នាយករង & ប្រធានមជ្ឈមណ្ឌល' : 'Deputy Director & Center Head'}
+                                </span>
+                              )}
+                              <div className="text-muted small" style={{ fontSize: '0.8rem', marginTop: '2px' }}>
                                 <i className="fas fa-map-marker-alt me-1 text-danger"></i>
                                 {office.room}
                               </div>
@@ -1098,6 +1320,21 @@ export const OrganizationPage = () => {
                           <h5 className="fw-bold mb-2" style={{ color: '#07294D', fontSize: '1.18rem', lineHeight: 1.45 }}>
                             {isKhmer ? item.nameKm : item.nameEn}
                           </h5>
+                          {item.dualRole && (
+                            <span
+                              className="badge rounded-pill mb-2 px-2.5 py-1 align-self-start"
+                              style={{
+                                backgroundColor: '#fffbeb',
+                                color: '#b45309',
+                                fontSize: '0.74rem',
+                                fontWeight: 700,
+                                border: '1px solid #fde68a'
+                              }}
+                            >
+                              <i className="fas fa-award me-1 text-warning"></i>
+                              {isKhmer ? 'មាន ២ តួនាទីផ្លូវការ' : 'Dual Roles'}
+                            </span>
+                          )}
                           <div
                             className="small fw-semibold mb-3"
                             style={{ color: '#1e73be', fontSize: '0.92rem', lineHeight: 1.5 }}
@@ -1177,8 +1414,8 @@ export const OrganizationPage = () => {
                 </h4>
                 <p className="text-muted mb-4" style={{ lineHeight: '2.1', fontSize: '0.98rem' }}>
                   {isKhmer
-                    ? 'វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប (RPITSSR) ត្រូវដឹកនាំដោយនាយិកាវិទ្យាស្ថាន រួមជាមួយនាយករង ៤ រូប ទទួលបន្ទុកការងារតាមផ្នែកជំនាញ។ រចនាសម្ព័ន្ធនេះរៀបចំឡើងដើម្បីធានានូវអភិបាលកិច្ចប្រកបដោយគុណភាព ការបណ្តុះបណ្តាលស្របតាមតម្រូវការទីផ្សារការងារ និងការបម្រើសេវាសិស្ស-និស្សិតប្រកបដោយតម្លាភាព។'
-                    : 'RPITSSR is administered by the Institute Director supported by 4 Deputy Directors across designated functional areas. This governance model guarantees high pedagogical standards, market-responsive technical education, and transparent student-centered administration.'}
+                    ? 'វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប (RPITSSR) ត្រូវដឹកនាំដោយនាយិកាវិទ្យាស្ថាន រួមជាមួយនាយករង ៤ រូប ទទួលបន្ទុកការងារតាមផ្នែកជំនាញ ដេប៉ាតឺម៉ង់បច្ចេកទេសចំនួន ៦ និងការិយាល័យ-មជ្ឈមណ្ឌលចំនួន ៧។ រចនាសម្ព័ន្ធនេះរៀបចំឡើងដើម្បីធានានូវអភិបាលកិច្ចប្រកបដោយគុណភាព ការបណ្តុះបណ្តាលស្របតាមតម្រូវការទីផ្សារការងារ និងការបម្រើសេវាសិស្ស-និស្សិតប្រកបដោយតម្លាភាព។'
+                    : 'RPITSSR is administered by the Institute Director supported by 4 Deputy Directors, 6 Technical Departments, and 7 Offices & Centers. This governance model guarantees high pedagogical standards, market-responsive technical education, and transparent student-centered administration.'}
                 </p>
                 <div className="d-flex flex-wrap justify-content-center justify-content-md-start gap-3 pt-2">
                   <Link to="/about" className="btn btn-outline-primary org-governance-btn">
@@ -1202,26 +1439,15 @@ export const OrganizationPage = () => {
       </div>
 
       {/* LEADER PROFILE MODAL */}
-      {selectedLeader && (
+      {selectedLeader && typeof document !== 'undefined' && createPortal(
         <div
-          className="org-modal-backdrop position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3"
-          style={{
-            backgroundColor: 'rgba(7, 41, 77, 0.65)',
-            backdropFilter: 'blur(6px)',
-            zIndex: 9999
-          }}
+          className="org-modal-backdrop"
           onClick={() => setSelectedLeader(null)}
+          role="dialog"
+          aria-modal="true"
         >
           <div
-            className="org-modal-card bg-white rounded-4 shadow-lg overflow-hidden"
-            style={{
-              maxWidth: '680px',
-              width: '100%',
-              maxHeight: '90vh',
-              display: 'flex',
-              flexDirection: 'column',
-              animation: 'fadeInUp 0.25s ease-out'
-            }}
+            className="org-modal-card bg-white"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -1262,7 +1488,51 @@ export const OrganizationPage = () => {
             </div>
 
             {/* Modal Body with Scrollable Area */}
-            <div className="org-modal-body overflow-auto" style={{ flex: 1 }}>
+            <div className="org-modal-body">
+              {/* Dual Role Callout Banner */}
+              {(selectedLeader.dualRole || selectedLeader.id === 'deputy-chanthon' || selectedLeader.id === 'center-assessment') && (
+                <div
+                  className="rounded-4 border mb-4 p-3 px-4 shadow-xs"
+                  style={{
+                    backgroundColor: '#fffbeb',
+                    borderColor: '#fde68a',
+                    borderLeft: '5px solid #f59e0b'
+                  }}
+                >
+                  <div className="d-flex align-items-center gap-2 mb-2">
+                    <span
+                      className="badge rounded-pill px-2.5 py-1"
+                      style={{
+                        backgroundColor: '#fef3c7',
+                        color: '#b45309',
+                        border: '1px solid #fde68a',
+                        fontSize: '0.8rem',
+                        fontWeight: 700
+                      }}
+                    >
+                      <i className="fas fa-award me-1.5 text-warning"></i>
+                      {isKhmer ? 'កាន់កាប់ ២ តួនាទីផ្លូវការក្នុងស្ថាប័ន' : 'Official Dual Leadership Roles'}
+                    </span>
+                  </div>
+                  <div className="d-flex flex-column gap-2" style={{ fontSize: '0.9rem', color: '#1e293b' }}>
+                    <div className="d-flex align-items-start gap-2">
+                      <span className="badge bg-primary text-white rounded-circle p-1 d-inline-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '22px', height: '22px', fontSize: '0.72rem' }}>1</span>
+                      <div>
+                        <strong>{isKhmer ? 'តួនាទីទី ១ (គណៈនាយក)៖' : 'Role 1 (Executive Directorate):'}</strong>{' '}
+                        <span>{isKhmer ? 'នាយករងវិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប' : 'Deputy Director of RPITSSR'}</span>
+                      </div>
+                    </div>
+                    <div className="d-flex align-items-start gap-2">
+                      <span className="badge bg-success text-white rounded-circle p-1 d-inline-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '22px', height: '22px', fontSize: '0.72rem' }}>2</span>
+                      <div>
+                        <strong>{isKhmer ? 'តួនាទីទី ២ (មជ្ឈមណ្ឌលជំនាញ)៖' : 'Role 2 (Specialized Center):'}</strong>{' '}
+                        <span>{isKhmer ? 'ប្រធានមជ្ឈមណ្ឌលវាយតម្លៃសមត្ថភាព' : 'Head of Assessment Center of Competency'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Contact Information Bar */}
               <div
                 className="rounded-4 border mb-4"
@@ -1435,7 +1705,8 @@ export const OrganizationPage = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

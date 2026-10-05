@@ -21,13 +21,14 @@ import {
   FileDown,
 } from 'lucide-react';
 import api from '../api/client';
+import { courseService } from '../services/courseService';
 
 export const CoursesPage = () => {
   const { t, currentLanguage, language } = useLanguage();
   const isKhmer = currentLanguage === 'km' || language === 'km';
 
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState(() => courseService.getCachedCourses() || []);
+  const [loading, setLoading] = useState(() => !courseService.getCachedCourses()?.length);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -38,9 +39,11 @@ export const CoursesPage = () => {
 
     (async () => {
       try {
-        setLoading(true);
-        const coursesRes = await api.get('/courses');
-        const sortedCourses = [...(coursesRes.data || [])].sort(
+        if (!courses.length) {
+          setLoading(true);
+        }
+        const data = await courseService.getAll();
+        const sortedCourses = [...(data || [])].sort(
           (a, b) => (b.id || 0) - (a.id || 0)
         );
         setCourses(sortedCourses);
@@ -160,7 +163,7 @@ export const CoursesPage = () => {
               {/* Breadcrumb Navigation */}
               <div className="courses-breadcrumb">
                 <Link to="/" onClick={scrollToTop}>
-                  <Home size={14} />
+                  <Home size={14} className="me-1" />
                   <span>{isKhmer ? 'ទំព័រដើម' : 'Home'}</span>
                 </Link>
                 <span className="crumb-sep">
@@ -173,7 +176,7 @@ export const CoursesPage = () => {
 
               {/* Badge */}
               <div className="courses-hero-badge">
-                <Sparkles size={15} />
+                <Sparkles size={14} className="me-1 text-primary" />
                 <span>{isKhmer ? 'កម្មវិធីបណ្តុះបណ្តាល TVET & បរិញ្ញាបត្រ' : 'TVET & Higher Education Programs'}</span>
               </div>
             </div>
@@ -520,22 +523,99 @@ export const CoursesPage = () => {
                 className="faculty-banner-img"
                 onError={(e) => { e.target.src = '/images/teacher-all.webp'; }}
               />
+              <div className="faculty-photo-overlay-badge">
+                <Award size={15} />
+                <span>{isKhmer ? 'គ្រូជំនាញទទួលស្គាល់កម្រិតជាតិ ISO 9001:2015' : 'Certified National Master Trainers & Faculty'}</span>
+              </div>
+              <div className="faculty-photo-overlay-caption">
+                <Users size={14} />
+                <span>{isKhmer ? 'គណៈគ្រប់គ្រង និងលោកគ្រូ-អ្នកគ្រូ RPITSSR' : 'RPITSSR Leadership & Teaching Staff'}</span>
+              </div>
             </div>
-            <div className="faculty-banner-content">
-              <div>
-                <h3 className="faculty-banner-title">
+
+            <div className="faculty-banner-deck">
+              <div className="faculty-deck-left">
+                <div className="faculty-deck-badge-wrap">
+                  <span className="faculty-deck-badge">
+                    <Sparkles size={13} /> {isKhmer ? 'កម្លាំងចលករនៃឧត្តមភាពអប់រំ' : 'Driving Academic Excellence'}
+                  </span>
+                </div>
+                <h3 className="faculty-deck-title">
                   {isKhmer ? 'ក្រុមការងារសាស្ត្រាចារ្យ និងលោកគ្រូអ្នកគ្រូ RPITSSR' : 'RPITSSR Teaching Staff & Master Trainers'}
                 </h3>
-                <p className="faculty-banner-desc">
+                <p className="faculty-deck-desc">
                   {isKhmer
-                    ? 'វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប មានសាស្ត្រាចារ្យ និងគ្រូបច្ចេកទេសជំនាញជាង ១០៥ នាក់ ដែលត្រូវបានទទួលស្គាល់កម្រិតជាតិ និងមានបទពិសោធន៍បង្រៀនជាក់ស្តែងជាច្រើនឆ្នាំ។'
-                    : 'Over 105 certified instructors and faculty members dedicated to excellence in technical and vocational training.'}
+                    ? 'វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប មានសាស្ត្រាចារ្យ និងគ្រូបច្ចេកទេសជំនាញជាង ១០៥ នាក់ ដែលត្រូវបានទទួលស្គាល់កម្រិតជាតិ មានគរុកោសល្យខ្ពស់ និងបទពិសោធន៍បង្រៀនផ្សារភ្ជាប់ការងារជាក់ស្តែងក្នុងវិស័យឧស្សាហកម្មឌីជីថល វិស្វកម្ម សំណង់ និងទេសចរណ៍។'
+                    : 'Over 105 certified instructors and faculty members dedicated to excellence in technical and vocational training with practical industry expertise.'}
                 </p>
+
+                {/* 4 Feature highlight badges */}
+                <div className="faculty-deck-highlights">
+                  <div className="faculty-highlight-item">
+                    <div className="faculty-highlight-icon blue">
+                      <Users size={18} />
+                    </div>
+                    <div>
+                      <strong>{isKhmer ? '១០៥+ នាក់' : '105+ Faculty'}</strong>
+                      <span>{isKhmer ? 'សាស្ត្រាចារ្យជំនាញ' : 'Expert Trainers'}</span>
+                    </div>
+                  </div>
+
+                  <div className="faculty-highlight-item">
+                    <div className="faculty-highlight-icon gold">
+                      <Award size={18} />
+                    </div>
+                    <div>
+                      <strong>{isKhmer ? '១០០%' : '100%'}</strong>
+                      <span>{isKhmer ? 'គរុកោសល្យជាតិ' : 'Certified Pedagogy'}</span>
+                    </div>
+                  </div>
+
+                  <div className="faculty-highlight-item">
+                    <div className="faculty-highlight-icon green">
+                      <CheckCircle2 size={18} />
+                    </div>
+                    <div>
+                      <strong>{isKhmer ? '៧០% អនុវត្ត' : '70% Practical'}</strong>
+                      <span>{isKhmer ? 'រៀនក្នុង Lab ជាក់ស្តែង' : 'Hands-on Labs'}</span>
+                    </div>
+                  </div>
+
+                  <div className="faculty-highlight-item">
+                    <div className="faculty-highlight-icon purple">
+                      <Briefcase size={18} />
+                    </div>
+                    <div>
+                      <strong>{isKhmer ? 'ដៃគូឧស្សាហកម្ម' : 'Industry Partners'}</strong>
+                      <span>{isKhmer ? 'ឱកាសការងារ ៩៥%' : '95% Job Rate'}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <Link to="/teachers" onClick={scrollToTop} className="faculty-banner-btn">
-                <span>{isKhmer ? 'មើលប្រវត្តិរូបសាស្ត្រាចារ្យទាំងអស់' : 'Explore Faculty Directory'}</span>
-                <ArrowRight size={17} />
-              </Link>
+
+              <div className="faculty-deck-right">
+                <div className="faculty-cta-box">
+                  <div className="faculty-cta-icon-wrap">
+                    <Users size={24} />
+                  </div>
+                  <h4 className="faculty-cta-title">
+                    {isKhmer ? 'ស្វែងយល់ពីសាស្ត្រាចារ្យ' : 'Meet Our Instructors'}
+                  </h4>
+                  <p className="faculty-cta-subtitle">
+                    {isKhmer
+                      ? 'មើលជីវប្រវត្តិ ជំនាញឯកទេស និងបទពិសោធន៍ការងារជាក់ស្តែងរបស់លោកគ្រូអ្នកគ្រូ'
+                      : 'Browse full instructor profiles, research background, and department details.'}
+                  </p>
+                  <Link to="/teachers" onClick={scrollToTop} className="faculty-cta-btn">
+                    <span>{isKhmer ? 'មើលប្រវត្តិរូបសាស្ត្រាចារ្យទាំងអស់' : 'Explore Faculty Directory'}</span>
+                    <ArrowRight size={16} />
+                  </Link>
+                  <Link to="/contact" onClick={scrollToTop} className="faculty-cta-sublink">
+                    <PhoneCall size={13} />
+                    <span>{isKhmer ? 'ទំនាក់ទំនងផ្នែកសិក្សាធិការ' : 'Contact Academic Affairs'}</span>
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>

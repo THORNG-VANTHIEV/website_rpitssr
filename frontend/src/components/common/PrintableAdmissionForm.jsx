@@ -265,19 +265,22 @@ export const PrintableAdmissionForm = ({
         display: 'inline-flex',
         alignItems: 'flex-end',
         justifyContent: 'center',
-        padding: '0 2px',
-        lineHeight: '1.15'
+        padding: '0 2px 0 2px',
+        lineHeight: 1
       }}>
         {value ? (
           <span style={{
-            fontWeight: 700,
+            fontWeight: 600,
             color: '#000',
-            fontFamily: "'Khmer OS Battambang', 'Battambang', sans-serif",
+            fontFamily: 'inherit',
             fontSize: 'inherit',
             whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
+            overflow: 'visible',
             maxWidth: '100%',
+            lineHeight: 1,
+            display: 'inline-block',
+            position: 'relative',
+            top: '1.5px',
             ...valueStyle
           }}>
             {value}
@@ -351,16 +354,23 @@ export const PrintableAdmissionForm = ({
     </div>
   );
 
-  // Royal Divider SVG (Traditional divider: line - dot - diamond - dot - line)
-  const RoyalDivider = () => (
-    <div style={{ textAlign: 'center', margin: '2px 0 3px' }}>
-      <svg width="120" height="8" viewBox="0 0 120 8" fill="none" style={{ margin: '0 auto', display: 'block' }}>
-        <line x1="8" y1="4" x2="44" y2="4" stroke="#000" strokeWidth="0.8"/>
-        <circle cx="50" cy="4" r="1.5" fill="#000"/>
-        <rect x="57" y="1" width="6" height="6" transform="rotate(45 60 4)" fill="#000"/>
-        <circle cx="70" cy="4" r="1.5" fill="#000"/>
-        <line x1="76" y1="4" x2="112" y2="4" stroke="#000" strokeWidth="0.8"/>
-      </svg>
+  // Official Cambodian Royal Ornamental Divider (Authentic Tacteing '3' flourish from official template)
+  const RoyalDivider = ({ width = '95px', style = {} }) => (
+    <div style={{ textAlign: 'center', margin: '5px auto 4px', ...style }}>
+      <img
+        src="/images/tacteing_divider.png"
+        alt="Royal Divider"
+        style={{
+          width: width,
+          height: 'auto',
+          maxHeight: '6.5px',
+          display: 'block',
+          margin: '0 auto',
+          objectFit: 'contain',
+          printColorAdjust: 'exact',
+          WebkitPrintColorAdjust: 'exact'
+        }}
+      />
     </div>
   );
 
@@ -415,21 +425,62 @@ export const PrintableAdmissionForm = ({
           PRINT & TYPOGRAPHY STYLESHEET (MIXED ORIENTATIONS & KHMER OS FONTS)
           ========================================================================= */}
       <style>{`
+        @font-face {
+          font-family: 'Khmer OS Muol Light';
+          src: url('/fonts/KhmerOSMuolLight.ttf') format('truetype');
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+        }
+
+        @font-face {
+          font-family: 'Khmer OS Moul Light';
+          src: url('/fonts/KhmerOSMuolLight.ttf') format('truetype');
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+        }
+
+        @font-face {
+          font-family: 'Khmer OS Battambang';
+          src: url('/fonts/KhmerOSBattambang.ttf') format('truetype');
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+        }
+
+        @font-face {
+          font-family: 'Khmer OS Siemreap';
+          src: url('/fonts/KhmerOSSiemreap.ttf') format('truetype');
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+        }
+
+        @font-face {
+          font-family: 'Khmer OS Bokor';
+          src: url('/fonts/KhmerOSbokor.ttf') format('truetype');
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+        }
+
         /* Khmer OS Font Declarations - Strictly override global Kantumruy Pro */
         .fr02-page-1,
-        .fr02-page-2,
-        .fr02-page-3,
-        .fr02-page-1,
+        .fr02-page-1 :not(.fr02-muol):not(.fr02-muol *):not(.fr02-times):not(.fr02-times *):not(.fr02-bokor):not(.fr02-bokor *) {
+          font-family: 'Khmer OS Siemreap', 'Siemreap', 'Khmer OS Battambang', sans-serif !important;
+          color: #000000 !important;
+        }
+
         .fr02-page-2,
         .fr02-page-3,
         .fr02-page-4,
         .fr02-page-5,
-        .fr02-page-1 :not(.fr02-muol):not(.fr02-muol *):not(.fr02-times):not(.fr02-times *),
-        .fr02-page-2 :not(.fr02-muol):not(.fr02-muol *):not(.fr02-times):not(.fr02-times *),
-        .fr02-page-3 :not(.fr02-muol):not(.fr02-muol *):not(.fr02-times):not(.fr02-times *),
-        .fr02-page-4 :not(.fr02-muol):not(.fr02-muol *):not(.fr02-times):not(.fr02-times *),
-        .fr02-page-5 :not(.fr02-muol):not(.fr02-muol *):not(.fr02-times):not(.fr02-times *) {
-          font-family: 'Khmer OS Battambang', 'Battambang', sans-serif !important;
+        .fr02-page-2 :not(.fr02-muol):not(.fr02-muol *):not(.fr02-times):not(.fr02-times *):not(.fr02-bokor):not(.fr02-bokor *),
+        .fr02-page-3 :not(.fr02-muol):not(.fr02-muol *):not(.fr02-times):not(.fr02-times *):not(.fr02-bokor):not(.fr02-bokor *),
+        .fr02-page-4 :not(.fr02-muol):not(.fr02-muol *):not(.fr02-times):not(.fr02-times *):not(.fr02-bokor):not(.fr02-bokor *),
+        .fr02-page-5 :not(.fr02-muol):not(.fr02-muol *):not(.fr02-times):not(.fr02-times *):not(.fr02-bokor):not(.fr02-bokor *) {
+          font-family: 'Khmer OS Battambang', 'Khmer OS Siemreap', 'Siemreap', 'Battambang', sans-serif !important;
           color: #000000 !important;
         }
 
@@ -450,14 +501,14 @@ export const PrintableAdmissionForm = ({
         .fr02-page-3 .fr02-header-gray,
         .fr02-page-4 .fr02-header-gray,
         .fr02-page-5 .fr02-header-gray {
-          font-family: 'Moul', 'Khmer OS Muol Light', 'Khmer OS Moul Light', 'Khmer OS Moul', serif !important;
+          font-family: 'Khmer OS Muol Light', 'Khmer OS Moul Light', 'Moul', serif !important;
           font-weight: normal !important;
           color: #000000 !important;
         }
 
         .fr02-battambang,
         .fr02-battambang * {
-          font-family: 'Khmer OS Battambang', 'Battambang', sans-serif !important;
+          font-family: 'Khmer OS Battambang', 'Khmer OS Siemreap', 'Siemreap', 'Battambang', sans-serif !important;
           color: #000000 !important;
         }
 
@@ -474,6 +525,19 @@ export const PrintableAdmissionForm = ({
         .fr02-page-5 .fr02-times,
         .fr02-page-5 .fr02-times * {
           font-family: 'Times New Roman', Times, serif !important;
+          color: #000000 !important;
+        }
+
+        .fr02-bokor,
+        .fr02-bokor *,
+        .fr02-page-1 .fr02-bokor,
+        .fr02-page-1 .fr02-bokor *,
+        .fr02-page-2 .fr02-bokor,
+        .fr02-page-2 .fr02-bokor *,
+        .fr02-page-5 .fr02-bokor,
+        .fr02-page-5 .fr02-bokor * {
+          font-family: 'Khmer OS Bokor', serif !important;
+          font-weight: normal !important;
           color: #000000 !important;
         }
 
@@ -496,14 +560,14 @@ export const PrintableAdmissionForm = ({
           padding: 6.5mm 8.0mm 6.5mm 8.0mm;
           box-sizing: border-box;
           color: #000000 !important;
-          font-size: 9.3pt;
-          line-height: 1.70;
+          font-size: 11pt;
+          line-height: 1.60;
           position: relative;
           box-shadow: 0 10px 40px rgba(0,0,0,0.5);
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          font-family: 'Khmer OS Battambang', 'Battambang', sans-serif;
+          font-family: 'Siemreap', 'Battambang', 'Kantumruy Pro', sans-serif;
           overflow: hidden;
         }
 
@@ -523,7 +587,7 @@ export const PrintableAdmissionForm = ({
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          font-family: 'Khmer OS Battambang', 'Battambang', sans-serif;
+          font-family: 'Siemreap', 'Battambang', 'Kantumruy Pro', sans-serif;
           overflow: hidden;
         }
 
@@ -542,7 +606,7 @@ export const PrintableAdmissionForm = ({
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          font-family: 'Khmer OS Battambang', 'Battambang', sans-serif;
+          font-family: 'Siemreap', 'Battambang', 'Kantumruy Pro', sans-serif;
           overflow: hidden;
         }
 
@@ -561,7 +625,7 @@ export const PrintableAdmissionForm = ({
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          font-family: 'Khmer OS Battambang', 'Battambang', sans-serif;
+          font-family: 'Siemreap', 'Battambang', 'Kantumruy Pro', sans-serif;
           overflow: hidden;
         }
 
@@ -581,7 +645,7 @@ export const PrintableAdmissionForm = ({
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          font-family: 'Khmer OS Battambang', 'Battambang', sans-serif;
+          font-family: 'Siemreap', 'Battambang', 'Kantumruy Pro', sans-serif;
           overflow: hidden;
         }
 
@@ -589,7 +653,7 @@ export const PrintableAdmissionForm = ({
           background-color: #d1d5db !important;
           -webkit-print-color-adjust: exact !important;
           print-color-adjust: exact !important;
-          font-family: 'Khmer OS Muol Light', 'Khmer OS Moul Light', 'Khmer OS Moul', 'Moul', serif !important;
+          font-family: 'Moul', serif !important;
           font-weight: 400 !important;
           text-align: center;
           font-size: 9.8pt;
@@ -920,14 +984,14 @@ export const PrintableAdmissionForm = ({
               <div style={{ position: 'relative', minHeight: '34mm', marginBottom: '3mm' }}>
                 {/* Top Center: Kingdom & Motto */}
                 <div style={{ textAlign: 'center', width: '100%', paddingTop: '0px' }}>
-                  <div className="fr02-muol" style={{ fontSize: '13pt', lineHeight: 1.25 }}>ព្រះរាជាណាចក្រកម្ពុជា</div>
-                  <div className="fr02-muol" style={{ fontSize: '11pt', lineHeight: 1.25, marginTop: '2px' }}>ជាតិ សាសនា ព្រះមហាក្សត្រ</div>
-                  <RoyalDivider />
+                  <div className="fr02-muol" style={{ fontSize: '13pt', lineHeight: 1.45 }}>ព្រះរាជាណាចក្រកម្ពុជា</div>
+                  <div className="fr02-bokor" style={{ fontSize: '13.5pt', lineHeight: 1.4, marginTop: '4px' }}>ជាតិ សាសនា ព្រះមហាក្សត្រ</div>
+                  <RoyalDivider width="95px" style={{ margin: '5px auto 4px' }} />
                 </div>
 
                 {/* Left: Ministry & Institute (positioned on left, aligning below Royal Divider) */}
                 <div style={{ position: 'absolute', top: '15mm', left: 0 }}>
-                  <div className="fr02-muol" style={{ fontSize: '10.5pt', lineHeight: 1.35, whiteSpace: 'nowrap' }}>ក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ:</div>
+                  <div className="fr02-muol" style={{ fontSize: '10.5pt', lineHeight: 1.35, whiteSpace: 'nowrap' }}>ក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ</div>
                   <div className="fr02-muol" style={{ fontSize: '10.5pt', lineHeight: 1.35, marginTop: '3px', whiteSpace: 'nowrap' }}>
                     វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប
                   </div>
@@ -958,16 +1022,16 @@ export const PrintableAdmissionForm = ({
               </div>
 
               {/* Title Page 1 */}
-              <div style={{ textAlign: 'center', margin: '4mm 0 4mm' }}>
-                <div className="fr02-muol" style={{ fontSize: '15.5pt', margin: 0, color: '#000000', lineHeight: 1.3 }}>
+              <div style={{ textAlign: 'center', margin: '3.5mm 0 3.5mm' }}>
+                <div className="fr02-muol" style={{ fontSize: '13.5pt', margin: 0, color: '#000000', lineHeight: 1.35 }}>
                   ពាក្យសុំចុះឈ្មោះចូលរៀន
                 </div>
               </div>
 
               {/* Bio Summary Page 1 with Complete Continuous Dot Leaders */}
-              <div className="fr02-battambang" style={{ fontSize: '9.3pt', lineHeight: 1.72, color: '#000000' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '2px' }}>
-                  <span style={{ whiteSpace: 'nowrap' }}>ខ្ញុំបាទ/នាងខ្ញុំឈ្មោះ:</span>
+              <div className="fr02-battambang" style={{ fontSize: '11pt', lineHeight: 1.62, color: '#000000' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '3px' }}>
+                  <span style={{ whiteSpace: 'nowrap' }}>ខ្ញុំបាទ/នាងខ្ញុំឈ្មោះ៖</span>
                   <DottedField value={admission.khmerName} flex="1.2" />
                   <span style={{ marginLeft: '8px', whiteSpace: 'nowrap' }}>អក្សរឡាតាំង</span>
                   <DottedField value={admission.latinName} flex="1.2" valueStyle={{ textTransform: 'uppercase' }} />
@@ -975,7 +1039,7 @@ export const PrintableAdmissionForm = ({
                   <DottedField value={admission.gender === 'male' ? 'ប្រុស' : admission.gender === 'female' ? 'ស្រី' : ''} width="55px" />
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '2px' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '3px' }}>
                   <span style={{ whiteSpace: 'nowrap' }}>ជនជាតិ</span>
                   <DottedField value={admission.ethnicity || 'ខ្មែរ'} flex="0.9" />
                   <span style={{ marginLeft: '8px', whiteSpace: 'nowrap' }}>សញ្ជាតិ</span>
@@ -990,74 +1054,93 @@ export const PrintableAdmissionForm = ({
                   <DottedField value={toKhmerNum(dobParts.year)} width="58px" />
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '2px' }}>
-                  <span style={{ whiteSpace: 'nowrap' }}>ទីកន្លែងកំណើត:</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '3px' }}>
+                  <span style={{ whiteSpace: 'nowrap' }}>ទីកន្លែងកំណើត៖</span>
                   <DottedField value={fullPobAddress} flex="1" />
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '2px' }}>
-                  <span style={{ whiteSpace: 'nowrap' }}>អាសយដ្ឋានបច្ចុប្បន្ន:</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '3px' }}>
+                  <span style={{ whiteSpace: 'nowrap' }}>អាសយដ្ឋានបច្ចុប្បន្ន៖</span>
                   <DottedField value={fullCurrentAddress} flex="1" />
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '2px' }}>
-                  <span style={{ whiteSpace: 'nowrap' }}>លេខទំនាក់ទំនងផ្ទាល់ខ្លួន:</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '3px' }}>
+                  <span style={{ whiteSpace: 'nowrap' }}>លេខទំនាក់ទំនងផ្ទាល់ខ្លួន៖</span>
                   <DottedField value={admission.phone} flex="1" />
                   <span style={{ marginLeft: '10px', whiteSpace: 'nowrap' }}>លេខទំនាក់ទំនងអាណាព្យាបាល</span>
                   <DottedField value={admission.guardianPhone} flex="1" />
                 </div>
 
-                {/* Addressing Leadership */}
-                <div className="fr02-muol" style={{ textAlign: 'center', margin: '14px 0 4px', fontSize: '11.5pt', color: '#000000' }}>
+                {/* Addressing Leadership (Matching official Word LTSC template: លោកស្រី នាយិកា) */}
+                <div className="fr02-muol" style={{ textAlign: 'center', margin: '12px 0 3px', fontSize: '12pt', color: '#000000', lineHeight: 1.35 }}>
                   សូមគោរពជូន
                 </div>
-                <div className="fr02-muol" style={{ textAlign: 'center', fontSize: '12pt', marginBottom: '12px', color: '#000000' }}>
+                <div className="fr02-muol" style={{ textAlign: 'center', fontSize: '12pt', marginBottom: '10px', color: '#000000', lineHeight: 1.35 }}>
                   លោកស្រី នាយិកាវិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប
                 </div>
 
-                <div style={{ textIndent: '32px', textAlign: 'justify', marginBottom: '6px' }}>
-                  សូមលោកស្រីនាយិកាមេត្តាអនុញ្ញាតចុះឈ្មោះខ្ញុំបាទ/នាងខ្ញុំ &nbsp; &nbsp; &nbsp; ក្នុងបញ្ជីសិក្សានៅវិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោ<br />
-                  សែនសៀមរាប សម្រាប់ឆ្នាំសិក្សា <strong>{toKhmerNum(admission.academicYear) || '២០.....-២០.....'}</strong>។
+                {/* Paragraph 1: Exact indent 49.7pt, line 1 justified to right margin, Line 2 flush left 0px */}
+                <div style={{ marginBottom: '6px', lineHeight: 1.65, fontSize: '11pt' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '49.7pt' }}>
+                    <span style={{ whiteSpace: 'nowrap' }}>សូមលោកស្រីនាយិកាមេត្តាអនុញ្ញាតចុះឈ្មោះខ្ញុំបាទ/នាងខ្ញុំ</span>
+                    <span style={{ whiteSpace: 'nowrap' }}>ក្នុងបញ្ជីសិក្សានៅវិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោ</span>
+                  </div>
+                  <div style={{ textAlign: 'left' }}>
+                    សែនសៀមរាប សម្រាប់ឆ្នាំសិក្សា <strong>{toKhmerNum(admission.academicYear) || '២០.....-២០.....'}</strong>។
+                  </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '6px' }}>
-                  <span style={{ whiteSpace: 'nowrap', textIndent: '32px' }}>កម្រិតសិក្សា៖</span>
-                  <DottedField value={degreeKhmer} flex="1" />
-                  <span style={{ marginLeft: '8px', whiteSpace: 'nowrap' }}>ឆ្នាំទី</span>
-                  <DottedField value="១" width="38px" />
-                  <span style={{ marginLeft: '8px', whiteSpace: 'nowrap' }}>ជំនាញឯកទេស៖</span>
+                {/* Major & Year: Indented 49.7pt, right edge stretches to right margin */}
+                <div style={{ display: 'flex', alignItems: 'baseline', paddingLeft: '49.7pt', marginBottom: '6px', lineHeight: 1.65, fontSize: '11pt' }}>
+                  <span style={{ whiteSpace: 'nowrap' }}>កម្រិតសិក្សា៖</span>
+                  <DottedField value={degreeKhmer} flex="1.1" />
+                  <span style={{ marginLeft: '12px', whiteSpace: 'nowrap' }}>ឆ្នាំទី</span>
+                  <DottedField value="១" width="45px" />
+                  <span style={{ marginLeft: '12px', whiteSpace: 'nowrap' }}>ជំនាញឯកទេស៖</span>
                   <DottedField value={admission.major} flex="1.5" />
                 </div>
 
-                <div style={{
-                  marginTop: '4px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  whiteSpace: 'nowrap',
-                  lineHeight: 1.5
-                }}>
-                  <span style={{ marginRight: '2px' }}>វេនសិក្សា៖</span>
-                  <Box checked={isShiftMorning} label="ចន្ទ-សុក្រ(ព្រឹក)" style={{ marginRight: '0' }} />
-                  <Box checked={isShiftAfternoon} label="ចន្ទ-សុក្រ(រសៀល)" style={{ marginRight: '0' }} />
-                  <Box checked={isShiftBoth} label="ចន្ទ-សុក្រ(ព្រឹក-រសៀល)" style={{ marginRight: '0' }} />
-                  <Box checked={isShiftEvening} label="ចន្ទ-សុក្រ(យប់)" style={{ marginRight: '0' }} />
-                  <Box checked={isShiftWeekend} label="សៅរ៍-អាទិត្យ(ព្រឹក-រសៀល)" style={{ marginRight: '0' }} />
+                {/* Study Shifts: Flush left 0px, distributed checkboxes to right margin */}
+                <div style={{ marginTop: '4px', marginBottom: '6px', lineHeight: 1.55, fontSize: '11pt' }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    <span>វេនសិក្សា៖</span>
+                    <Box checked={isShiftMorning} label="ចន្ទ-សុក្រ(ព្រឹក)" style={{ marginRight: 0 }} />
+                    <Box checked={isShiftAfternoon} label="ចន្ទ-សុក្រ(រសៀល)" style={{ marginRight: 0 }} />
+                    <Box checked={isShiftBoth} label="ចន្ទ-សុក្រ(ព្រឹក-រសៀល)" style={{ marginRight: 0 }} />
+                    <Box checked={isShiftEvening} label="ចន្ទ-សុក្រ(យប់)" style={{ marginRight: 0 }} />
+                    <Box checked={isShiftWeekend} label="សៅរ៍-អាទិត្យ" style={{ marginRight: 0 }} />
+                  </div>
+                  <div style={{ lineHeight: 1.25, marginTop: '1px', textAlign: 'left' }}>
+                    (ព្រឹក-រសៀល)
+                  </div>
                 </div>
 
-                <div style={{ textIndent: '32px', textAlign: 'justify', marginTop: '10px' }}>
-                  ខ្ញុំបាទ/ នាងខ្ញុំ សូមសន្យា គោរពបទបញ្ជាផ្ទៃក្នុង និងអនុវត្តតាមកម្មវិធីសិក្សារបស់វិទ្យាស្ថានយ៉ាងខ្ជាប់ខ្ជួន បើមានការប្រព្រឹត្តិ<br />
-                  ខុសដោយប្រការណាមួយ ខ្ញុំបាទ/ នាងខ្ញុំ សូមទទួលយកការវិនិច្ឆ័យរបស់ក្រុមប្រឹក្សាវិន័យរបស់វិទ្យាស្ថានដោយពុំមានការតវ៉ាឡើយ។
+                {/* Pledge Paragraph: Line 1 indented 49.7pt & justified to right; Line 2 flush left 0px & justified to right */}
+                <div style={{ marginTop: '8px', marginBottom: '8px', lineHeight: 1.65, fontSize: '10.5pt' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '49.7pt' }}>
+                    <span style={{ whiteSpace: 'nowrap' }}>ខ្ញុំបាទ/ នាងខ្ញុំ សូមសន្យា គោរពបទបញ្ជាផ្ទៃក្នុង</span>
+                    <span style={{ whiteSpace: 'nowrap' }}>និងអនុវត្តតាមកម្មវិធីសិក្សារបស់វិទ្យាស្ថានយ៉ាងខ្ជាប់ខ្ជួន បើមានការប្រព្រឹត្តិ</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ whiteSpace: 'nowrap' }}>ខុសដោយប្រការណាមួយ ខ្ញុំបាទ/ នាងខ្ញុំ</span>
+                    <span style={{ whiteSpace: 'nowrap' }}>សូមទទួលយកការវិនិច្ឆ័យរបស់ក្រុមប្រឹក្សាវិន័យរបស់វិទ្យាស្ថានដោយពុំមានការតវ៉ាឡើយ។</span>
+                  </div>
                 </div>
 
-                <div style={{ textAlign: 'center', margin: '10px 0 10px 0' }}>
+                {/* Closing Respect: Indented 49.7pt, left aligned */}
+                <div style={{ paddingLeft: '49.7pt', textAlign: 'left', marginTop: '8px', marginBottom: '8px', lineHeight: 1.65, fontSize: '11pt' }}>
                   សូមលោកស្រីនាយិកា មេត្តាទទួលនូវការគោរពដ៏ខ្ពង់ខ្ពស់អំពីខ្ញុំបាទ/នាងខ្ញុំ។
                 </div>
 
                 {/* Attachments Section: Full page-width dot leaders (Matching official Word LTSC PDF) */}
-                <div style={{ marginTop: '10px' }}>
-                  <div style={{ fontWeight: 700, marginBottom: '3px' }}>សូមភ្ជាប់មកជាមួយ:</div>
-                  <div style={{ paddingLeft: '20px', lineHeight: 1.75 }}>
+                <div style={{ marginTop: '8px', fontSize: '10pt' }}>
+                  <div style={{ fontWeight: 700, marginBottom: '3px' }}>សូមភ្ជាប់មកជាមួយ៖</div>
+                  <div style={{ paddingLeft: '38.6pt', lineHeight: 1.7 }}>
                     <div style={{ display: 'flex', alignItems: 'baseline' }}>
                       <span style={{ whiteSpace: 'nowrap' }}>• &nbsp; អត្តសញ្ញាណប័ណ្ណ(កូពី)</span>
                       <span style={{ flex: 1, borderBottom: '1px dotted #000', margin: '0 6px' }}></span>
@@ -1082,14 +1165,14 @@ export const PrintableAdmissionForm = ({
                 </div>
 
                 {/* Date & Signature Section: Positioned below attachments, aligned on the right */}
-                <div style={{ width: '52%', marginLeft: 'auto', textAlign: 'center', marginTop: '10px', lineHeight: 1.55 }}>
+                <div style={{ width: '52%', marginLeft: 'auto', textAlign: 'center', marginTop: '8px', lineHeight: 1.55 }}>
                   <div>ថ្ងៃ...........................ខែ..................ឆ្នាំ............ ព.ស ២៥......</div>
                   <div style={{ marginTop: '2px' }}>
                     សៀមរាប ថ្ងៃទី {toKhmerNum(today.day)} ខែ {toKhmerNum(today.month)} ឆ្នាំ {toKhmerNum(today.year)}
                   </div>
                   <div style={{ fontWeight: 700, marginTop: '4px' }}>ហត្ថលេខា/ឈ្មោះសាមីខ្លួន</div>
                   {admission.khmerName && (
-                    <div style={{ fontWeight: 700, marginTop: '24px' }}>{admission.khmerName}</div>
+                    <div style={{ fontWeight: 700, marginTop: '20px' }}>{admission.khmerName}</div>
                   )}
                 </div>
               </div>
@@ -1108,45 +1191,45 @@ export const PrintableAdmissionForm = ({
               {/* Outer Top Box with 1px black border - Exact official layout matching Word LTSC PDF */}
               <div style={{ border: '1px solid #000', marginBottom: '5px' }}>
                 {/* Header Top: Logo on Left, Centered Institute Titles on Right */}
-                <div style={{ display: 'flex', alignItems: 'flex-start', padding: '6px 12px 2px 12px' }}>
-                  <div style={{ width: '102px', flexShrink: 0, textAlign: 'center', paddingTop: '1px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', padding: '8px 14px 4px 14px' }}>
+                  <div style={{ width: '104px', flexShrink: 0, textAlign: 'center', paddingTop: '2px' }}>
                     <img
                       src="/images/logo.png"
                       alt="RPITSSR"
                       style={{ width: '96px', height: '96px', objectFit: 'contain', display: 'block', margin: '0 auto' }}
                     />
                   </div>
-                  <div style={{ flex: 1, textAlign: 'center', paddingRight: '102px', paddingTop: '1px' }}>
-                    <div className="fr02-muol" style={{ fontSize: '12pt', lineHeight: 1.3, color: '#000000' }}>
+                  <div style={{ flex: 1, textAlign: 'center', paddingRight: '104px', paddingTop: '1px' }}>
+                    <div className="fr02-muol" style={{ fontSize: '12pt', lineHeight: 1.35, color: '#000000' }}>
                       វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប
                     </div>
-                    <div className="fr02-times" style={{ fontSize: '14pt', fontWeight: 400, color: '#000000', margin: '1px 0 2px 0' }}>
+                    <div className="fr02-times" style={{ fontSize: '13.5pt', fontWeight: 400, color: '#000000', margin: '2px 0 3px 0' }}>
                       Regional Polytechnic Institute Techo Sen Siem Reap
                     </div>
-                    <div className="fr02-muol" style={{ fontSize: '12.5pt', lineHeight: 1.45, margin: '4px 0 6px 0', color: '#000000' }}>
+                    <div className="fr02-muol" style={{ fontSize: '12.5pt', lineHeight: 1.35, margin: '2px 0 4px 0', color: '#000000' }}>
                       ពាក្យសុំចុះឈ្មោះចូលរៀន
                     </div>
-                    <div className="fr02-muol" style={{ textAlign: 'center', lineHeight: 1.45, margin: '5px 0 4px 0', fontSize: '11pt' }}>
-                      <Box checked={isScholarship} label="អាហារូបករណ៍" style={{ marginRight: '55px' }} boxStyle={{ width: '11.5px', height: '11.5px', fontSize: '9px', marginRight: '5px' }} />
-                      <Box checked={!isScholarship} label="បង់ថ្លៃ" boxStyle={{ width: '11.5px', height: '11.5px', fontSize: '9px', marginRight: '5px' }} />
+                    <div className="fr02-muol" style={{ textAlign: 'center', lineHeight: 1.35, margin: '4px 0 2px 0', fontSize: '12pt' }}>
+                      <Box checked={isScholarship} label="អាហារូបករណ៍" style={{ marginRight: '64px' }} boxStyle={{ width: '11.5px', height: '11.5px', fontSize: '9px', marginRight: '6px' }} />
+                      <Box checked={!isScholarship} label="បង់ថ្លៃ" boxStyle={{ width: '11.5px', height: '11.5px', fontSize: '9px', marginRight: '6px' }} />
                     </div>
                   </div>
                 </div>
 
                 {/* Header Body: 3 Structured Rows with Dedicated Label Columns */}
-                <div style={{ padding: '0 12px 8px 12px' }}>
+                <div style={{ padding: '0 14px 4px 14px' }}>
                   {/* Row 1: Degree Levels */}
-                  <div style={{ display: 'flex', alignItems: 'center', marginTop: '5px' }}>
-                    <div className="fr02-muol" style={{ width: '13%', fontSize: '9.2pt', textAlign: 'left', flexShrink: 0 }}>
-                      កម្រិតសិក្សា:
+                  <div style={{ display: 'flex', alignItems: 'flex-start', marginTop: '3px' }}>
+                    <div className="fr02-muol" style={{ width: '21%', fontSize: '12pt', textAlign: 'left', flexShrink: 0, lineHeight: 1.42 }}>
+                      កម្រិតសិក្សា៖
                     </div>
-                    <div style={{ width: '87%', display: 'grid', gridTemplateColumns: '1.05fr 1fr', gap: '5px 10px', fontSize: '8.3pt', lineHeight: 1.45 }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ width: '79%', display: 'grid', gridTemplateColumns: '1.02fr 1fr', gap: '2px 12px', fontSize: '12pt', lineHeight: 1.42 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                         <Box checked={isBachelor} label="បរិញ្ញាបត្របច្ចេកវិទ្យា/ឯកទេស" />
                         <Box checked={isC3} label="សញ្ញាបត្របច្ចេកទេស និងវិជ្ជាជីវៈ ៣" />
                         <Box checked={isC1} label="សញ្ញាបត្របច្ចេកទេស និងវិជ្ជាជីវៈ ១" />
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                         <Box checked={isHigherDip} label="សញ្ញាបត្រជាន់ខ្ពស់បច្ចេកទេស" />
                         <Box checked={isC2} label="សញ្ញាបត្របច្ចេកទេស និងវិជ្ជាជីវៈ ២" />
                         <Box checked={isShortCourse} label={`វិញ្ញាបនបត្រវិជ្ជាជីវៈ: (${isShortCourse ? admission.major : '.......................'})`} />
@@ -1155,33 +1238,47 @@ export const PrintableAdmissionForm = ({
                   </div>
 
                   {/* Row 2: Study Application */}
-                  <div style={{ display: 'flex', alignItems: 'baseline', marginTop: '8px' }}>
-                    <div className="fr02-muol" style={{ width: '13%', fontSize: '9.2pt', textAlign: 'left', flexShrink: 0 }}>
-                      សុំចូលរៀន:
+                  <div style={{ display: 'flex', alignItems: 'baseline', marginTop: '5px' }}>
+                    <div className="fr02-muol" style={{ width: '21%', fontSize: '12pt', textAlign: 'left', flexShrink: 0 }}>
+                      សុំចូលរៀន៖
                     </div>
-                    <div style={{ width: '87%', display: 'flex', alignItems: 'baseline', fontSize: '8.3pt' }}>
-                      <span>ឆ្នាំទី</span>
-                      <DottedField value={toKhmerNum(admission.studyYear || '១')} width="36px" />
-                      <span style={{ marginLeft: '10px' }}>ឆមាសទី</span>
-                      <DottedField value={toKhmerNum(admission.semester || '១')} width="36px" />
-                      <span style={{ marginLeft: '12px' }}>មុខជំនាញ:</span>
-                      <DottedField value={admission.major} flex="1" />
+                    <div style={{ width: '79%', display: 'flex', alignItems: 'baseline', fontSize: '12pt' }}>
+                      <span style={{ whiteSpace: 'nowrap' }}>ឆ្នាំទី</span>
+                      {admission.studyYear ? (
+                        <DottedField value={toKhmerNum(admission.studyYear)} width="48px" />
+                      ) : (
+                        <span style={{ letterSpacing: '1px', margin: '0 2px' }}>............</span>
+                      )}
+                      <span style={{ marginLeft: '12px', whiteSpace: 'nowrap' }}>ឆមាសទី</span>
+                      {admission.semester ? (
+                        <DottedField value={toKhmerNum(admission.semester)} width="48px" />
+                      ) : (
+                        <span style={{ letterSpacing: '1px', margin: '0 2px' }}>............</span>
+                      )}
+                      <span style={{ marginLeft: '14px', whiteSpace: 'nowrap' }}>មុខជំនាញ៖</span>
+                      {admission.major ? (
+                        <DottedField value={admission.major} flex="1" />
+                      ) : (
+                        <span style={{ flex: 1, letterSpacing: '1px', overflow: 'hidden', whiteSpace: 'nowrap', marginLeft: '2px' }}>
+                          ........................................................................................................
+                        </span>
+                      )}
                     </div>
                   </div>
 
                   {/* Row 3: Shifts */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', marginTop: '8px' }}>
-                    <div className="fr02-muol" style={{ width: '13%', fontSize: '9.2pt', paddingTop: '1px', textAlign: 'left', flexShrink: 0 }}>
-                      វេនសិក្សា:
+                  <div style={{ display: 'flex', alignItems: 'flex-start', marginTop: '5px' }}>
+                    <div className="fr02-muol" style={{ width: '21%', fontSize: '12pt', paddingTop: '1px', textAlign: 'left', flexShrink: 0 }}>
+                      វេនសិក្សា៖
                     </div>
-                    <div style={{ width: '87%', fontSize: '8.0pt' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', whiteSpace: 'nowrap' }}>
+                    <div style={{ width: '79%', fontSize: '11pt' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', whiteSpace: 'nowrap' }}>
                         <Box checked={isShiftMorning} label="ចន្ទ-សុក្រ(ព្រឹក)" />
                         <Box checked={isShiftAfternoon} label="ចន្ទ-សុក្រ(រសៀល)" />
                         <Box checked={isShiftBoth} label="ចន្ទ-សុក្រ(ព្រឹក-រសៀល)" />
                         <Box checked={isShiftEvening} label="ចន្ទ-សុក្រ(យប់)" />
                       </div>
-                      <div style={{ marginTop: '4px' }}>
+                      <div style={{ marginTop: '2px' }}>
                         <Box checked={isShiftWeekend} label="សៅរ៍-អាទិត្យ(ព្រឹក-រសៀល)" />
                       </div>
                     </div>
@@ -1189,32 +1286,49 @@ export const PrintableAdmissionForm = ({
                 </div>
 
                 {/* Data Clerk Usage Sub-row with continuous dotted lines */}
-                <div style={{ borderTop: '1px solid #000', padding: '5px 12px', fontSize: '7.8pt', background: '#ffffff' }}>
-                  <div className="fr02-times" style={{ textAlign: 'center', fontWeight: 700, fontSize: '8.4pt', marginBottom: '3px' }}>Data Clerk Usage</div>
-                  <div className="fr02-times" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '14px' }}>
-                    <div style={{ display: 'flex', alignItems: 'baseline', flex: '1 1 auto' }}>
+                <div style={{ borderTop: '1px solid #000', padding: '6px 14px 8px 14px', fontSize: '11pt', background: '#ffffff' }}>
+                  <div className="fr02-times" style={{ textAlign: 'center', fontWeight: 400, fontSize: '11pt', marginBottom: '4px' }}>Data Clerk Usage</div>
+                  <div className="fr02-times" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: '11pt' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', flex: '1.2 1 auto' }}>
                       <span style={{ whiteSpace: 'nowrap' }}>Student Record #:</span>
-                      <span style={{ flex: 1, borderBottom: '1px dotted #000', padding: '0 4px', fontWeight: 700 }}>{admission.trackingCode || ''}</span>
+                      {admission.trackingCode ? (
+                        <span style={{ flex: 1, borderBottom: '1px dotted #000', padding: '0 4px', fontWeight: 600 }}>{admission.trackingCode}</span>
+                      ) : (
+                        <span style={{ flex: 1, overflow: 'hidden', whiteSpace: 'nowrap', letterSpacing: '1px', paddingLeft: '2px' }}>
+                          ..................................................
+                        </span>
+                      )}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', flex: '1 1 auto' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', flex: '1 1 auto', margin: '0 10px' }}>
                       <span style={{ whiteSpace: 'nowrap' }}>Entry Date:</span>
-                      <span style={{ flex: 1, borderBottom: '1px dotted #000', padding: '0 4px', textAlign: 'center' }}>{today.day}/{today.month}/{today.year}</span>
+                      {admission.trackingCode ? (
+                        <span style={{ flex: 1, borderBottom: '1px dotted #000', padding: '0 4px', textAlign: 'center' }}>
+                          {today.day}/{today.month}/{today.year}
+                        </span>
+                      ) : (
+                        <span style={{ flex: 1, letterSpacing: '1px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          ........../........../..........
+                        </span>
+                      )}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', flex: '1.2 1 auto' }}>
                       <span style={{ whiteSpace: 'nowrap' }}>Controlled by:</span>
-                      <span style={{ flex: 1, borderBottom: '1px dotted #000', padding: '0 4px' }}>&nbsp;</span>
+                      <span style={{ flex: 1, overflow: 'hidden', whiteSpace: 'nowrap', letterSpacing: '1px', paddingLeft: '2px' }}>
+                        ..................................................
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Gray Banner: (A) ជីវប្រវត្តិសិស្ស */}
-              <div className="fr02-header-gray" style={{ height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10.5pt', margin: '4px 0 0 0', background: '#c0c0c0', border: '1px solid #000', borderBottom: 'none' }}>
-                (A) ជីវប្រវត្តិសិស្ស
+              <div style={{ height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '3px 0 0 0', background: '#b8b8b8', border: '1px solid #000', borderBottom: 'none' }}>
+                <span className="fr02-times" style={{ fontWeight: 700, marginRight: '8px', fontSize: '10.5pt', color: '#000000' }}>(A)</span>
+                <span className="fr02-muol" style={{ fontSize: '10.5pt', color: '#000000' }}>ជីវប្រវត្តិសិស្ស</span>
               </div>
 
               {/* Section A Table Grid */}
-              <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #000', borderTop: 'none', fontSize: '8.3pt', tableLayout: 'fixed' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #000', borderTop: 'none', fontSize: '9pt', tableLayout: 'fixed' }}>
                 <colgroup>
                   <col style={{ width: '12%' }} />
                   <col style={{ width: '28%' }} />
@@ -1223,14 +1337,14 @@ export const PrintableAdmissionForm = ({
                 <tbody>
                   {/* Row 1: 1*. គោត្តនាម & នាម */}
                   <tr>
-                    <td colSpan="3" style={{ border: '1px solid #000', padding: '6px 10px' }}>
+                    <td colSpan="3" style={{ border: '1px solid #000', padding: '5px 10px' }}>
                       <div style={{ display: 'flex', alignItems: 'baseline' }}>
                         <span style={{ width: '50%', display: 'flex', alignItems: 'baseline' }}>
-                          <span style={{ whiteSpace: 'nowrap' }}>1*. គោត្តនាម:</span>
+                          <span style={{ whiteSpace: 'nowrap' }}>1*. គោត្តនាម៖</span>
                           <DottedField value={khmerLastName} flex="1" />
                         </span>
                         <span style={{ width: '50%', display: 'flex', alignItems: 'baseline', paddingLeft: '14px' }}>
-                          <span style={{ whiteSpace: 'nowrap' }}>នាម:</span>
+                          <span style={{ whiteSpace: 'nowrap' }}>នាម៖</span>
                           <DottedField value={khmerFirstName} flex="1" />
                         </span>
                       </div>
@@ -1239,7 +1353,7 @@ export const PrintableAdmissionForm = ({
 
                   {/* Row 2: 2*. Family Name & First Name */}
                   <tr>
-                    <td colSpan="3" style={{ border: '1px solid #000', padding: '6px 10px' }}>
+                    <td colSpan="3" style={{ border: '1px solid #000', padding: '5px 10px' }}>
                       <div className="fr02-times" style={{ display: 'flex', alignItems: 'baseline' }}>
                         <span style={{ width: '50%', display: 'flex', alignItems: 'baseline' }}>
                           <span style={{ whiteSpace: 'nowrap' }}>2*. Family Name:</span>
@@ -1256,60 +1370,60 @@ export const PrintableAdmissionForm = ({
                   {/* Row 3: 3*, 4*, 5, 6 */}
                   <tr>
                     {/* 3*. ភេទ */}
-                    <td style={{ border: '1px solid #000', width: '12%', verticalAlign: 'top', padding: '6px 8px' }}>
-                      <div style={{ whiteSpace: 'nowrap' }}>3*. ភេទ:</div>
-                      <div style={{ marginTop: '6px' }}><Box checked={admission.gender === 'female'} label="ស្រី" /></div>
-                      <div style={{ marginTop: '5px' }}><Box checked={admission.gender === 'male'} label="ប្រុស" /></div>
+                    <td style={{ border: '1px solid #000', width: '12%', verticalAlign: 'top', padding: '5px 8px' }}>
+                      <div style={{ whiteSpace: 'nowrap' }}>3*. ភេទ៖</div>
+                      <div style={{ marginTop: '5px' }}><Box checked={admission.gender === 'female'} label="ស្រី" /></div>
+                      <div style={{ marginTop: '4px' }}><Box checked={admission.gender === 'male'} label="ប្រុស" /></div>
                     </td>
 
                     {/* 4*. ថ្ងៃខែឆ្នាំកំណើត (Split 8-digit Boxes: Year 4, Month 2, Day 2 with labels underneath) */}
-                    <td style={{ border: '1px solid #000', width: '28%', verticalAlign: 'top', padding: '6px 8px' }}>
-                      <div style={{ marginBottom: '5px', whiteSpace: 'nowrap' }}>4*. ថ្ងៃខែឆ្នាំកំណើត</div>
-                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: '6px', fontSize: '8.0pt' }}>
+                    <td style={{ border: '1px solid #000', width: '28%', verticalAlign: 'top', padding: '5px 8px' }}>
+                      <div style={{ marginBottom: '4px', whiteSpace: 'nowrap' }}>4*. ថ្ងៃខែឆ្នាំកំណើត</div>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: '6px', fontSize: '8.5pt' }}>
                         {/* Year */}
                         <div style={{ textAlign: 'center' }}>
                           <div style={{ display: 'flex' }}>
                             {dobDigits.y.map((digit, i) => (
-                              <span key={i} style={{ width: '15px', height: '22px', border: '1px solid #000', borderRight: i === 3 ? '1px solid #000' : 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '9.0pt' }}>
+                              <span key={i} style={{ width: '16px', height: '21px', border: '1px solid #000', borderRight: i === 3 ? '1px solid #000' : 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '9pt' }}>
                                 {toKhmerNum(digit)}
                               </span>
                             ))}
                           </div>
-                          <div style={{ fontSize: '7.5pt', marginTop: '3px' }}>ឆ្នាំ</div>
+                          <div style={{ fontSize: '8.0pt', marginTop: '3px' }}>ឆ្នាំ</div>
                         </div>
                         {/* Month */}
                         <div style={{ textAlign: 'center' }}>
                           <div style={{ display: 'flex' }}>
                             {dobDigits.m.map((digit, i) => (
-                              <span key={i} style={{ width: '15px', height: '22px', border: '1px solid #000', borderRight: i === 1 ? '1px solid #000' : 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '9.0pt' }}>
+                              <span key={i} style={{ width: '16px', height: '21px', border: '1px solid #000', borderRight: i === 1 ? '1px solid #000' : 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '9pt' }}>
                                 {toKhmerNum(digit)}
                               </span>
                             ))}
                           </div>
-                          <div style={{ fontSize: '7.5pt', marginTop: '3px' }}>ខែ</div>
+                          <div style={{ fontSize: '8.0pt', marginTop: '3px' }}>ខែ</div>
                         </div>
                         {/* Day */}
                         <div style={{ textAlign: 'center' }}>
                           <div style={{ display: 'flex' }}>
                             {dobDigits.d.map((digit, i) => (
-                              <span key={i} style={{ width: '15px', height: '22px', border: '1px solid #000', borderRight: i === 1 ? '1px solid #000' : 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '9.0pt' }}>
+                              <span key={i} style={{ width: '16px', height: '21px', border: '1px solid #000', borderRight: i === 1 ? '1px solid #000' : 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '9pt' }}>
                                 {toKhmerNum(digit)}
                               </span>
                             ))}
                           </div>
-                          <div style={{ fontSize: '7.5pt', marginTop: '3px' }}>ថ្ងៃ</div>
+                          <div style={{ fontSize: '8.0pt', marginTop: '3px' }}>ថ្ងៃ</div>
                         </div>
                       </div>
                     </td>
 
                     {/* 5. លេខអត្តសញ្ញាណប័ណ្ណ & 6. អត្តលេខសិស្ស (Separated by inner border line) */}
                     <td style={{ border: '1px solid #000', width: '60%', verticalAlign: 'top', padding: 0 }}>
-                      <div style={{ padding: '6px 8px', borderBottom: '1px solid #000', display: 'flex', alignItems: 'baseline' }}>
-                        <span style={{ whiteSpace: 'nowrap' }}>5. លេខអត្តសញ្ញាណប័ណ្ណ:</span>
+                      <div style={{ padding: '5px 8px', borderBottom: '1px solid #000', display: 'flex', alignItems: 'baseline' }}>
+                        <span style={{ whiteSpace: 'nowrap' }}>5. លេខអត្តសញ្ញាណប័ណ្ណ៖</span>
                         <DottedField value={toKhmerNum(admission.idCardNumber)} flex="1" />
                       </div>
-                      <div style={{ padding: '6px 8px', display: 'flex', alignItems: 'baseline' }}>
-                        <span style={{ whiteSpace: 'nowrap' }}>6. អត្តលេខសិស្ស:</span>
+                      <div style={{ padding: '5px 8px', display: 'flex', alignItems: 'baseline' }}>
+                        <span style={{ whiteSpace: 'nowrap' }}>6. អត្តលេខសិស្ស៖</span>
                         <DottedField value={admission.enrolledStudentId || ''} flex="1" />
                       </div>
                     </td>
@@ -1317,17 +1431,17 @@ export const PrintableAdmissionForm = ({
 
                   {/* Row 4: 8. ចំនួនសមាជិកគ្រួសារក្នុងបន្ទុក (Left) & 7*. ចម្ងាយផ្លូវធ្វើដំណើរ (Right) */}
                   <tr>
-                    <td colSpan="2" style={{ border: '1px solid #000', verticalAlign: 'middle', padding: '6px 8px' }}>
+                    <td colSpan="2" style={{ border: '1px solid #000', verticalAlign: 'middle', padding: '5px 8px' }}>
                       <div style={{ display: 'flex', alignItems: 'baseline' }}>
-                        <span style={{ whiteSpace: 'nowrap' }}>8. ចំនួនសមាជិកគ្រួសារក្នុងបន្ទុក:</span>
+                        <span style={{ whiteSpace: 'nowrap' }}>8. ចំនួនសមាជិកគ្រួសារក្នុងបន្ទុក៖</span>
                         <DottedField value={toKhmerNum(admission.familyMembersCount)} flex="1" />
                       </div>
                     </td>
-                    <td style={{ border: '1px solid #000', verticalAlign: 'middle', padding: '6px 8px' }}>
+                    <td style={{ border: '1px solid #000', verticalAlign: 'middle', padding: '5px 8px' }}>
                       <div style={{ display: 'flex', alignItems: 'baseline' }}>
-                        <span style={{ whiteSpace: 'nowrap' }}>7*. ចម្ងាយផ្លូវធ្វើដំណើរពីលំនៅបច្ចុប្បន្នទៅគ្រឹះស្ថាន:</span>
+                        <span style={{ whiteSpace: 'nowrap' }}>7*. ចម្ងាយផ្លូវធ្វើដំណើរពីទីលំនៅបច្ចុប្បន្នទៅគ្រឹះស្ថាន</span>
                         <DottedField value={toKhmerNum(admission.distanceKm)} flex="1" />
-                        <span style={{ marginLeft: '4px', fontWeight: 700 }}>KM</span>
+                        <span style={{ marginLeft: '4px' }}>KM</span>
                       </div>
                     </td>
                   </tr>
@@ -1335,9 +1449,9 @@ export const PrintableAdmissionForm = ({
                   {/* Row 5: 9. ស្ថានភាពគ្រួសារ (Left) & 10*. មធ្យោបាយធ្វើដំណើរ (Right) */}
                   <tr>
                     {/* Left: 9. ស្ថានភាពគ្រួសារ */}
-                    <td colSpan="2" style={{ border: '1px solid #000', verticalAlign: 'top', padding: '6px 8px' }}>
-                      <div style={{ fontWeight: 700, marginBottom: '6px' }}>9. ស្ថានភាពគ្រួសារ:</div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', paddingLeft: '4px' }}>
+                    <td colSpan="2" style={{ border: '1px solid #000', verticalAlign: 'top', padding: '5px 8px' }}>
+                      <div style={{ marginBottom: '5px' }}>9. ស្ថានភាពគ្រួសារ៖</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', paddingLeft: '4px' }}>
                         <div><Box checked={admission.maritalStatus === 'alive' || !admission.maritalStatus} label="នៅរស់" /></div>
                         <div><Box checked={admission.maritalStatus === 'married'} label="រៀបការរួច" /></div>
                         <div><Box checked={admission.maritalStatus === 'divorced'} label="លែងលះ" /></div>
@@ -1346,23 +1460,23 @@ export const PrintableAdmissionForm = ({
                     </td>
 
                     {/* Right: 10*. មធ្យោបាយធ្វើដំណើរ (2-column table grid matching Word LTSC PDF) */}
-                    <td style={{ border: '1px solid #000', verticalAlign: 'top', padding: '3px 2px' }}>
-                      <div style={{ fontWeight: 700, marginBottom: '2px', paddingLeft: '3px', fontSize: 'inherit' }}>10*. មធ្យោបាយធ្វើដំណើរ៖</div>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #000', fontSize: 'inherit', letterSpacing: '-0.3px', lineHeight: 1.3, tableLayout: 'fixed' }}>
+                    <td style={{ border: '1px solid #000', verticalAlign: 'top', padding: '4px 4px 5px 4px' }}>
+                      <div style={{ marginBottom: '3px', paddingLeft: '2px', fontSize: 'inherit' }}>10*. មធ្យោបាយធ្វើដំណើរ៖</div>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #000', fontSize: '8.1pt', lineHeight: 1.35, tableLayout: 'fixed' }}>
                         <colgroup>
-                          <col style={{ width: '50.5%' }} />
-                          <col style={{ width: '49.5%' }} />
+                          <col style={{ width: '48%' }} />
+                          <col style={{ width: '52%' }} />
                         </colgroup>
                         <tbody>
                           <tr>
-                            <td style={{ border: '1px solid #000', padding: '2.5px 3px', verticalAlign: 'top', overflow: 'hidden' }}>
+                            <td style={{ border: '1px solid #000', padding: '4px 6px', verticalAlign: 'top', overflow: 'hidden' }}>
                               <CommuteOption
                                 checked={admission.commuteMethod === 'taxi_paid'}
                                 line1="ម៉ូតូឌុប(ចំណាយលុយផ្ទាល់"
                                 line2="ខ្លួន)"
                               />
                             </td>
-                            <td style={{ border: '1px solid #000', padding: '2.5px 3px', verticalAlign: 'top', overflow: 'hidden' }}>
+                            <td style={{ border: '1px solid #000', padding: '4px 6px', verticalAlign: 'top', overflow: 'hidden' }}>
                               <CommuteOption
                                 checked={admission.commuteMethod === 'institute_free'}
                                 line1="មធ្យោបាយធ្វើដំណើរផ្តល់ដោយ"
@@ -1371,13 +1485,13 @@ export const PrintableAdmissionForm = ({
                             </td>
                           </tr>
                           <tr>
-                            <td style={{ border: '1px solid #000', padding: '2.5px 3px', verticalAlign: 'top', overflow: 'hidden' }}>
+                            <td style={{ border: '1px solid #000', padding: '4px 6px', verticalAlign: 'top', overflow: 'hidden' }}>
                               <CommuteOption
                                 checked={admission.commuteMethod === 'own_motorcycle'}
                                 line1="ម៉ូតូផ្ទាល់ខ្លួន"
                               />
                             </td>
-                            <td style={{ border: '1px solid #000', padding: '2.5px 3px', verticalAlign: 'top', overflow: 'hidden' }}>
+                            <td style={{ border: '1px solid #000', padding: '4px 6px', verticalAlign: 'top', overflow: 'hidden' }}>
                               <CommuteOption
                                 checked={admission.commuteMethod === 'community_free'}
                                 line1="មធ្យោបាយធ្វើដំណើរផ្តល់ដោយ"
@@ -1386,14 +1500,14 @@ export const PrintableAdmissionForm = ({
                             </td>
                           </tr>
                           <tr>
-                            <td style={{ border: '1px solid #000', padding: '2.5px 3px', verticalAlign: 'top', overflow: 'hidden' }}>
+                            <td style={{ border: '1px solid #000', padding: '4px 6px', verticalAlign: 'top', overflow: 'hidden' }}>
                               <CommuteOption
                                 checked={admission.commuteMethod === 'public_paid'}
                                 line1="មធ្យោបាយធ្វើដំណើរសាធារណៈ"
                                 line2="(ចំណាយលុយផ្ទាល់ខ្លួន)"
                               />
                             </td>
-                            <td style={{ border: '1px solid #000', padding: '2.5px 3px', verticalAlign: 'top', overflow: 'hidden' }}>
+                            <td style={{ border: '1px solid #000', padding: '4px 6px', verticalAlign: 'top', overflow: 'hidden' }}>
                               <CommuteOption
                                 checked={admission.commuteMethod === 'walking'}
                                 line1="ថ្មើរជើង"
@@ -1401,13 +1515,13 @@ export const PrintableAdmissionForm = ({
                             </td>
                           </tr>
                           <tr>
-                            <td style={{ border: '1px solid #000', padding: '2.5px 3px', verticalAlign: 'top', overflow: 'hidden' }}>
+                            <td style={{ border: '1px solid #000', padding: '4px 6px', verticalAlign: 'top', overflow: 'hidden' }}>
                               <CommuteOption
                                 checked={admission.commuteMethod === 'bicycle'}
                                 line1="កង់"
                               />
                             </td>
-                            <td style={{ border: '1px solid #000', padding: '2.5px 3px', verticalAlign: 'top', overflow: 'hidden' }}>
+                            <td style={{ border: '1px solid #000', padding: '4px 6px', verticalAlign: 'top', overflow: 'hidden' }}>
                               <CommuteOption
                                 checked={!['own_motorcycle','taxi_paid','walking','bicycle','institute_free','community_free','public_paid'].includes(admission.commuteMethod)}
                                 line1="ផ្សេងៗ"
@@ -1421,7 +1535,7 @@ export const PrintableAdmissionForm = ({
 
                   {/* Row 6: 11. ទីកន្លែងកំណើត */}
                   <tr>
-                    <td colSpan="3" style={{ border: '1px solid #000', padding: '6px 10px' }}>
+                    <td colSpan="3" style={{ border: '1px solid #000', padding: '5px 10px' }}>
                       <div>11. ទីកន្លែងកំណើត៖</div>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', alignItems: 'baseline', marginTop: '4px' }}>
                         <div style={{ display: 'flex', alignItems: 'baseline' }}><span>ភូមិ</span><DottedField value={pobVillage} flex="1" /></div>
@@ -1434,14 +1548,14 @@ export const PrintableAdmissionForm = ({
 
                   {/* Row 7: 12. ទីលំនៅអចិន្ត្រៃយ៍ */}
                   <tr>
-                    <td colSpan="3" style={{ border: '1px solid #000', padding: '6px 10px' }}>
+                    <td colSpan="3" style={{ border: '1px solid #000', padding: '5px 10px' }}>
                       <div style={{ display: 'flex', alignItems: 'baseline' }}>
                         <span>12. ទីលំនៅអចិន្ត្រៃយ៍៖ ផ្ទះលេខ</span><DottedField value={currentHouse} flex="0.7" />
                         <span style={{ marginLeft: '6px' }}>ផ្លូវ</span><DottedField value={currentStreet} flex="0.8" />
                         <span style={{ marginLeft: '6px' }}>ក្រុម</span><DottedField value={currentGroup} flex="0.6" />
                         <span style={{ marginLeft: '6px' }}>ភូមិ</span><DottedField value={currentVillage} flex="1.2" />
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', alignItems: 'baseline', marginTop: '5px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', alignItems: 'baseline', marginTop: '4px' }}>
                         <div style={{ display: 'flex', alignItems: 'baseline' }}><span>ឃុំ/សង្កាត់</span><DottedField value={currentCommune} flex="1" /></div>
                         <div style={{ display: 'flex', alignItems: 'baseline' }}><span>ស្រុក/ខណ្ឌ</span><DottedField value={currentDistrict} flex="1" /></div>
                         <div style={{ display: 'flex', alignItems: 'baseline' }}><span>ខេត្ត/ក្រុង</span><DottedField value={currentProvince} flex="1" /></div>
@@ -1451,25 +1565,25 @@ export const PrintableAdmissionForm = ({
 
                   {/* Row 8: 13. អាណាព្យាបាល ឬសាច់ញាតិ */}
                   <tr>
-                    <td colSpan="3" style={{ border: '1px solid #000', padding: '6px 10px' }}>
+                    <td colSpan="3" style={{ border: '1px solid #000', padding: '5px 10px' }}>
                       <div style={{ display: 'flex', alignItems: 'baseline' }}>
-                        <span>13. អាណាព្យាបាល ឬសាច់ញាតិ៖ ឈ្មោះ៖</span>
+                        <span>13. អាណាព្យាបាល ឬសាច់ញាតិ៖ ឈ្មោះ</span>
                         <DottedField value={admission.guardianName} flex="1.2" />
                         <span style={{ marginLeft: '10px' }}>លេខទូរស័ព្ទ</span>
                         <DottedField value={admission.guardianPhone} flex="1" />
                         <span style={{ marginLeft: '10px' }}>អ៊ីម៉ែល</span>
                         <DottedField value={admission.guardianEmail} flex="1.1" />
                       </div>
-                      <div style={{ marginTop: '5px' }}>
-                        <div style={{ display: 'flex', alignItems: 'baseline', fontSize: '8.2pt', whiteSpace: 'nowrap' }}>
-                          <span style={{ whiteSpace: 'nowrap' }}>ទីលំនៅរបស់អាណាព្យាបាល ឬសាច់ញាតិ ប្រសិនបើសិនខុសពីទីលំនៅអចិន្ត្រៃយ៍៖ ផ្ទះលេខ</span>
+                      <div style={{ marginTop: '4px' }}>
+                        <div style={{ display: 'flex', alignItems: 'baseline', fontSize: '8.5pt', whiteSpace: 'nowrap' }}>
+                          <span style={{ whiteSpace: 'nowrap' }}>ទីលំនៅរបស់អាណាព្យាបាល ឬសាច់ញាតិ ប្រសិនបើខុសពីទីលំនៅអចិន្ត្រៃយ៍៖ ផ្ទះលេខ</span>
                           <DottedField value={guardianHouse} flex="0.7" />
                           <span style={{ marginLeft: '6px', whiteSpace: 'nowrap' }}>ផ្លូវ</span>
                           <DottedField value={guardianStreet} flex="0.8" />
                           <span style={{ marginLeft: '6px', whiteSpace: 'nowrap' }}>ក្រុម</span>
                           <DottedField value={guardianGroup} flex="0.6" />
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', alignItems: 'baseline', marginTop: '5px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', alignItems: 'baseline', marginTop: '4px' }}>
                           <div style={{ display: 'flex', alignItems: 'baseline' }}><span>ភូមិ</span><DottedField value={guardianVillage} flex="1" /></div>
                           <div style={{ display: 'flex', alignItems: 'baseline' }}><span>ឃុំ/សង្កាត់</span><DottedField value={guardianCommune} flex="1" /></div>
                           <div style={{ display: 'flex', alignItems: 'baseline' }}><span>ស្រុក/ខណ្ឌ</span><DottedField value={guardianDistrict} flex="1" /></div>
@@ -1481,7 +1595,7 @@ export const PrintableAdmissionForm = ({
                 </tbody>
               </table>
 
-              <div style={{ fontSize: '7.8pt', color: '#000', marginTop: '6px', marginBottom: '2px' }}>
+              <div style={{ fontSize: '8.5pt', color: '#000', marginTop: '5px', marginBottom: '2px' }}>
                 ចំណុច * សូមបំពេញព័ត៌មានដោយមិនអាចខ្វះបាន
               </div>
             </div>
@@ -1899,9 +2013,9 @@ export const PrintableAdmissionForm = ({
                 <div style={{ position: 'relative', minHeight: '27mm', marginBottom: '1px' }}>
                   {/* Top Center: Kingdom & Motto */}
                   <div style={{ textAlign: 'center', width: '100%', paddingTop: '0px' }}>
-                    <div className="fr02-muol" style={{ fontSize: '10.5pt', lineHeight: 1.25 }}>ព្រះរាជាណាចក្រកម្ពុជា</div>
-                    <div className="fr02-muol" style={{ fontSize: '9pt', lineHeight: 1.25, marginTop: '1px' }}>ជាតិ សាសនា ព្រះមហាក្សត្រ</div>
-                    <RoyalDivider />
+                    <div className="fr02-muol" style={{ fontSize: '10.5pt', lineHeight: 1.4 }}>ព្រះរាជាណាចក្រកម្ពុជា</div>
+                    <div className="fr02-bokor" style={{ fontSize: '11pt', lineHeight: 1.35, marginTop: '3px' }}>ជាតិ សាសនា ព្រះមហាក្សត្រ</div>
+                    <RoyalDivider width="85px" style={{ margin: '4px auto 3px' }} />
                   </div>
 
                   {/* Left: Ministry & Institute (single line each) */}
@@ -1939,25 +2053,25 @@ export const PrintableAdmissionForm = ({
                 </div>
 
                 {/* Title */}
-                <div style={{ textAlign: 'center', margin: '2px 0 4px' }}>
-                  <div className="fr02-muol" style={{ fontSize: '11.5pt', margin: 0, color: '#000000', lineHeight: 1.3 }}>
+                <div style={{ textAlign: 'center', margin: '1px 0 3px' }}>
+                  <div className="fr02-muol" style={{ fontSize: '12pt', margin: 0, color: '#000000', lineHeight: 1.25 }}>
                     បង្កាន់ដៃទទួលពាក្យ
                   </div>
                 </div>
 
                 {/* Fields */}
-                <div className="fr02-battambang" style={{ fontSize: '8.4pt', lineHeight: 1.95 }}>
-                  <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '4.5px' }}>
+                <div className="fr02-battambang" style={{ fontSize: '11pt', lineHeight: 1.35 }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '2.5px' }}>
                     <span style={{ whiteSpace: 'nowrap' }}>គោត្តនាម-នាម៖</span>
                     <DottedField value={admission.khmerName} flex="1.2" />
                     <span style={{ marginLeft: '6px', whiteSpace: 'nowrap' }}>អក្សរឡាតាំង</span>
                     <DottedField value={admission.latinName} flex="1.2" valueStyle={{ textTransform: 'uppercase' }} />
                     <span style={{ marginLeft: '6px', whiteSpace: 'nowrap' }}>ភេទ</span>
-                    <DottedField value={admission.gender === 'male' ? 'ប្រុស' : admission.gender === 'female' ? 'ស្រី' : ''} width="45px" />
+                    <DottedField value={admission.gender === 'male' ? 'ប្រុស' : admission.gender === 'female' ? 'ស្រី' : ''} width="50px" />
                     <DottedField flex="1" />
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '4.5px' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '2.5px' }}>
                     <span style={{ whiteSpace: 'nowrap' }}>ជនជាតិ៖</span>
                     <DottedField value={admission.ethnicity || 'ខ្មែរ'} flex="0.8" />
                     <span style={{ marginLeft: '4px', whiteSpace: 'nowrap' }}>សញ្ជាតិ</span>
@@ -1965,78 +2079,78 @@ export const PrintableAdmissionForm = ({
                     <span style={{ marginLeft: '4px', whiteSpace: 'nowrap' }}>សាសនា</span>
                     <DottedField value={admission.religion || 'ព្រះពុទ្ធ'} flex="0.8" />
                     <span style={{ marginLeft: '4px', whiteSpace: 'nowrap' }}>កើតថ្ងៃទី</span>
-                    <DottedField value={toKhmerNum(dobParts.day)} width="26px" />
+                    <DottedField value={toKhmerNum(dobParts.day)} width="28px" />
                     <span style={{ margin: '0 2px' }}>ខែ</span>
-                    <DottedField value={toKhmerNum(dobParts.month)} width="26px" />
+                    <DottedField value={toKhmerNum(dobParts.month)} width="28px" />
                     <span style={{ margin: '0 2px' }}>ឆ្នាំ</span>
-                    <DottedField value={toKhmerNum(dobParts.year)} width="45px" />
+                    <DottedField value={toKhmerNum(dobParts.year)} width="48px" />
                     <DottedField flex="1" />
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '4.5px' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '2.5px' }}>
                     <span style={{ whiteSpace: 'nowrap' }}>អាសយដ្ឋានបច្ចុប្បន្ន៖</span>
                     <DottedField value={fullCurrentAddress} flex="1" />
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '4.5px' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '2.5px' }}>
                     <span style={{ whiteSpace: 'nowrap' }}>លេខទូរស័ព្ទផ្ទាល់ខ្លួន៖</span>
                     <DottedField value={admission.phone} flex="1" />
                     <span style={{ marginLeft: '6px', whiteSpace: 'nowrap' }}>លេខទូរស័ព្ទអាណាព្យាបាល</span>
                     <DottedField value={admission.guardianPhone} flex="1" />
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '4.5px' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '2.5px' }}>
                     <span style={{ whiteSpace: 'nowrap' }}>កម្រិតវប្បធម៌៖</span>
                     <DottedField value={admission.educationLevel || 'បាក់ឌុប'} flex="1" />
                     <span style={{ marginLeft: '4px', whiteSpace: 'nowrap' }}>ឆ្នាំ</span>
-                    <DottedField value={toKhmerNum(admission.schoolGraduationYear || '២០២៤')} width="45px" />
+                    <DottedField value={toKhmerNum(admission.schoolGraduationYear || '២០២៤')} width="48px" />
                     <span style={{ marginLeft: '4px', whiteSpace: 'nowrap' }}>សាលា</span>
                     <DottedField value={admission.previousSchool} flex="1.2" />
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '4.5px' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '2.5px' }}>
                     <span style={{ whiteSpace: 'nowrap' }}>កម្រិតសិក្សា៖</span>
                     <DottedField value={degreeKhmer} flex="1.2" />
                     <span style={{ marginLeft: '4px', whiteSpace: 'nowrap' }}>ឆ្នាំទី</span>
-                    <DottedField value={toKhmerNum(admission.studyYear || '១')} width="26px" />
+                    <DottedField value={toKhmerNum(admission.studyYear || '១')} width="28px" />
                     <span style={{ marginLeft: '4px', whiteSpace: 'nowrap' }}>ឆ្នាំសិក្សា</span>
                     <DottedField value={toKhmerNum(admission.academicYear || '២០២៦-២០២៧')} flex="1" />
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '3px' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '2px' }}>
                     <span style={{ whiteSpace: 'nowrap' }}>ជំនាញឯកទេស៖</span>
                     <DottedField value={admission.major} flex="1" />
                     <span style={{ marginLeft: '6px', whiteSpace: 'nowrap' }}>វេនសិក្សា៖</span>
-                    <Box checked={isShiftMorning} label="ចន្ទ-សុក្រ(ព្រឹក)" style={{ marginLeft: '4px' }} />
-                    <Box checked={isShiftAfternoon} label="ចន្ទ-សុក្រ(រសៀល)" />
+                    <Box checked={isShiftMorning} label="ចន្ទ-សុក្រ(ព្រឹក)" style={{ marginLeft: '4px' }} boxStyle={{ width: '11px', height: '11px' }} />
+                    <Box checked={isShiftAfternoon} label="ចន្ទ-សុក្រ(រសៀល)" boxStyle={{ width: '11px', height: '11px' }} />
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginTop: '3px', marginBottom: '8px' }}>
-                    <Box checked={isShiftBoth} label="ចន្ទ-សុក្រ(ព្រឹក-រសៀល)" />
-                    <Box checked={isShiftEvening} label="ចន្ទ-សុក្រ(យប់)" />
-                    <Box checked={isShiftWeekend} label="សៅរ៍-អាទិត្យ(ព្រឹក-រសៀល)" />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '2px', marginBottom: '4px' }}>
+                    <Box checked={isShiftBoth} label="ចន្ទ-សុក្រ(ព្រឹក-រសៀល)" boxStyle={{ width: '11px', height: '11px' }} />
+                    <Box checked={isShiftEvening} label="ចន្ទ-សុក្រ(យប់)" boxStyle={{ width: '11px', height: '11px' }} />
+                    <Box checked={isShiftWeekend} label="សៅរ៍-អាទិត្យ(ព្រឹក-រសៀល)" boxStyle={{ width: '11px', height: '11px' }} />
                   </div>
 
                   {/* Signatures */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', textAlign: 'center', marginTop: '12px', fontSize: '8pt', lineHeight: 1.5 }}>
-                    <div style={{ width: '46%' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', textAlign: 'center', marginTop: '6px', fontSize: '10.5pt', lineHeight: 1.32 }}>
+                    <div style={{ width: '47%' }}>
                       <div>ថ្ងៃ....................ខែ...............ឆ្នាំ........... ព.ស ២៥..…</div>
-                      <div>សៀមរាប ថ្ងៃទី {toKhmerNum(today.day)} ខែ {toKhmerNum(today.month)} ឆ្នាំ {toKhmerNum(today.year)}</div>
-                      <div style={{ fontWeight: 800, marginTop: '4px' }}>ហត្ថលេខា/ឈ្មោះអ្នកទទួលពាក្យ</div>
-                      <div style={{ height: '26px' }}></div>
+                      <div style={{ marginTop: '1px' }}>សៀមរាប ថ្ងៃទី {toKhmerNum(today.day)} ខែ {toKhmerNum(today.month)} ឆ្នាំ {toKhmerNum(today.year)}</div>
+                      <div style={{ fontWeight: 800, marginTop: '3px' }}>ហត្ថលេខា/ឈ្មោះអ្នកទទួលពាក្យ</div>
+                      <div style={{ height: '22px' }}></div>
                       <div style={{ fontWeight: 800 }}>ការិយាល័យ ETO</div>
                     </div>
-                    <div style={{ width: '46%' }}>
+                    <div style={{ width: '47%' }}>
                       <div>ថ្ងៃ....................ខែ...............ឆ្នាំ........... ព.ស ២៥..…</div>
-                      <div>សៀមរាប ថ្ងៃទី {toKhmerNum(today.day)} ខែ {toKhmerNum(today.month)} ឆ្នាំ {toKhmerNum(today.year)}</div>
-                      <div style={{ fontWeight: 800, marginTop: '4px' }}>ហត្ថលេខា/ឈ្មោះសាមីខ្លួន</div>
-                      <div style={{ height: '26px' }}></div>
+                      <div style={{ marginTop: '1px' }}>សៀមរាប ថ្ងៃទី {toKhmerNum(today.day)} ខែ {toKhmerNum(today.month)} ឆ្នាំ {toKhmerNum(today.year)}</div>
+                      <div style={{ fontWeight: 800, marginTop: '3px' }}>ហត្ថលេខា/ឈ្មោះសាមីខ្លួន</div>
+                      <div style={{ height: '22px' }}></div>
                       <div style={{ fontWeight: 800 }}>{admission.khmerName}</div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div style={{ marginTop: 'auto', paddingTop: '2px' }}>
+              <div style={{ marginTop: 'auto', paddingTop: '1px' }}>
                 <Fr02Footer pageNum="៥" />
               </div>
             </div>

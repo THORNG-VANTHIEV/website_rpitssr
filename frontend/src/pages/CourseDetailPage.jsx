@@ -3,12 +3,21 @@ import { useParams, Link } from 'react-router-dom';
 import { PageBanner } from '../components/common/PageBanner';
 import { useLanguage } from '../context/LanguageContext';
 import client from '../api/client';
+import { resolveImageUrl } from '../utils/imageUrl';
+import { courseService } from '../services/courseService';
 
 export const CourseDetailPage = () => {
   const { id } = useParams();
   const { t } = useLanguage();
-  const [course, setCourse] = useState(null);
-  const [loading, setLoading] = useState(true);
+
+  const [course, setCourse] = useState(() => {
+    const cached = courseService.getCachedCourses();
+    if (cached && Array.isArray(cached)) {
+      return cached.find((c) => String(c.id) === String(id)) || null;
+    }
+    return null;
+  });
+  const [loading, setLoading] = useState(!course);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -57,10 +66,9 @@ export const CourseDetailPage = () => {
         return [course.benefits];
       }
     }
-    return [String(course.benefits)];
   }, [course?.benefits]);
 
-  const courseImage = course?.imageUrl || course?.image || course?.image_url || '/images/courses/Course 1.jpg';
+  const courseImage = resolveImageUrl(course?.imageUrl || course?.image || course?.image_url, '/images/courses/Course 1.jpg');
 
   return (
     <div>

@@ -26,6 +26,7 @@ import {
   Sparkles,
   Phone,
   Globe,
+  BookOpen,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -98,10 +99,10 @@ export const Navbar = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const scrollY = window.scrollY;
-          // Hysteresis threshold: only stick when scrolling past 130px, unstick when scrolling back above 50px
-          if (scrollY > 130) {
+          // Smooth hysteresis threshold: stick past top utility bar (>120px), unstick when near top (<40px)
+          if (scrollY > 120) {
             setIsSticky(true);
-          } else if (scrollY < 50) {
+          } else if (scrollY < 40) {
             setIsSticky(false);
           }
           ticking = false;
@@ -127,6 +128,9 @@ export const Navbar = () => {
     if (path === '/downloads' || path === '/download-center' || path === '/forms') {
       return location.pathname === '/downloads' || location.pathname === '/download-center' || location.pathname === '/forms' ? 'active' : '';
     }
+    if (path === '/library' || path === '/e-library' || path === '/books') {
+      return location.pathname === '/library' || location.pathname === '/e-library' || location.pathname === '/books' ? 'active' : '';
+    }
     return location.pathname === path ? 'active' : '';
   };
 
@@ -151,8 +155,8 @@ export const Navbar = () => {
   return (
     <>
       <header className="modern-header">
-        {/* Top Header Bar */}
-        <div className="modern-header-top">
+        {/* Top Header Bar (Desktop Only) */}
+        <div className="modern-header-top d-none d-lg-block">
           <div className="modern-container">
             <div className="modern-top-content">
               {/* Left Contact & Khmer Lunar Calendar */}
@@ -203,6 +207,14 @@ export const Navbar = () => {
                   onClick={closeMobileMenu}
                 >
                   {t('nav.events') || 'Events'}
+                </Link>
+                <Link
+                  className={`modern-top-link ${isActive('/library')}`}
+                  to="/library"
+                  onClick={closeMobileMenu}
+                >
+                  <i className="fas fa-book-reader me-1"></i>
+                  {isKhmer ? 'បណ្ណាល័យ' : 'E-Library'}
                 </Link>
 
                 {isAuthenticated ? (
@@ -457,7 +469,7 @@ export const Navbar = () => {
                 </span>
               </div>
               <div className="drawer-group-header-right">
-                <span className="drawer-group-count-pill">{isKhmer ? '៤' : '4'}</span>
+                <span className="drawer-group-count-pill">{isKhmer ? '៥' : '5'}</span>
                 <ChevronDown
                   size={16}
                   className={`drawer-group-chevron ${activeDrawerGroup === 'academic' ? 'rotated' : ''}`}
@@ -503,7 +515,7 @@ export const Navbar = () => {
                   </div>
                   <div className="drawer-item-text-group">
                     <span className="drawer-item-label">{t('nav.examResult') || 'លទ្ធផលប្រឡង'}</span>
-                    <span className="drawer-badge-pill blue">TVET MIS</span>
+                    <span className="drawer-badge-pill amber">{isKhmer ? 'ឆាប់ៗនេះ' : 'Coming Soon'}</span>
                   </div>
                   <ChevronRight size={16} className="drawer-item-arrow" />
                 </Link>
@@ -516,7 +528,25 @@ export const Navbar = () => {
                   <div className="drawer-item-icon green">
                     <FileDown size={18} />
                   </div>
-                  <span className="drawer-item-label">{t('nav.downloads') || 'ទាញយកឯកសារ & ពាក្យសុំ'}</span>
+                  <div className="drawer-item-text-group">
+                    <span className="drawer-item-label">{t('nav.downloads') || 'ទាញយកឯកសារ & ពាក្យសុំ'}</span>
+                    <span className="drawer-badge-pill amber">{isKhmer ? 'ឆាប់ៗនេះ' : 'Coming Soon'}</span>
+                  </div>
+                  <ChevronRight size={16} className="drawer-item-arrow" />
+                </Link>
+
+                <Link
+                  to="/library"
+                  className={`drawer-item ${isActive('/library')}`}
+                  onClick={closeMobileMenu}
+                >
+                  <div className="drawer-item-icon blue">
+                    <BookOpen size={18} />
+                  </div>
+                  <div className="drawer-item-text-group">
+                    <span className="drawer-item-label">{isKhmer ? 'បណ្ណាល័យអេឡិចត្រូនិក' : 'E-Library Catalog'}</span>
+                    <span className="drawer-badge-pill amber">{isKhmer ? 'ឆាប់ៗនេះ' : 'Coming Soon'}</span>
+                  </div>
                   <ChevronRight size={16} className="drawer-item-arrow" />
                 </Link>
               </div>

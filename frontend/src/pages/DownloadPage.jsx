@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import {
@@ -33,6 +34,34 @@ const toKhmerNumber = (num) => {
   return String(num).replace(/[0-9]/g, (digit) => khmerDigits[parseInt(digit, 10)]);
 };
 
+// Helper to push text starting with '(' (e.g. (RPITSSR...)) to the 2nd line
+const formatDocumentTitle = (text, isSubtitle = false) => {
+  if (!text) return null;
+  const parenIndex = text.indexOf('(');
+  if (parenIndex !== -1 && text.includes(')')) {
+    const mainPart = text.substring(0, parenIndex).trim();
+    const parenPart = text.substring(parenIndex).trim();
+    return (
+      <>
+        <span className="d-block">{mainPart}</span>
+        <span
+          className="d-block"
+          style={{
+            fontSize: isSubtitle ? '0.84rem' : '0.96rem',
+            fontWeight: isSubtitle ? 500 : 700,
+            color: isSubtitle ? '#64748b' : '#1e73be',
+            marginTop: isSubtitle ? '3px' : '5px',
+            lineHeight: 1.4
+          }}
+        >
+          {parenPart}
+        </span>
+      </>
+    );
+  }
+  return text;
+};
+
 // Official Documents Database for RPITSSR Download Center
 const OFFICIAL_DOCUMENTS = [
   // 1. ADMISSIONS & SCHOLARSHIPS
@@ -52,9 +81,9 @@ const OFFICIAL_DOCUMENTS = [
     descriptionEn: 'Standard 5-page institutional admission application form with bio data, TVET MIS indicators, and receipt voucher.',
     submissionOffice: 'ការិយាល័យអប់រំ និងបណ្តុះបណ្តាល (ETO) / អគារ A បន្ទប់ ១០៤',
     requiredDocsKm: [
-      'សញ្ញាបត្រ (កូពី) ចំនួន ០២ ច្បាប់',
-      'អត្តសញ្ញាណប័ណ្ណសញ្ជាតិខ្មែរ (កូពី) ចំនួន ០១ ច្បាប់',
-      'សំបុត្រកំណើត ឬសៀវភៅគ្រួសារ (កូពី) ចំនួន ០១ ច្បាប់',
+      'សញ្ញាបត្រ (ច្បាប់ថតចម្លង) ចំនួន ០២ ច្បាប់',
+      'អត្តសញ្ញាណប័ណ្ណសញ្ជាតិខ្មែរ (ច្បាប់ថតចម្លង) ចំនួន ០១ ច្បាប់',
+      'សំបុត្រកំណើត ឬសៀវភៅគ្រួសារ (ច្បាប់ថតចម្លង) ចំនួន ០១ ច្បាប់',
       'រូបថតថ្មីថតចំពីមុខ ៤x៦ ចំនួន ០១ សន្លឹក'
     ],
     requiredDocsEn: [
@@ -354,6 +383,35 @@ export const DownloadPage = () => {
   const [downloadSuccessToast, setDownloadSuccessToast] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
+
+  // Close modal on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setSelectedDoc(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Prevent background scroll when modal open without layout jitter
+  useEffect(() => {
+    if (selectedDoc) {
+      const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.overflow = 'hidden';
+      if (scrollBarWidth > 0) {
+        document.body.style.paddingRight = `${scrollBarWidth}px`;
+      }
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    };
+  }, [selectedDoc]);
 
   // Filter categories with labels and icons
   const categories = [
@@ -1026,149 +1084,211 @@ export const DownloadPage = () => {
       </section>
 
       {/* =========================================================================
-          4. OFFICIAL DOCUMENT PREVIEW LIGHTBOX MODAL
+          4. OFFICIAL DOCUMENT PREVIEW LIGHTBOX MODAL (PORTAL)
           ========================================================================= */}
-      {selectedDoc && (
+      {selectedDoc && typeof document !== 'undefined' && createPortal(
         <div
-          className="download-modal-backdrop position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3"
-          style={{ backgroundColor: 'rgba(7, 41, 77, 0.65)', backdropFilter: 'blur(6px)', zIndex: 9999 }}
+          className="download-modal-backdrop"
           onClick={() => setSelectedDoc(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="doc-preview-title"
         >
           <div
-            className="download-preview-modal bg-white rounded-4 shadow-lg overflow-hidden"
-            style={{ maxWidth: '740px', width: '100%', maxHeight: '92vh', display: 'flex', flexDirection: 'column' }}
+            className="download-preview-modal"
             onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
           >
             {/* Modal Header */}
-            <div className="p-4 text-white d-flex justify-content-between align-items-start" style={{ background: 'linear-gradient(135deg, #07294D 0%, #1e73be 100%)' }}>
+            <div className="download-preview-header">
               <div className="d-flex align-items-center gap-3">
-                <div className="rounded-3 bg-white d-flex align-items-center justify-content-center" style={{ width: '48px', height: '48px', color: '#07294D' }}>
-                  <FileText size={24} />
+                <div className="download-preview-header-icon">
+                  <FileText size={22} />
                 </div>
                 <div>
-                  <span className="badge bg-warning text-dark rounded-pill px-2.5 py-1 mb-1" style={{ fontSize: '0.72rem', fontWeight: '700' }}>
-                    {selectedDoc.code}
-                  </span>
-                  <h5 className="fw-bold mb-0 text-white" style={{ fontSize: '1.15rem' }}>
+                  <div className="d-flex align-items-center gap-2 mb-1">
+                    <span className="badge rounded-pill" style={{ background: '#ffaf00', color: '#07294D', fontWeight: 800, fontSize: '0.72rem', letterSpacing: '0.4px', padding: '3px 9px' }}>
+                      {selectedDoc.code}
+                    </span>
+                    <span className="text-white-50 small d-none d-sm-inline" style={{ fontSize: '0.75rem' }}>
+                      {isKhmer ? 'ឯកសារផ្លូវការ' : 'Official Document'}
+                    </span>
+                  </div>
+                  <h5 id="doc-preview-title" className="fw-bold mb-0 text-white" style={{ fontSize: '1.12rem', lineHeight: 1.3 }}>
                     {isKhmer ? 'គំរូទម្រង់ឯកសារផ្លូវការ' : 'Official Document Template Preview'}
                   </h5>
                 </div>
               </div>
               <button
                 type="button"
-                className="btn btn-sm btn-link text-white p-0"
+                className="download-preview-close-btn"
                 onClick={() => setSelectedDoc(null)}
-                style={{ fontSize: '1.4rem', opacity: 0.85 }}
                 aria-label="Close"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
             {/* Modal Body: Document Preview Sheet */}
-            <div className="p-4 overflow-auto" style={{ flex: 1 }}>
-              <div className="p-4 rounded-3 border bg-light position-relative overflow-hidden mb-4" style={{ borderStyle: 'dashed' }}>
-                {/* Watermark */}
-                <div
-                  className="position-absolute top-50 start-50 translate-middle text-uppercase fw-bold text-center"
-                  style={{ color: 'rgba(7, 41, 77, 0.04)', fontSize: '5rem', pointerEvents: 'none', transform: 'translate(-50%, -50%) rotate(-25deg)', whiteSpace: 'nowrap' }}
-                >
+            <div className="download-preview-body">
+              <div className="doc-sheet-paper">
+                {/* Subtle Watermark */}
+                <div className="doc-sheet-watermark">
                   RPITSSR
                 </div>
 
-                {/* Institutional Header */}
-                <div className="text-center mb-3 pb-3 border-bottom">
-                  <div className="small fw-bold text-muted text-uppercase mb-1">
-                    ព្រះរាជាណាចក្រកម្ពុជា | ជាតិ សាសនា ព្រះមហាក្សត្រ
+                {/* Kingdom & Ministry Official Header */}
+                <div className="doc-sheet-institution-header">
+                  <div className="doc-sheet-kingdom">
+                    {isKhmer ? 'ព្រះរាជាណាចក្រកម្ពុជា' : 'KINGDOM OF CAMBODIA'}
                   </div>
-                  <div className="text-primary fw-bold small">
-                    ក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ
+                  <div className="doc-sheet-motto">
+                    {isKhmer ? 'ជាតិ សាសនា ព្រះមហាក្សត្រ' : 'NATION RELIGION KING'}
                   </div>
-                  <h6 className="fw-bold mt-2" style={{ color: '#07294D' }}>
-                    វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប
-                  </h6>
-                  <div className="badge bg-secondary text-white rounded-pill px-3 py-1 mt-1">
-                    {selectedDoc.code}
+                  <div className="doc-sheet-divider">
+                    <span className="doc-sheet-divider-line"></span>
+                    <span style={{ color: '#1e73be', fontSize: '11px', letterSpacing: '2px' }}>✦ ✦ ✦</span>
+                    <span className="doc-sheet-divider-line right"></span>
+                  </div>
+                  <div className="doc-sheet-ministry">
+                    {isKhmer ? 'ក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ' : 'Ministry of Labour and Vocational Training'}
+                  </div>
+                  <div className="doc-sheet-institute">
+                    {isKhmer ? 'វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប' : 'Regional Polytechnic Institute Techo Sen Siem Reap'}
+                  </div>
+                  <div>
+                    <span className="doc-sheet-code-pill">
+                      <FileCode size={13} />
+                      <span>{selectedDoc.code}</span>
+                    </span>
                   </div>
                 </div>
 
                 {/* Document Main Title */}
-                <h5 className="fw-bold text-center mb-2" style={{ color: '#07294D' }}>
-                  {isKhmer ? selectedDoc.titleKm : selectedDoc.titleEn}
-                </h5>
-                <div className="text-center text-muted small mb-3">
-                  {isKhmer ? selectedDoc.titleEn : selectedDoc.titleKm}
+                <h4 className="doc-sheet-title">
+                  {formatDocumentTitle(isKhmer ? selectedDoc.titleKm : selectedDoc.titleEn, false)}
+                </h4>
+                <div className="doc-sheet-subtitle">
+                  {formatDocumentTitle(isKhmer ? selectedDoc.titleEn : selectedDoc.titleKm, true)}
                 </div>
 
-                {/* Details Paragraph */}
-                <div className="p-3 bg-white rounded-3 border mb-3 small">
-                  <div className="text-muted fw-semibold mb-1">
-                    {isKhmer ? 'សេចក្តីពិពណ៌នា និងគោលបំណង ៖' : 'Description & Scope:'}
+                {/* Details Paragraph / Purpose Callout */}
+                <div className="doc-sheet-callout-box">
+                  <div className="doc-sheet-callout-label">
+                    <FileText size={16} color="#1e73be" />
+                    <span>{isKhmer ? 'សេចក្តីពិពណ៌នា និងគោលបំណង ៖' : 'Description & Scope:'}</span>
                   </div>
-                  <div style={{ lineHeight: '1.8', color: '#334155' }}>
+                  <p className="doc-sheet-callout-text">
                     {isKhmer ? selectedDoc.descriptionKm : selectedDoc.descriptionEn}
-                  </div>
+                  </p>
                 </div>
 
                 {/* Submission Target Office */}
-                <div className="d-flex align-items-center gap-2 p-2 px-3 bg-white rounded-3 border mb-3 small">
-                  <Building size={16} color="#1e73be" />
-                  <span className="text-muted">{isKhmer ? 'ការិយាល័យទទួលពាក្យ ៖' : 'Submission Location:'}</span>
-                  <span className="fw-bold text-dark">{selectedDoc.submissionOffice}</span>
+                <div className="doc-sheet-location-bar">
+                  <div className="doc-sheet-location-icon">
+                    <Building size={18} />
+                  </div>
+                  <div>
+                    <div className="doc-sheet-location-label">
+                      {isKhmer ? 'ការិយាល័យទទួលពាក្យ និងបែបបទ ៖' : 'Submission Location:'}
+                    </div>
+                    <div className="doc-sheet-location-val">
+                      {selectedDoc.submissionOffice}
+                    </div>
+                  </div>
                 </div>
 
                 {/* Required Documents / Checklist */}
                 {selectedDoc.requiredDocsKm && (
-                  <div className="p-3 bg-white rounded-3 border small">
-                    <div className="fw-bold text-dark mb-2 d-flex align-items-center gap-2">
-                      <ClipboardCheck size={16} color="#059669" />
-                      <span>{isKhmer ? 'ឯកសារភ្ជាប់ចាំបាច់សម្រាប់បំពេញបែបបទ ៖' : 'Required Supporting Documents:'}</span>
+                  <div className="doc-sheet-checklist-card">
+                    <div className="doc-sheet-checklist-header">
+                      <div className="doc-sheet-checklist-icon">
+                        <ClipboardCheck size={18} />
+                      </div>
+                      <div>
+                        <div className="doc-sheet-checklist-title">
+                          {isKhmer ? 'ឯកសារភ្ជាប់ចាំបាច់សម្រាប់បំពេញបែបបទ ៖' : 'Required Supporting Documents:'}
+                        </div>
+                        <div className="text-muted" style={{ fontSize: '0.78rem' }}>
+                          {isKhmer ? 'សូមរៀបចំឯកសារខាងក្រោមឱ្យបានគ្រប់គ្រាន់មុនពេលដាក់ពាក្យ' : 'Please prepare all required documents before submission'}
+                        </div>
+                      </div>
                     </div>
-                    <ul className="list-unstyled mb-0 d-flex flex-column gap-2">
+                    <div className="d-flex flex-column gap-2">
                       {(isKhmer ? selectedDoc.requiredDocsKm : selectedDoc.requiredDocsEn).map((item, idx) => (
-                        <li key={idx} className="d-flex align-items-start gap-2 text-muted">
-                          <CheckCircle2 size={14} color="#1e73be" className="mt-1 flex-shrink-0" />
+                        <div key={idx} className="doc-sheet-checklist-item">
+                          <div className="doc-sheet-check-badge">
+                            <CheckCircle2 size={13} />
+                          </div>
                           <span>{item}</span>
-                        </li>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="p-3 bg-light border-top d-flex justify-content-between align-items-center">
-              <div className="text-muted small">
-                <span>{selectedDoc.fileSize}</span> • <span>{selectedDoc.updatedAt}</span>
+            <div className="download-preview-footer">
+              <div className="d-flex align-items-center flex-wrap" style={{ gap: '10px' }}>
+                <span
+                  className="d-inline-flex align-items-center rounded-pill"
+                  style={{
+                    background: '#f1f5f9',
+                    color: '#475569',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    border: '1px solid #e2e8f0',
+                    padding: '6px 14px',
+                    gap: '8px'
+                  }}
+                >
+                  <HardDrive size={14} className="text-primary flex-shrink-0" />
+                  <span>{selectedDoc.fileSize}</span>
+                </span>
+                <span
+                  className="d-inline-flex align-items-center rounded-pill"
+                  style={{
+                    background: '#f1f5f9',
+                    color: '#475569',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    border: '1px solid #e2e8f0',
+                    padding: '6px 14px',
+                    gap: '8px'
+                  }}
+                >
+                  <Calendar size={14} className="text-primary flex-shrink-0" />
+                  <span>{selectedDoc.updatedAt}</span>
+                </span>
               </div>
-              <div className="d-flex gap-2">
+              <div className="d-flex gap-2 align-items-center">
                 <button
                   type="button"
-                  className="btn btn-outline-secondary rounded-pill px-3 btn-sm d-inline-flex align-items-center gap-1"
+                  className="btn btn-outline-secondary rounded-pill px-3.5 py-2 btn-sm d-inline-flex align-items-center gap-2 fw-semibold"
+                  style={{ borderColor: '#cbd5e1', color: '#334155' }}
                   onClick={() => window.print()}
                 >
-                  <Printer size={14} />
+                  <Printer size={15} />
                   <span>{isKhmer ? 'បោះពុម្ព' : 'Print'}</span>
                 </button>
                 <button
                   type="button"
-                  className="btn btn-primary rounded-pill px-4 btn-sm d-inline-flex align-items-center gap-1"
-                  style={{ background: '#07294D', borderColor: '#07294D' }}
+                  className="btn text-white rounded-pill px-4 py-2 btn-sm d-inline-flex align-items-center gap-2 fw-bold shadow-sm"
+                  style={{ background: 'linear-gradient(135deg, #07294D 0%, #1e73be 100%)', border: 'none' }}
                   onClick={() => {
                     handleDownload(selectedDoc);
                     setSelectedDoc(null);
                   }}
                 >
-                  <Download size={14} />
-                  <span>{isKhmer ? 'ទាញយកទម្រង់' : 'Download'}</span>
+                  <Download size={15} />
+                  <span>{isKhmer ? 'ទាញយកទម្រង់' : 'Download Form'}</span>
                 </button>
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Floating Download Success Toast */}

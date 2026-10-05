@@ -46,45 +46,6 @@ export const Footer = () => {
 
   return (
     <footer className="modern-footer-area">
-      {/* Top CTA Banner - Crisp White Floating Institutional Card */}
-      <div className="footer-top-cta-banner">
-        <div className="container">
-          <div className="footer-cta-card">
-            <div className="row align-items-center">
-              <div className="col-lg-8 col-md-7">
-                <div className="footer-cta-content">
-                  <span className="footer-cta-badge">
-                    <GraduationCap size={16} />
-                    <span>{language === 'km' ? 'ចាប់ផ្តើមអនាគតរបស់អ្នក' : 'Shape Your Future'}</span>
-                  </span>
-                  <h3 className="footer-cta-title">
-                    {language === 'km'
-                      ? 'ត្រៀមខ្លួនរួចរាល់ដើម្បីក្លាយជាអ្នកជំនាញបច្ចេកវិទ្យាហើយឬនៅ?'
-                      : 'Ready to Become a Certified Technical Professional?'}
-                  </h3>
-                  <p className="footer-cta-desc">
-                    {language === 'km'
-                      ? 'ចុះឈ្មោះចូលរៀនវគ្គបណ្តុះបណ្តាល TVET 1.5M ឥតគិតថ្លៃ និងអាហារូបករណ៍ ១០០% ជាមួយ RPITSSR ថ្ងៃនេះ!'
-                      : 'Enroll in high-demand TVET skills and 100% scholarship programs with RPITSSR today!'}
-                  </p>
-                </div>
-              </div>
-              <div className="col-lg-4 col-md-5 text-md-end text-center mt-3 mt-md-0">
-                <div className="footer-cta-actions">
-                  <Link to="/apply" onClick={scrollToTop} className="footer-btn-primary">
-                    <Edit3 size={17} />
-                    <span>{language === 'km' ? 'ចុះឈ្មោះចូលរៀន' : 'Apply Online'}</span>
-                  </Link>
-                  <Link to="/contact" onClick={scrollToTop} className="footer-btn-outline">
-                    <MessageCircle size={17} />
-                    <span>{language === 'km' ? 'ទំនាក់ទំនង' : 'Contact Us'}</span>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Main Footer Widget Area */}
       <div className="footer-main-widget">
@@ -208,6 +169,12 @@ export const Footer = () => {
                     <Link to="/gallery" onClick={scrollToTop}>
                       <ChevronRight size={14} className="link-arrow" />
                       <span>{language === 'km' ? 'វិចិត្រសាលរូបភាព' : 'Campus Gallery'}</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/library" onClick={scrollToTop}>
+                      <ChevronRight size={14} className="link-arrow" />
+                      <span>{language === 'km' ? 'បណ្ណាល័យអេឡិចត្រូនិក' : 'E-Library Catalog'}</span>
                     </Link>
                   </li>
                   <li>
@@ -615,6 +582,12 @@ export const Footer = () => {
                         <Link to="/downloads" onClick={scrollToTop}>
                           <ChevronRight size={13} />
                           <span>{language === 'km' ? 'មជ្ឈមណ្ឌលទាញយកឯកសារ' : 'Document Download Center'}</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/library" onClick={scrollToTop}>
+                          <ChevronRight size={13} />
+                          <span>{language === 'km' ? 'បណ្ណាល័យអេឡិចត្រូនិក' : 'E-Library Catalog'}</span>
                         </Link>
                       </li>
                       <li>
