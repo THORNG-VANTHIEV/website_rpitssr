@@ -73,14 +73,19 @@ jobs:
             --exclude='.env*' \
             --exclude='tests/' \
             --exclude='node_modules/' \
+            --exclude='vendor/' \
             --exclude='*.sqlite*' \
             --exclude='*.sql*' \
+            --exclude='public/uploads' \
+            --exclude='public/storage' \
             --exclude='storage/logs/*.log' \
             --exclude='storage/framework/cache/*' \
             --exclude='storage/framework/sessions/*' \
             --exclude='storage/framework/views/*' \
             --exclude='storage/app/backups/*' \
             --exclude='storage/app/admissions/private/*' \
+            --exclude='storage/app/private/*' \
+            --exclude='storage/app/public/*' \
             -e "ssh -p ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}" \
             ./backend/ \
             ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:domains/rpitssr.edu.kh/public_html/backend_api/ || \
@@ -89,14 +94,19 @@ jobs:
             --exclude='.env*' \
             --exclude='tests/' \
             --exclude='node_modules/' \
+            --exclude='vendor/' \
             --exclude='*.sqlite*' \
             --exclude='*.sql*' \
+            --exclude='public/uploads' \
+            --exclude='public/storage' \
             --exclude='storage/logs/*.log' \
             --exclude='storage/framework/cache/*' \
             --exclude='storage/framework/sessions/*' \
             --exclude='storage/framework/views/*' \
             --exclude='storage/app/backups/*' \
             --exclude='storage/app/admissions/private/*' \
+            --exclude='storage/app/private/*' \
+            --exclude='storage/app/public/*' \
             -e "ssh -p ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}" \
             ./backend/ \
             ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:public_html/backend_api/
