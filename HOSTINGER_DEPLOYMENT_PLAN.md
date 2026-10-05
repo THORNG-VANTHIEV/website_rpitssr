@@ -2,7 +2,7 @@
 
 > **Domain ផ្លូវការ:** `rpitssr.edu.kh`  
 > **ស្ថាបត្យកម្ម Subdomain (Dual Subdomain Architecture):**
-> - 🌐 **Frontend Web Portal**: `https://web.rpitssr.edu.kh` (ឬ `https://portal.rpitssr.edu.kh`)
+> - 🌐 **Frontend Web Portal**: `https://portal.rpitssr.edu.kh`
 > - ⚙️ **Backend API**: `https://api.rpitssr.edu.kh`
 
 ---
@@ -24,7 +24,7 @@
 ```text
 /home/u123456789/domains/rpitssr.edu.kh/public_html/
 │
-├── portal/                          <-- [Frontend Document Root: web.rpitssr.edu.kh]
+├── portal/                          <-- [Frontend Document Root: portal.rpitssr.edu.kh]
 │   ├── assets/
 │   ├── images/
 │   ├── fonts/
@@ -56,7 +56,7 @@
 1. ចូលទៅកាន់ **Hostinger hPanel** -> ជ្រើសរើស Domain **`rpitssr.edu.kh`**
 2. ចូលទៅកាន់ **Subdomains**៖
    - **Subdomain ទី ១ (Frontend)**:
-     - ឈ្មោះ Subdomain: `web` (ចេញជា `web.rpitssr.edu.kh`)
+     - ឈ្មោះ Subdomain: `portal` (ចេញជា `portal.rpitssr.edu.kh`)
      - ធីកយក: *Custom folder for subdomain*
      - បញ្ចូលឈ្មោះថត: `public_html/portal`
      - ចុច **Create**
@@ -66,7 +66,7 @@
      - បញ្ចូលឈ្មោះថត: `public_html/backend_api`
      - ចុច **Create**
 3. ចូលទៅកាន់ Menu **SSL** ក្នុង hPanel៖
-   - ដំឡើង **Free SSL (Let's Encrypt)** សម្រាប់ `web.rpitssr.edu.kh` និង `api.rpitssr.edu.kh` (ដើម្បីឱ្យមាន `https://` បៃតងទាំងពីរ)
+   - ដំឡើង **Free SSL (Let's Encrypt)** សម្រាប់ `portal.rpitssr.edu.kh` និង `api.rpitssr.edu.kh` (ដើម្បីឱ្យមាន `https://` បៃតងទាំងពីរ)
 4. ចូលទៅកាន់ **PHP Configuration**៖
    - ជ្រើសយក **PHP 8.2** ឬ **PHP 8.3**
    - ផ្ទាំង **PHP Extensions**: ធីកបើក `fileinfo`, `pdo_mysql`, `mbstring`, `openssl`, `curl`, `gd`, `bcmath`, `zip`
@@ -194,7 +194,7 @@ chmod -R 775 storage bootstrap/cache
 | ចំណុចតេស្ត | URL / សកម្មភាព | លទ្ធផលដែលរំពឹងទុក |
 | :--- | :--- | :--- |
 | **១. Backend Health** | `https://api.rpitssr.edu.kh/api/health` | បង្ហាញ JSON: `{"status":"ok"}` |
-| **២. Frontend Home** | `https://web.rpitssr.edu.kh` | បង្ហាញទំព័រដើមស្ថាប័នពេញលេញ |
+| **២. Frontend Home** | `https://portal.rpitssr.edu.kh` | បង្ហាញទំព័រដើមស្ថាប័នពេញលេញ |
 | **៣. Mobile Sliders** | បើកមើលលើទូរស័ព្ទដៃ | Carousel ជំនាញ, វីដេអូ, ព្រឹត្តិការណ៍ រត់ទៅមុខជានិច្ចគ្មាន rewind |
 | **៤. Daylight Banners** | ចូល `/courses`, `/organization`, `/about` | Banner ពណ៌ Daylight Slate-Blue មាន tricolor line ស្រស់ស្អាត |
 | **៥. Refresh (SPA)** | ចូល `/courses` រួចចុច F5 Refresh | មិន error 404 (ផ្ទុកទំព័រ Course ត្រឹមត្រូវតាមរយៈ `.htaccess`) |
