@@ -245,8 +245,8 @@ export const RegisterPage = () => {
               <div className="auth-brand-sidebar h-100">
                 <div>
                   <img
-                    src="/images/logo/logo.webp"
-                    alt="RPITSSR Institutional Logo"
+                    src="/images/rpitssr-seal.png"
+                    alt="RPITSSR Institutional Seal"
                     className="auth-sidebar-logo"
                     onError={(e) => {
                       e.target.style.display = 'none';

@@ -401,7 +401,7 @@ export const EventsPage = () => {
               </div>
               <div className="events-metric-info">
                 <span className="events-metric-val">
-                  {isKhmer ? '០៤ ប្រភេទកម្មវិធី' : '4 Event Tracks'}
+                  {isKhmer ? '៤ ប្រភេទកម្មវិធី' : '4 Event Tracks'}
                 </span>
                 <span className="events-metric-lbl">
                   {isKhmer ? 'TVET, ICT, ពិព័រណ៍ & ការងារ' : 'TVET, Tech & Job Fairs'}
@@ -788,7 +788,7 @@ export const EventsPage = () => {
 
             <div className="d-flex align-items-center gap-3 flex-wrap">
               <a
-                href="https://t.me/rpitssr"
+                href="https://qrcode.rpitssr.edu.kh/"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -972,7 +972,7 @@ export const EventsPage = () => {
               {/* Action Buttons */}
               <div style={{ marginTop: '30px', display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
                 <a
-                  href="https://t.me/rpitssr"
+                  href="https://qrcode.rpitssr.edu.kh/"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{

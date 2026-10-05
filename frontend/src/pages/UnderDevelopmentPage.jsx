@@ -475,7 +475,7 @@ export const UnderDevelopmentPage = ({ feature: propFeature }) => {
             </Link>
 
             <a
-              href="https://t.me/rpitssr"
+              href="https://qrcode.rpitssr.edu.kh/"
               target="_blank"
               rel="noopener noreferrer"
               className="under-dev-btn-accent"

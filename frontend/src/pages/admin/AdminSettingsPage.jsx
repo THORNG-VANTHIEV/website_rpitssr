@@ -57,9 +57,10 @@ export const AdminSettingsPage = () => {
     metaTitle: 'វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប - RPITSSR',
     metaDescription: 'គេហទំព័រផ្លូវការរបស់វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប (RPITSSR) - ជំនាញបច្ចេកទេស អាហារូបករណ៍ ១០០% និងការងារសមរម្យ។',
     metaKeywords: 'RPITSSR, TVET, សៀមរាប, អាហារូបករណ៍, បច្ចេកវិទ្យា, វិស្វកម្ម, ព័ត៌មានវិទ្យា',
-    facebookUrl: 'https://facebook.com/rpitssr',
+    facebookUrl: 'https://web.facebook.com/rpitssr.page',
     youtubeUrl: 'https://youtube.com/@rpitssr_edu',
-    telegramUrl: 'https://t.me/rpitssr',
+    telegramUrl: 'https://qrcode.rpitssr.edu.kh/',
+    tiktokUrl: 'https://tiktok.com/@rpitssr_edu',
     linkedinUrl: '',
     instagramUrl: '',
     academicYear: '2025-2026',
@@ -1149,6 +1150,20 @@ export const AdminSettingsPage = () => {
                     className="admin-form-control"
                     value={settings.linkedinUrl}
                     onChange={(e) => handleChange('linkedinUrl', e.target.value)}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  />
+                </div>
+
+                <div className="admin-form-group">
+                  <label className="admin-form-label" style={{ fontWeight: 600, color: '#475569', marginBottom: '6px', display: 'block' }}>
+                    TikTok URL
+                  </label>
+                  <input
+                    type="text"
+                    className="admin-form-control"
+                    value={settings.tiktokUrl || ''}
+                    onChange={(e) => handleChange('tiktokUrl', e.target.value)}
+                    placeholder="https://tiktok.com/@rpitssr_edu"
                     style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
                   />
                 </div>

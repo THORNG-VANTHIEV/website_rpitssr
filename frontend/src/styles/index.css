@@ -2764,6 +2764,18 @@ i {
     font-size: 0.68rem !important;
     line-height: 1.3 !important;
     margin-top: 2px !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+  }
+
+  @media (max-width: 380px) {
+    .contact-metric-lbl {
+      font-size: 0.62rem !important;
+      line-height: 1.25 !important;
+    }
+    .contact-metric-val {
+      font-size: 0.86rem !important;
+    }
   }
 
   /* 3. Main Contact Area & Gateway Cards */
@@ -5120,14 +5132,35 @@ i {
     text-overflow: ellipsis;
   }
 
-  .contact-main-val {
-    font-size: 0.88rem;
+  .contact-numbers-wrap {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2px 6px;
+    margin-top: 1px;
+  }
+
+  .contact-phone-link {
+    font-size: 0.84rem;
     font-weight: 800;
-    color: #ffffff;
-    line-height: 1.3;
+    color: #ffffff !important;
+    text-decoration: none !important;
+    line-height: 1.25;
+    letter-spacing: 0.2px;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    transition: color 0.2s ease;
+  }
+
+  .contact-phone-link:hover,
+  .contact-phone-link:active {
+    color: #60a5fa !important;
+    text-decoration: underline !important;
+  }
+
+  .contact-phone-divider {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.80rem;
+    user-select: none;
   }
 
   .footer-mobile-call-btn {
@@ -8096,7 +8129,8 @@ i {
     font-size: clamp(1.55rem, 5.5vw, 1.95rem);
     line-height: 1.35;
     margin-bottom: 12px;
-    word-break: keep-all;
+    word-break: normal;
+    overflow-wrap: break-word;
   }
   .home-hero-subtitle {
     font-size: 0.90rem;
@@ -8186,8 +8220,8 @@ i {
   }
   .home-gateways-section {
     margin-top: -24px;
-    margin-bottom: 35px;
-    padding: 0 4px;
+    margin-bottom: 20px !important;
+    padding: 0 4px !important;
   }
   .home-gateway-card {
     padding: 16px 12px;
@@ -8234,7 +8268,7 @@ i {
 
   /* Why Choose Section */
   .home-why-section {
-    padding: 45px 0 50px;
+    padding: 35px 0 40px;
   }
   .home-why-grid {
     grid-template-columns: 1fr !important;
@@ -8249,18 +8283,27 @@ i {
   }
   .home-why-icon-box {
     margin-bottom: 0 !important;
-    width: 44px !important;
-    height: 44px !important;
+    width: 46px !important;
+    height: 46px !important;
     border-radius: 12px !important;
     flex-shrink: 0 !important;
   }
+  .home-why-card-content {
+    flex: 1;
+    min-width: 0;
+  }
   .home-why-card-title {
-    font-size: 0.98rem !important;
-    margin-bottom: 4px !important;
+    font-size: 1.02rem !important;
+    font-weight: 700 !important;
+    color: #07294D !important;
+    margin-bottom: 6px !important;
+    line-height: 1.35 !important;
   }
   .home-why-card-desc {
-    font-size: 0.82rem !important;
-    line-height: 1.5 !important;
+    font-size: 0.84rem !important;
+    color: #64748b !important;
+    line-height: 1.55 !important;
+    margin: 0 !important;
   }
 
   /* Section Spacings on Mobile */
@@ -8268,8 +8311,7 @@ i {
   .modern-video-showcase-area,
   .event-area,
   .modern-blog,
-  .home-why-section,
-  .home-gateways-section {
+  .home-why-section {
     padding: 32px 0 35px !important;
   }
 }
@@ -8282,6 +8324,13 @@ i {
   .home-hero-btn-outline {
     font-size: 0.80rem !important;
     padding: 10px 8px !important;
+  }
+  .contact-phone-link {
+    font-size: 0.78rem !important;
+  }
+  .footer-mobile-call-btn {
+    padding: 5px 10px !important;
+    font-size: 0.70rem !important;
   }
 }
 
@@ -9276,15 +9325,18 @@ i {
   }
   .courses-action-sub-row {
     display: flex !important;
-    gap: 8px !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
     width: 100% !important;
   }
   .courses-action-sub {
-    flex: 1 !important;
+    flex: 1 1 180px !important;
+    min-width: 0 !important;
     justify-content: center !important;
-    padding: 10px 12px !important;
-    font-size: 0.82rem !important;
-    white-space: nowrap !important;
+    padding: 11px 16px !important;
+    font-size: 0.86rem !important;
+    white-space: normal !important;
+    text-align: center !important;
   }
 }
 
@@ -11107,10 +11159,13 @@ i {
 
 /* Metric Strip */
 .blog-metric-card {
+  height: 100%;
+  display: flex;
+  align-items: center;
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 20px;
-  padding: 22px 18px;
+  padding: 18px 18px;
   box-shadow: 0 4px 18px rgba(7, 41, 77, 0.04);
   transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
   position: relative;
@@ -16109,7 +16164,7 @@ i {
 .website-guide-floating-wrapper {
   position: fixed;
   bottom: 26px;
-  left: 26px;
+  right: 26px;
   z-index: 1040;
 }
 
@@ -16781,13 +16836,19 @@ i {
   .section-title-2 .title {
     font-size: 1.45rem !important;
     line-height: 1.45 !important;
-    word-break: keep-all;
-    overflow-wrap: break-word;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
   }
   .section-title-2 p {
     font-size: 0.90rem !important;
     line-height: 1.55 !important;
     padding: 0 4px;
+  }
+}
+
+@media (max-width: 768px) {
+  .website-guide-floating-btn {
+    display: none !important;
   }
 }
 
@@ -17887,31 +17948,47 @@ i {
   .mobile-nav-right-actions {
     display: none !important;
   }
+  .modern-logo {
+    display: flex !important;
+    align-items: center !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    max-width: calc(100% - 50px) !important;
+  }
   .modern-navbar-logo {
-    height: 42px !important;
-    max-width: calc(100vw - 84px) !important;
+    max-height: 38px !important;
+    max-width: 100% !important;
+    height: auto !important;
+    width: auto !important;
+    object-fit: contain !important;
     display: block !important;
   }
   .modern-nav-content {
     display: flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    gap: 12px !important;
+    gap: 10px !important;
     padding: 8px 0 !important;
   }
 }
 
 @media (max-width: 480px) {
   .modern-navbar-logo {
-    height: 38px !important;
-    max-width: calc(100vw - 74px) !important;
+    max-height: 32px !important;
+    max-width: 100% !important;
+    height: auto !important;
+    width: auto !important;
+    object-fit: contain !important;
   }
 }
 
 @media (max-width: 360px) {
   .modern-navbar-logo {
-    height: 32px !important;
-    max-width: calc(100vw - 64px) !important;
+    max-height: 28px !important;
+    max-width: 100% !important;
+    height: auto !important;
+    width: auto !important;
+    object-fit: contain !important;
   }
 }
 
@@ -17925,14 +18002,89 @@ i {
   .mobile-nav-right-actions {
     display: none !important;
   }
+  .modern-mobile-menu,
+  .modern-mobile-overlay {
+    display: none !important;
+  }
   .desktop-navbar-logo {
     display: block !important;
   }
   .modern-navbar-logo {
-    height: 54px !important;
+    height: 54px;
     display: block !important;
   }
 }
+
+/* Institutional Navbar Responsive Spacing for Small Desktop & Laptop Screens (1024px - 1366px) */
+@media (min-width: 1024px) and (max-width: 1120px) {
+  .modern-container {
+    padding: 0 0.85rem !important;
+  }
+  .modern-navbar-logo {
+    height: 42px !important;
+    max-width: 350px !important;
+  }
+  .modern-nav-sticky .modern-navbar-logo {
+    height: 40px !important;
+  }
+  .modern-nav-content {
+    gap: 1.25rem !important;
+  }
+  .modern-menu-desktop {
+    gap: 0.2rem !important;
+  }
+  .modern-menu-link {
+    font-size: 0.82rem !important;
+    padding: 0.35rem 0.32rem !important;
+  }
+}
+
+@media (min-width: 1121px) and (max-width: 1260px) {
+  .modern-container {
+    padding: 0 1rem !important;
+  }
+  .modern-navbar-logo {
+    height: 46px !important;
+    max-width: 385px !important;
+  }
+  .modern-nav-sticky .modern-navbar-logo {
+    height: 44px !important;
+  }
+  .modern-nav-content {
+    gap: 1.5rem !important;
+  }
+  .modern-menu-desktop {
+    gap: 0.35rem !important;
+  }
+  .modern-menu-link {
+    font-size: 0.88rem !important;
+    padding: 0.4rem 0.42rem !important;
+  }
+}
+
+@media (min-width: 1261px) and (max-width: 1366px) {
+  .modern-container {
+    padding: 0 1.25rem !important;
+  }
+  .modern-navbar-logo {
+    height: 50px !important;
+    max-width: 415px !important;
+  }
+  .modern-nav-sticky .modern-navbar-logo {
+    height: 48px !important;
+  }
+  .modern-nav-content {
+    gap: 1.75rem !important;
+  }
+  .modern-menu-desktop {
+    gap: 0.5rem !important;
+  }
+  .modern-menu-link {
+    font-size: 0.94rem !important;
+    padding: 0.45rem 0.5rem !important;
+  }
+}
+
 
 /* ==========================================================================
    MOBILE & TABLET INSTITUTIONAL SCREEN STANDARDS (RPITSSR 2026)
@@ -18616,6 +18768,65 @@ i {
     border-radius: 12px !important;
     background: linear-gradient(135deg, #07294D 0%, #1e73be 100%) !important;
     box-shadow: 0 2px 8px rgba(30, 115, 190, 0.35) !important;
+  }
+
+  /* Center Mode Course Card Customization */
+  .mobile-center-slide-item .single-courses {
+    margin: 0 !important;
+    height: 100% !important;
+    box-shadow: 0 8px 24px rgba(7, 41, 77, 0.08) !important;
+    border-radius: 18px !important;
+    padding: 14px !important;
+    background: #ffffff !important;
+  }
+
+  .mobile-center-slide-item.is-active .single-courses {
+    box-shadow: 0 14px 34px rgba(7, 41, 77, 0.14) !important;
+  }
+
+  .mobile-center-slide-item .courses-image {
+    height: 145px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+
+  .mobile-center-slide-item .courses-image img {
+    height: 100% !important;
+    width: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .mobile-center-slide-item .courses-title {
+    font-size: 0.96rem !important;
+    line-height: 1.4 !important;
+    margin: 6px 0 8px !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+
+  .mobile-center-slide-item .duration-fee {
+    padding: 6px 0 !important;
+    margin-top: 6px !important;
+    border-top: 1px dashed #e2e8f0 !important;
+  }
+
+  .mobile-center-slide-item .courses-link {
+    display: flex !important;
+    gap: 8px !important;
+    margin-top: 10px !important;
+  }
+
+  .mobile-center-slide-item .courses-link .apply-btn,
+  .mobile-center-slide-item .courses-link .details-btn {
+    flex: 1 !important;
+    padding: 8px 12px !important;
+    font-size: 0.82rem !important;
+    text-align: center !important;
+    border-radius: 8px !important;
+    white-space: nowrap !important;
   }
 
   /* Center Mode Event Card Customization */

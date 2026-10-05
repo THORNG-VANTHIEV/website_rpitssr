@@ -332,16 +332,16 @@ export const CoursesPage = () => {
 
           {/* Action Links */}
           <div className="courses-env-actions">
-            <Link to="/register" onClick={scrollToTop} className="footer-btn-primary courses-action-main" style={{ padding: '12px 30px' }}>
+            <Link to="/register" onClick={scrollToTop} className="footer-btn-primary courses-action-main">
               <Edit3 size={17} />
               <span>{isKhmer ? 'ចុះឈ្មោះចូលរៀនឥឡូវនេះ' : 'Apply For Admission'}</span>
             </Link>
             <div className="courses-action-sub-row">
-              <Link to="/contact" onClick={scrollToTop} className="footer-btn-outline courses-action-sub" style={{ padding: '12px 24px' }}>
+              <Link to="/contact" onClick={scrollToTop} className="footer-btn-outline courses-action-sub">
                 <PhoneCall size={16} />
                 <span>{isKhmer ? 'ទំនាក់ទំនងប្រឹក្សា' : 'Consult Advisors'}</span>
               </Link>
-              <Link to="/downloads" onClick={scrollToTop} className="home-hero-btn-outline courses-action-sub" style={{ padding: '11px 22px' }}>
+              <Link to="/downloads" onClick={scrollToTop} className="footer-btn-outline courses-action-sub">
                 <FileDown size={16} />
                 <span>{isKhmer ? 'មជ្ឈមណ្ឌលឯកសារ' : 'Brochures'}</span>
               </Link>

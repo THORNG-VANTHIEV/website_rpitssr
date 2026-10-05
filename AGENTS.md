@@ -108,3 +108,11 @@ Never use the legacy `.section-title` with the vertical divider line `|` (`.titl
   - Gateways: `ច្រកទ្វារផ្លូវកាត់រហ័ស`
   - Free: `ឥតគិតថ្លៃ` / `អាហារូបករណ៍ ១០០%`
 - Avoid literal/machine translation. Maintain an elevated, trustworthy, academic Cambodian institutional tone.
+
+---
+
+## 7. Git & Deployment Policy (Strict Rule)
+
+> [!CAUTION]
+> **NO AUTOMATIC GIT PUSH**: Never run `git push` autonomously or on your own initiative. Every `git push` to GitHub MUST be explicitly requested or approved by the USER first. All code modifications, local testing, and staging remain strictly local until the user explicitly issues the command to push.
+

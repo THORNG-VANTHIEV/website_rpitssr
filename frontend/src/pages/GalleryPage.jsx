@@ -34,7 +34,7 @@ const SAMPLE_GALLERY = [
     id: 103,
     title: 'Computer Science & Software Development Lab',
     description: 'បន្ទប់ពិសោធន៍កុំព្យូទ័រ និងអភិវឌ្ឍន៍កម្មវិធីកម្រិតខ្ពស់ បំពាក់ដោយប្រព័ន្ធអ៊ីនធឺណិតល្បឿនលឿន និងកម្មវិធីស្តង់ដារ',
-    imageUrl: '/images/gallery/CS.jpg',
+    imageUrl: '/images/gallery/gallery 3.jpg',
     category: 'academic',
     createdAt: '2026-09-08'
   },
@@ -42,7 +42,7 @@ const SAMPLE_GALLERY = [
     id: 104,
     title: 'Electrical Automation & PLC Control Workshop',
     description: 'រោងជាងអនុវត្តជាក់ស្តែងផ្នែកអគ្គិសនីស្វ័យប្រវត្តិកម្ម និងការបញ្ជាប្រព័ន្ធម៉ូទ័រឧស្សាហកម្ម PLC',
-    imageUrl: '/images/gallery/electricity.jpg',
+    imageUrl: '/images/courses/Course 4.jpg',
     category: 'academic',
     createdAt: '2026-09-06'
   },
@@ -50,7 +50,7 @@ const SAMPLE_GALLERY = [
     id: 105,
     title: 'Civil Construction & Architectural Design Studio',
     description: 'ការអនុវត្តវាស់វែង គូរប្លង់ស្ថាបត្យកម្ម និងតេស្តសម្ភារៈសំណង់ស៊ីវិលរបស់និស្សិតវិស្វកម្ម',
-    imageUrl: '/images/gallery/civil engineering.jpg',
+    imageUrl: '/images/gallery/gallery 4.jpg',
     category: 'academic',
     createdAt: '2026-09-04'
   },
@@ -58,7 +58,7 @@ const SAMPLE_GALLERY = [
     id: 106,
     title: 'Air Conditioning & Refrigeration Technology',
     description: 'សិក្ខាសាលាអនុវត្តបច្ចេកវិទ្យាកំដៅ និងត្រជាក់ឧស្សាហកម្មទំនើប សន្សំសំចៃថាមពលអគ្គិសនី',
-    imageUrl: '/images/gallery/ac.jpg',
+    imageUrl: '/images/courses/Course 5.jpg',
     category: 'academic',
     createdAt: '2026-09-02'
   },
@@ -66,7 +66,7 @@ const SAMPLE_GALLERY = [
     id: 107,
     title: 'Automotive Engine Diagnostics & Electronic Systems',
     description: 'ការត្រួតពិនិត្យប្រព័ន្ធអេឡិចត្រូនិក និងម៉ាស៊ីនរថយន្តទំនើបដោយប្រើឧបករណ៍ OBD-II Scanner',
-    imageUrl: '/images/gallery/auto.jpg',
+    imageUrl: '/images/gallery/gallery 5.jpg',
     category: 'academic',
     createdAt: '2026-08-30'
   },
@@ -74,7 +74,7 @@ const SAMPLE_GALLERY = [
     id: 108,
     title: 'Student Graduation and Skills Exhibition Day',
     description: 'ពិធីប្រគល់សញ្ញាបត្រ និងការតាំងពិព័រណ៍ស្នាដៃគំរូ និងការស្រាវជ្រាវរបស់និស្សិតជ័យលាភី',
-    imageUrl: '/images/gallery/events.jpg',
+    imageUrl: '/images/gallery/gallery 6.jpg',
     category: 'events',
     createdAt: '2026-08-25'
   },
@@ -82,7 +82,7 @@ const SAMPLE_GALLERY = [
     id: 109,
     title: 'Campus Sports & Cultural Festival',
     description: 'សកម្មភាពកីឡាបាល់ទាត់ មិត្តភាព និងការសម្តែងសិល្បៈវប្បធម៌បុរាណរបស់និស្សិត RPITSSR',
-    imageUrl: '/images/gallery/sports.jpg',
+    imageUrl: '/images/gallery/gallery 7.jpg',
     category: 'events',
     createdAt: '2026-08-20'
   }
@@ -788,7 +788,7 @@ export const GalleryPage = () => {
                 </div>
                 <div className="col-lg-4 text-lg-end text-center">
                   <a
-                    href="https://t.me/rpitssr"
+                    href="https://qrcode.rpitssr.edu.kh/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-light rounded-pill px-4 py-2.5 fw-bold d-inline-flex align-items-center gap-2 shadow"

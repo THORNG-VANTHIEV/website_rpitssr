@@ -190,7 +190,7 @@ class InitialContentSeeder extends Seeder
                 ['title' => 'Air Conditioning & Refrigeration Technology', 'category' => 'academic', 'imageUrl' => '/images/courses/Course 1.jpg', 'isActive' => true, 'order' => 6],
                 ['title' => 'Automotive Engine Diagnostics & Electronic Systems', 'category' => 'academic', 'imageUrl' => '/images/courses/Course 2.jpg', 'isActive' => true, 'order' => 7],
                 ['title' => 'Student Graduation and Skills Exhibition Day', 'category' => 'events', 'imageUrl' => '/images/gallery/gallery 7.jpg', 'isActive' => true, 'order' => 8],
-                ['title' => 'Campus Sports & Cultural Festival', 'category' => 'events', 'imageUrl' => '/images/gallery/school.jpg', 'isActive' => true, 'order' => 9],
+                ['title' => 'Campus Sports & Cultural Festival', 'category' => 'events', 'imageUrl' => '/images/gallery/gallery 6.jpg', 'isActive' => true, 'order' => 9],
             ];
             foreach ($gallery as $item) {
                 GalleryImage::create($item);

@@ -190,15 +190,17 @@ export const BlogPage = () => {
     sourceCategories.forEach(cat => {
       const catKey = String(cat.id || cat.slug);
       const count = posts.filter(p => matchesCategory(p, catKey)).length;
-      list.push({
-        key: catKey,
-        label: getCategoryDisplayName(cat, isKhmer),
-        count: count
-      });
+      if (count > 0 || catKey === activeCategory) {
+        list.push({
+          key: catKey,
+          label: getCategoryDisplayName(cat, isKhmer),
+          count: count
+        });
+      }
     });
 
     return list;
-  }, [categories, posts, isKhmer, t]);
+  }, [categories, posts, isKhmer, t, activeCategory]);
 
   const handleCategoryChange = (key) => {
     setActiveCategory(key);
@@ -295,8 +297,8 @@ export const BlogPage = () => {
       <section className="py-4" style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
         <div className="container">
           <div className="row g-3">
-            <div className="col-6 col-lg-3">
-              <div className="blog-metric-card d-flex align-items-center gap-3">
+            <div className="col-6 col-lg-3 d-flex">
+              <div className="blog-metric-card w-100 h-100 d-flex align-items-center gap-3">
                 <div
                   className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
                   style={{ width: '48px', height: '48px', backgroundColor: '#eff6ff', border: '1px solid #dbeafe', color: '#1e73be' }}
@@ -304,18 +306,18 @@ export const BlogPage = () => {
                   <i className="fas fa-newspaper" style={{ fontSize: '1.25rem' }}></i>
                 </div>
                 <div>
-                  <div className="fw-bold" style={{ color: '#07294D', fontSize: '1.35rem', lineHeight: 1.2 }}>
-                    {isKhmer ? '១៥០+' : '150+'}
+                  <div className="fw-bold" style={{ color: '#07294D', fontSize: '1.35rem', lineHeight: 1.2, fontFamily: "'Outfit', 'Inter', sans-serif" }}>
+                    150+
                   </div>
                   <div className="text-muted small fw-medium">
-                    {t('blog.stat_articles') || 'អត្ថបទ & សេចក្តីប្រកាស'}
+                    {t('blog.stat_articles') || (isKhmer ? 'អត្ថបទ & សេចក្តីប្រកាស' : 'Articles & Notices')}
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="col-6 col-lg-3">
-              <div className="blog-metric-card d-flex align-items-center gap-3">
+            <div className="col-6 col-lg-3 d-flex">
+              <div className="blog-metric-card w-100 h-100 d-flex align-items-center gap-3">
                 <div
                   className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
                   style={{ width: '48px', height: '48px', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', color: '#059669' }}
@@ -323,18 +325,18 @@ export const BlogPage = () => {
                   <i className="fas fa-check-double" style={{ fontSize: '1.25rem' }}></i>
                 </div>
                 <div>
-                  <div className="fw-bold" style={{ color: '#07294D', fontSize: '1.35rem', lineHeight: 1.2 }}>
-                    {isKhmer ? '១០០%' : '100%'}
+                  <div className="fw-bold" style={{ color: '#07294D', fontSize: '1.35rem', lineHeight: 1.2, fontFamily: "'Outfit', 'Inter', sans-serif" }}>
+                    100%
                   </div>
                   <div className="text-muted small fw-medium">
-                    {t('blog.stat_verified') || 'ព័ត៌មានផ្លូវការ & ផ្ទៀងផ្ទាត់'}
+                    {t('blog.stat_verified') || (isKhmer ? 'ព័ត៌មានផ្លូវការ & ផ្ទៀងផ្ទាត់' : 'Official & Verified')}
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="col-6 col-lg-3">
-              <div className="blog-metric-card d-flex align-items-center gap-3">
+            <div className="col-6 col-lg-3 d-flex">
+              <div className="blog-metric-card w-100 h-100 d-flex align-items-center gap-3">
                 <div
                   className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
                   style={{ width: '48px', height: '48px', backgroundColor: '#faf5ff', border: '1px solid #e9d5ff', color: '#7c3aed' }}
@@ -346,14 +348,14 @@ export const BlogPage = () => {
                     {isKhmer ? '៥ វិស័យ' : '5 Sectors'}
                   </div>
                   <div className="text-muted small fw-medium">
-                    {t('blog.stat_sectors') || 'ជំនាញបច្ចេកទេស TVET'}
+                    {t('blog.stat_sectors') || (isKhmer ? 'ជំនាញបច្ចេកទេស TVET' : 'TVET Technical Sectors')}
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="col-6 col-lg-3">
-              <div className="blog-metric-card d-flex align-items-center gap-3">
+            <div className="col-6 col-lg-3 d-flex">
+              <div className="blog-metric-card w-100 h-100 d-flex align-items-center gap-3">
                 <div
                   className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
                   style={{ width: '48px', height: '48px', backgroundColor: '#fff7ed', border: '1px solid #fed7aa', color: '#ea580c' }}
@@ -361,11 +363,11 @@ export const BlogPage = () => {
                   <i className="fas fa-broadcast-tower" style={{ fontSize: '1.25rem' }}></i>
                 </div>
                 <div>
-                  <div className="fw-bold" style={{ color: '#07294D', fontSize: '1.35rem', lineHeight: 1.2 }}>
-                    {isKhmer ? '២៤/៧' : '24/7'}
+                  <div className="fw-bold" style={{ color: '#07294D', fontSize: '1.35rem', lineHeight: 1.2, fontFamily: "'Outfit', 'Inter', sans-serif" }}>
+                    24/7
                   </div>
                   <div className="text-muted small fw-medium">
-                    {t('blog.stat_updates') || 'ផ្សព្វផ្សាយព័ត៌មានទាន់ហេតុការណ៍'}
+                    {t('blog.stat_updates') || (isKhmer ? 'ព័ត៌មានទាន់ហេតុការណ៍' : 'Breaking Updates')}
                   </div>
                 </div>
               </div>
@@ -719,7 +721,7 @@ export const BlogPage = () => {
                 </div>
                 <div className="col-lg-4 text-lg-end">
                   <a
-                    href="https://t.me/rpitssr"
+                    href="https://qrcode.rpitssr.edu.kh/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-light rounded-pill px-4 py-2.5 fw-bold d-inline-flex align-items-center gap-2 shadow"

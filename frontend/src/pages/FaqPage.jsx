@@ -381,7 +381,7 @@ export const FaqPage = () => {
               </div>
               <div className="faq-metric-info">
                 <span className="faq-metric-val">
-                  {isKhmer ? '០៤ កម្រិតសិក្សា' : '4 Study Tracks'}
+                  {isKhmer ? '៤ កម្រិតសិក្សា' : '4 Study Tracks'}
                 </span>
                 <span className="faq-metric-lbl">
                   {isKhmer ? 'C1-C3, បរិញ្ញាបត្ររង និងបច្ចេកវិទ្យា' : 'Certificates to B.Tech'}
@@ -698,7 +698,7 @@ export const FaqPage = () => {
                   : 'Get prompt guidance via hotline 063 963 888 or join the official RPITSSR Telegram channel for instant updates and alerts.'}
               </p>
               <a
-                href="https://t.me/rpitssr"
+                href="https://qrcode.rpitssr.edu.kh/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="faq-support-action"

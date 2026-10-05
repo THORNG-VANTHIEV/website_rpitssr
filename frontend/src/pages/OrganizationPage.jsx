@@ -679,6 +679,12 @@ export const OrganizationPage = () => {
   const { t, language, currentLanguage } = useLanguage();
   const isKhmer = (currentLanguage || language) === 'km';
 
+  const toKhmerNumber = (num) => {
+    if (!isKhmer || num === undefined || num === null) return num;
+    const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+    return String(num).replace(/[0-9]/g, (d) => khmerDigits[parseInt(d, 10)]);
+  };
+
   const [viewMode, setViewMode] = useState('tree'); // 'tree' or 'grid'
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -817,7 +823,7 @@ export const OrganizationPage = () => {
                 >
                   <i className="fas fa-user-tie"></i>
                 </div>
-                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>1</div>
+                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>{isKhmer ? '១' : '1'}</div>
                 <div className="fw-semibold text-dark small mt-1">{t('organization.stat_director')}</div>
                 <span
                   className="badge rounded-pill mt-2 px-2.5 py-1"
@@ -836,7 +842,7 @@ export const OrganizationPage = () => {
                 >
                   <i className="fas fa-users-cog"></i>
                 </div>
-                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>{LEADERSHIP_DATA.deputies.length}</div>
+                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>{isKhmer ? toKhmerNumber(LEADERSHIP_DATA.deputies.length) : LEADERSHIP_DATA.deputies.length}</div>
                 <div className="fw-semibold text-dark small mt-1">{t('organization.stat_deputies')}</div>
                 <span
                   className="badge rounded-pill mt-2 px-2.5 py-1"
@@ -855,7 +861,7 @@ export const OrganizationPage = () => {
                 >
                   <i className="fas fa-laptop-code"></i>
                 </div>
-                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>{LEADERSHIP_DATA.departments.length}</div>
+                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>{isKhmer ? toKhmerNumber(LEADERSHIP_DATA.departments.length) : LEADERSHIP_DATA.departments.length}</div>
                 <div className="fw-semibold text-dark small mt-1">{t('organization.stat_departments')}</div>
                 <span
                   className="badge rounded-pill mt-2 px-2.5 py-1"
@@ -874,7 +880,7 @@ export const OrganizationPage = () => {
                 >
                   <i className="fas fa-building"></i>
                 </div>
-                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>{LEADERSHIP_DATA.offices.length}</div>
+                <div className="fw-bold" style={{ fontSize: '2.1rem', color: '#07294D', lineHeight: 1.1 }}>{isKhmer ? toKhmerNumber(LEADERSHIP_DATA.offices.length) : LEADERSHIP_DATA.offices.length}</div>
                 <div className="fw-semibold text-dark small mt-1">{t('organization.stat_offices')}</div>
                 <span
                   className="badge rounded-pill mt-2 px-2.5 py-1"
@@ -915,7 +921,7 @@ export const OrganizationPage = () => {
                 style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', color: '#475569', fontSize: '0.84rem', fontWeight: 500 }}
               >
                 <i className="fas fa-sitemap text-primary"></i>
-                <span>{isKhmer ? `គណៈនាយក ៥ រូប • ${LEADERSHIP_DATA.departments.length} ដេប៉ាតឺម៉ង់ • ${LEADERSHIP_DATA.offices.length} ការិយាល័យ & មជ្ឈមណ្ឌល` : `5 Executive Directorate • ${LEADERSHIP_DATA.departments.length} Departments • ${LEADERSHIP_DATA.offices.length} Offices & Center`}</span>
+                <span>{isKhmer ? `គណៈនាយក ៥ រូប • ${toKhmerNumber(LEADERSHIP_DATA.departments.length)} ដេប៉ាតឺម៉ង់ • ${toKhmerNumber(LEADERSHIP_DATA.offices.length)} ការិយាល័យ & មជ្ឈមណ្ឌល` : `5 Executive Directorate • ${LEADERSHIP_DATA.departments.length} Departments • ${LEADERSHIP_DATA.offices.length} Offices & Center`}</span>
               </div>
             )}
 
@@ -1142,7 +1148,7 @@ export const OrganizationPage = () => {
                         </h5>
                       </div>
                       <span className="badge bg-primary text-white rounded-pill">
-                        {LEADERSHIP_DATA.departments.length} {isKhmer ? 'ដេប៉ាតឺម៉ង់' : 'Departments'}
+                        {isKhmer ? toKhmerNumber(LEADERSHIP_DATA.departments.length) : LEADERSHIP_DATA.departments.length} {isKhmer ? 'ដេប៉ាតឺម៉ង់' : 'Departments'}
                       </span>
                     </div>
 
@@ -1204,7 +1210,7 @@ export const OrganizationPage = () => {
                         </h5>
                       </div>
                       <span className="badge bg-success text-white rounded-pill">
-                        {LEADERSHIP_DATA.offices.length} {isKhmer ? 'អង្គភាព' : 'Units'}
+                        {isKhmer ? toKhmerNumber(LEADERSHIP_DATA.offices.length) : LEADERSHIP_DATA.offices.length} {isKhmer ? 'អង្គភាព' : 'Units'}
                       </span>
                     </div>
 

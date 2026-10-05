@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import {
   Compass,
@@ -22,6 +22,8 @@ export const WebsiteGuideModal = () => {
   const { currentLanguage, language } = useLanguage();
   const isKhmer = currentLanguage === 'km' || language === 'km';
   const navigate = useNavigate();
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
 
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -107,19 +109,25 @@ export const WebsiteGuideModal = () => {
     },
   ];
 
-  // Auto-launch for first-time visitors
+  // Auto-launch for first-time visitors on Homepage only (Desktop only, 4s delay, cancelled if navigated away)
   useEffect(() => {
-    if (window.location.search.includes('test_print') || window.location.pathname.startsWith('/admin')) {
+    if (
+      location.pathname !== '/' ||
+      window.location.search.includes('test_print') ||
+      location.pathname.startsWith('/admin') ||
+      window.innerWidth <= 768
+    ) {
       return;
     }
     const hasSeenGuide = localStorage.getItem('rpitssr_website_guide_seen');
     if (!hasSeenGuide) {
       const timer = setTimeout(() => {
+        if (window.location.pathname !== '/') return;
         setIsOpen(true);
-      }, 1500);
+      }, 4000);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [location.pathname]);
 
   // Listen to global open event from header / navbar or floating button
   useEffect(() => {
@@ -168,23 +176,25 @@ export const WebsiteGuideModal = () => {
 
   return (
     <>
-      {/* Floating Trigger Button on Bottom-Left */}
-      <div className="website-guide-floating-wrapper">
-        <button
-          type="button"
-          onClick={() => {
-            setCurrentStep(0);
-            setIsOpen(true);
-          }}
-          className="website-guide-floating-btn"
-          title={isKhmer ? 'មគ្គុទ្ទេសក៍ណែនាំគេហទំព័រ' : 'Website Quick Guide'}
-        >
-          <Compass size={18} className="guide-compass-icon" />
-          <span className="guide-floating-text">
-            {isKhmer ? 'មគ្គុទ្ទេសក៍' : 'Site Guide'}
-          </span>
-        </button>
-      </div>
+      {/* Floating Trigger Button on Homepage Only */}
+      {isHomePage && (
+        <div className="website-guide-floating-wrapper">
+          <button
+            type="button"
+            onClick={() => {
+              setCurrentStep(0);
+              setIsOpen(true);
+            }}
+            className="website-guide-floating-btn"
+            title={isKhmer ? 'មគ្គុទ្ទេសក៍ណែនាំគេហទំព័រ' : 'Website Quick Guide'}
+          >
+            <Compass size={18} className="guide-compass-icon" />
+            <span className="guide-floating-text">
+              {isKhmer ? 'មគ្គុទ្ទេសក៍' : 'Site Guide'}
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Interactive Modal */}
       {isOpen && (

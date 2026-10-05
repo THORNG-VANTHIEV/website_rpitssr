@@ -8,8 +8,11 @@ const SAMPLE_TEACHERS = [
   {
     id: 1,
     name: 'Dr. Seng Bunthoeun',
+    nameKm: 'បណ្ឌិត សេង ប៊ុនធឿន',
     designation: 'Director of RPITSSR',
+    designationKm: 'នាយកវិទ្យាស្ថាន RPITSSR',
     department: 'Executive Management',
+    departmentKm: 'គណៈគ្រប់គ្រងស្ថាប័ន',
     image_url: '/images/teachers/teacher-1.jpg',
     facebook: 'https://facebook.com',
     linkedin: 'https://linkedin.com'
@@ -17,31 +20,61 @@ const SAMPLE_TEACHERS = [
   {
     id: 2,
     name: 'Eng. Chhay Kimhong',
+    nameKm: 'វិស្វករ ឆាយ គឹមហុង',
     designation: 'Head of Information Technology',
+    designationKm: 'ប្រធានដេប៉ាតឺម៉ង់ព័ត៌មានវិទ្យា',
     department: 'Information Technology',
+    departmentKm: 'ព័ត៌មានវិទ្យា',
     image_url: '/images/teachers/teacher-2.jpg',
     facebook: 'https://facebook.com'
   },
   {
     id: 3,
     name: 'Ms. Keo Sreymom',
+    nameKm: 'សាស្ត្រាចារ្យ កែវ ស្រីមុំ',
     designation: 'Senior Lecturer, Civil Engineering',
+    designationKm: 'សាស្ត្រាចារ្យជាន់ខ្ពស់ វិស្វកម្មសំណង់ស៊ីវិល',
     department: 'Civil Engineering',
+    departmentKm: 'សំណង់ស៊ីវិល',
     image_url: '/images/teachers/teacher-3.jpg',
     facebook: 'https://facebook.com'
   },
   {
     id: 4,
     name: 'Mr. Heng Sokheng',
+    nameKm: 'លោក ហេង សុខហេង',
     designation: 'Electrical Automation Specialist',
+    designationKm: 'អ្នកឯកទេសស្វ័យប្រវត្តិកម្មអគ្គិសនី',
     department: 'Electrical Engineering',
+    departmentKm: 'អគ្គិសនី និងថាមពល',
     image_url: '/images/teachers/teacher-4.jpg',
     facebook: 'https://facebook.com'
   }
 ];
 
 export const TeachersPage = () => {
-  const { t } = useLanguage();
+  const { t, currentLanguage, language } = useLanguage();
+  const isKhmer = (currentLanguage || language) === 'km';
+
+  const toKhmerNumber = (num) => {
+    if (!isKhmer || num === undefined || num === null) return num;
+    const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+    return String(num).replace(/[0-9]/g, (d) => khmerDigits[parseInt(d, 10)]);
+  };
+
+  const getDepartmentName = (dept) => {
+    if (!isKhmer) return dept;
+    const mapping = {
+      'Executive Management': 'គណៈគ្រប់គ្រងស្ថាប័ន',
+      'Information Technology': 'ព័ត៌មានវិទ្យា',
+      'Civil Engineering': 'សំណង់ស៊ីវិល',
+      'Electrical Engineering': 'អគ្គិសនី និងថាមពល',
+      'Mechanical Engineering': 'មេកានិច',
+      'General Studies': 'ចំណេះទូទៅ'
+    };
+    return mapping[dept] || dept;
+  };
+
   const [teachers, setTeachers] = useState([]);
   const [filteredTeachers, setFilteredTeachers] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -110,7 +143,7 @@ export const TeachersPage = () => {
                 }}
               >
                 <i className="fas fa-users" style={{ marginRight: '0.5rem' }}></i>
-                {t('teachers.allTeachers') || 'All Faculty'} ({teachers.length})
+                {t('teachers.allTeachers') || 'All Faculty'} ({toKhmerNumber(teachers.length)})
               </button>
 
               {departments.map((dept) => {
@@ -135,7 +168,7 @@ export const TeachersPage = () => {
                     }}
                   >
                     <i className="fas fa-graduation-cap" style={{ marginRight: '0.5rem' }}></i>
-                    {dept} ({count})
+                    {getDepartmentName(dept)} ({toKhmerNumber(count)})
                   </button>
                 );
               })}
@@ -215,11 +248,11 @@ export const TeachersPage = () => {
                     <div className="teacher-content" style={{ padding: '1.5rem' }}>
                       <h4 className="name">
                         <Link to={`/teacher-details/${teacher.id}`} style={{ color: '#07294D', textDecoration: 'none' }}>
-                          {teacher.name}
+                          {isKhmer ? (teacher.nameKm || teacher.name) : (teacher.name || teacher.nameKm)}
                         </Link>
                       </h4>
                       <span className="designation" style={{ display: 'block', color: '#666', fontSize: '0.9rem', marginTop: '4px' }}>
-                        {teacher.designation}
+                        {isKhmer ? (teacher.designationKm || teacher.designation) : (teacher.designation || teacher.designationKm)}
                       </span>
                       {teacher.department && (
                         <div
@@ -235,7 +268,7 @@ export const TeachersPage = () => {
                           }}
                         >
                           <i className="fas fa-building" style={{ marginRight: '0.4rem' }}></i>
-                          {teacher.department}
+                          {getDepartmentName(teacher.department)}
                         </div>
                       )}
                     </div>

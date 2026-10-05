@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import client from '../api/client';
+import { FacebookIcon, TelegramIcon, TikTokIcon } from '../components/common/SocialBrandIcons';
 
 export const ContactPage = () => {
   const { t, language, currentLanguage } = useLanguage();
@@ -251,19 +252,27 @@ export const ContactPage = () => {
               </div>
             </div>
 
-            <div className="contact-metric-card">
+            <a
+              href="https://qrcode.rpitssr.edu.kh/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="contact-metric-card"
+              style={{ textDecoration: 'none' }}
+            >
               <div className="contact-metric-icon" style={{ background: '#faf5ff', color: '#7c3aed', border: '1px solid #e9d5ff' }}>
-                <i className="fab fa-telegram-plane"></i>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                </svg>
               </div>
               <div className="contact-metric-info">
                 <span className="contact-metric-val">
-                  t.me/rpitssr
+                  Telegram / QR
                 </span>
                 <span className="contact-metric-lbl">
-                  {isKhmer ? 'ឆានែល Telegram ផ្លូវការ' : 'Official Telegram Channel'}
+                  {isKhmer ? 'Telegram ផ្លូវការ' : 'Official Telegram'}
                 </span>
               </div>
-            </div>
+            </a>
           </div>
         </div>
       </section>
@@ -396,7 +405,79 @@ export const ContactPage = () => {
                 <h4 className="inst-contact-title">
                   {isKhmer ? 'អ៊ីមែល & ឆានែលផ្លូវការ' : 'Email & Online Portals'}
                 </h4>
-                <div style={{ width: '100%', marginBottom: '16px' }}>
+                <div style={{ width: '100%', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <a
+                    href="https://web.facebook.com/rpitssr.page"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inst-contact-channel-link"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      color: '#1877f2',
+                      fontWeight: '700',
+                      fontSize: '0.92rem',
+                      textDecoration: 'none',
+                      background: '#eff6ff',
+                      padding: '9px 14px',
+                      borderRadius: '12px',
+                      border: '1px solid #bfdbfe',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <FacebookIcon size={16} />
+                    <span>facebook.com/rpitssr.page</span>
+                  </a>
+                  <a
+                    href="https://qrcode.rpitssr.edu.kh/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inst-contact-channel-link"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      color: '#0284c7',
+                      fontWeight: '700',
+                      fontSize: '0.92rem',
+                      textDecoration: 'none',
+                      background: '#f0f9ff',
+                      padding: '9px 14px',
+                      borderRadius: '12px',
+                      border: '1px solid #bae6fd',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <TelegramIcon size={16} />
+                    <span>qrcode.rpitssr.edu.kh</span>
+                  </a>
+                  <a
+                    href="https://tiktok.com/@rpitssr_edu"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inst-contact-channel-link"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      color: '#0f172a',
+                      fontWeight: '700',
+                      fontSize: '0.92rem',
+                      textDecoration: 'none',
+                      background: '#f8fafc',
+                      padding: '9px 14px',
+                      borderRadius: '12px',
+                      border: '1px solid #e2e8f0',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <TikTokIcon size={16} />
+                    <span>tiktok.com/@rpitssr_edu</span>
+                  </a>
                   <a
                     href="mailto:info@rpitssr.edu.kh"
                     className="inst-contact-channel-link"
@@ -407,43 +488,17 @@ export const ContactPage = () => {
                       gap: '8px',
                       color: '#07294D',
                       fontWeight: '700',
-                      fontSize: '0.96rem',
+                      fontSize: '0.92rem',
                       textDecoration: 'none',
                       background: '#f8fafc',
-                      padding: '10px 16px',
+                      padding: '9px 14px',
                       borderRadius: '12px',
                       border: '1px solid #e2e8f0',
-                      marginBottom: '10px',
                       transition: 'all 0.2s ease'
                     }}
                   >
                     <i className="fas fa-envelope text-primary"></i>
                     <span>info@rpitssr.edu.kh</span>
-                  </a>
-                  <a
-                    href="https://t.me/rpitssr"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inst-contact-channel-link"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      color: '#059669',
-                      fontWeight: '700',
-                      fontSize: '0.96rem',
-                      textDecoration: 'none',
-                      background: '#f0fdf4',
-                      padding: '10px 16px',
-                      borderRadius: '12px',
-                      border: '1px solid #bbf7d0',
-                      marginBottom: '10px',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    <i className="fab fa-telegram text-success"></i>
-                    <span>t.me/rpitssr</span>
                   </a>
                   <a
                     href="https://www.rpitssr.edu.kh"
@@ -457,10 +512,10 @@ export const ContactPage = () => {
                       gap: '8px',
                       color: '#7c3aed',
                       fontWeight: '700',
-                      fontSize: '0.96rem',
+                      fontSize: '0.92rem',
                       textDecoration: 'none',
                       background: '#faf5ff',
-                      padding: '10px 16px',
+                      padding: '9px 14px',
                       borderRadius: '12px',
                       border: '1px solid #e9d5ff',
                       transition: 'all 0.2s ease'

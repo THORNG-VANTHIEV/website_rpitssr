@@ -673,7 +673,7 @@ export const NoticePage = () => {
               </div>
               <div className="col-lg-4 text-lg-end text-start">
                 <a
-                  href="https://t.me/rpitssr"
+                  href="https://qrcode.rpitssr.edu.kh/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="notice-telegram-btn"

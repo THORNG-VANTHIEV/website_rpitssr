@@ -364,7 +364,7 @@ export const HomePage = () => {
                 <span className="video-section-badge" style={{ display: 'inline-flex', marginBottom: '10px' }}>
                   <Sparkles size={14} /> {isKhmer ? 'ស្ថិតិ & សមិទ្ធផល' : 'Facts & Figures'}
                 </span>
-                <h2 className="title" style={{ fontSize: 'clamp(1.35rem, 3.8vw, 2rem)', fontWeight: 800, color: '#07294D', lineHeight: 1.4, wordBreak: 'keep-all' }}>
+                <h2 className="title" style={{ fontSize: 'clamp(1.35rem, 3.8vw, 2rem)', fontWeight: 800, color: '#07294D', lineHeight: 1.4, wordBreak: 'normal', overflowWrap: 'break-word' }}>
                   {isKhmer ? 'ស្ថិតិ និងសមិទ្ធផលសំខាន់ៗរបស់វិទ្យាស្ថាន' : 'Key Facts & Figures at a Glance'}
                 </h2>
                 <span className="line" style={{ margin: '12px auto' }}></span>
@@ -506,7 +506,7 @@ export const HomePage = () => {
                 <span className="video-section-badge" style={{ display: 'inline-flex', marginBottom: '10px' }}>
                   <GraduationCap size={14} /> {isKhmer ? 'ជំនាញ & វគ្គសិក្សា' : 'Academic Programs'}
                 </span>
-                <h2 className="title" style={{ fontSize: 'clamp(1.35rem, 3.8vw, 2rem)', fontWeight: 800, color: '#07294D', lineHeight: 1.4, wordBreak: 'keep-all' }}>
+                <h2 className="title" style={{ fontSize: 'clamp(1.35rem, 3.8vw, 2rem)', fontWeight: 800, color: '#07294D', lineHeight: 1.4, wordBreak: 'normal', overflowWrap: 'break-word' }}>
                   {t('home.topCourses')}
                 </h2>
                 <span className="line" style={{ margin: '12px auto' }}></span>
@@ -574,7 +574,7 @@ export const HomePage = () => {
                 <span className="video-section-badge" style={{ display: 'inline-flex', marginBottom: '10px' }}>
                   <Award size={14} /> {isKhmer ? 'ឧត្តមភាពវិទ្យាស្ថាន' : 'Why RPITSSR'}
                 </span>
-                <h2 className="title" style={{ fontSize: 'clamp(1.35rem, 3.8vw, 2rem)', fontWeight: 800, color: '#07294D', lineHeight: 1.4, wordBreak: 'keep-all' }}>
+                <h2 className="title" style={{ fontSize: 'clamp(1.35rem, 3.8vw, 2rem)', fontWeight: 800, color: '#07294D', lineHeight: 1.4, wordBreak: 'normal', overflowWrap: 'break-word' }}>
                   {isKhmer ? 'ហេតុអ្វីជ្រើសរើសសិក្សានៅ RPITSSR?' : 'Why Choose RPITSSR?'}
                 </h2>
                 <span className="line" style={{ margin: '12px auto' }}></span>
@@ -593,14 +593,16 @@ export const HomePage = () => {
               <div className="home-why-icon-box" style={{ background: '#eff6ff', color: '#1e73be' }}>
                 <Wrench size={26} />
               </div>
-              <h4 className="home-why-card-title">
-                {isKhmer ? 'បន្ទប់ពិសោធន៍ & រោងជាងទំនើប' : 'Modern Labs & Workshops'}
-              </h4>
-              <p className="home-why-card-desc">
-                {isKhmer
-                  ? 'បំពាក់ដោយឧបករណ៍ និងបច្ចេកវិទ្យាសិក្សាស្របតាមស្តង់ដារឧស្សាហកម្មជាក់ស្តែង សម្រាប់សិស្ស-និស្សិតអនុវត្តផ្ទាល់។'
-                  : 'Equipped with industry-standard machinery and simulation software for hands-on learning.'}
-              </p>
+              <div className="home-why-card-content">
+                <h4 className="home-why-card-title">
+                  {isKhmer ? 'បន្ទប់ពិសោធន៍ & រោងជាងទំនើប' : 'Modern Labs & Workshops'}
+                </h4>
+                <p className="home-why-card-desc">
+                  {isKhmer
+                    ? 'បំពាក់ដោយឧបករណ៍ និងបច្ចេកវិទ្យាសិក្សាស្របតាមស្តង់ដារឧស្សាហកម្មជាក់ស្តែង សម្រាប់សិស្ស-និស្សិតអនុវត្តផ្ទាល់។'
+                    : 'Equipped with industry-standard machinery and simulation software for hands-on learning.'}
+                </p>
+              </div>
             </div>
 
             {/* Card 2: Faculty */}
@@ -608,14 +610,16 @@ export const HomePage = () => {
               <div className="home-why-icon-box" style={{ background: '#fef3c7', color: '#d97706' }}>
                 <Users size={26} />
               </div>
-              <h4 className="home-why-card-title">
-                {isKhmer ? 'សាស្ត្រាចារ្យ & គ្រូបណ្តុះបណ្តាលជំនាញ' : 'Experienced Faculty'}
-              </h4>
-              <p className="home-why-card-desc">
-                {isKhmer
-                  ? 'គ្រូបណ្តុះបណ្តាលមានបទពិសោធន៍វិជ្ជាជីវៈច្បាស់លាស់ ទទួលបានការបណ្តុះបណ្តាលទាំងក្នុងនិងក្រៅប្រទេស។'
-                  : 'Certified instructors with extensive field experience and modern pedagogical training.'}
-              </p>
+              <div className="home-why-card-content">
+                <h4 className="home-why-card-title">
+                  {isKhmer ? 'សាស្ត្រាចារ្យ & គ្រូបណ្តុះបណ្តាលជំនាញ' : 'Experienced Faculty'}
+                </h4>
+                <p className="home-why-card-desc">
+                  {isKhmer
+                    ? 'គ្រូបណ្តុះបណ្តាលមានបទពិសោធន៍វិជ្ជាជីវៈច្បាស់លាស់ ទទួលបានការបណ្តុះបណ្តាលទាំងក្នុងនិងក្រៅប្រទេស។'
+                    : 'Certified instructors with extensive field experience and modern pedagogical training.'}
+                </p>
+              </div>
             </div>
 
             {/* Card 3: Job Placement */}
@@ -623,14 +627,16 @@ export const HomePage = () => {
               <div className="home-why-icon-box" style={{ background: '#ecfdf5', color: '#059669' }}>
                 <Briefcase size={26} />
               </div>
-              <h4 className="home-why-card-title">
-                {isKhmer ? 'ឱកាសការងារ ៩៥%+ ខ្ពស់' : 'High Job Placement Rate'}
-              </h4>
-              <p className="home-why-card-desc">
-                {isKhmer
-                  ? 'កិច្ចសហប្រតិបត្តិការជាមួយសហគ្រាស និងក្រុមហ៊ុនដៃគូរាប់រយ ជួយផ្តល់កម្មសិក្សា និងការងារភ្លាមៗក្រោយបញ្ចប់។'
-                  : 'Strong corporate partnerships offering internships and direct recruitment opportunities.'}
-              </p>
+              <div className="home-why-card-content">
+                <h4 className="home-why-card-title">
+                  {isKhmer ? 'ឱកាសការងារ ៩៥%+ ខ្ពស់' : 'High Job Placement Rate'}
+                </h4>
+                <p className="home-why-card-desc">
+                  {isKhmer
+                    ? 'កិច្ចសហប្រតិបត្តិការជាមួយសហគ្រាស និងក្រុមហ៊ុនដៃគូរាប់រយ ជួយផ្តល់កម្មសិក្សា និងការងារភ្លាមៗក្រោយបញ្ចប់។'
+                    : 'Strong corporate partnerships offering internships and direct recruitment opportunities.'}
+                </p>
+              </div>
             </div>
 
             {/* Card 4: Scholarship & Free Training */}
@@ -638,14 +644,16 @@ export const HomePage = () => {
               <div className="home-why-icon-box" style={{ background: '#fdf2f8', color: '#db2777' }}>
                 <ShieldCheck size={26} />
               </div>
-              <h4 className="home-why-card-title">
-                {isKhmer ? 'អាហារូបករណ៍ ១០០% & ឧបត្ថម្ភ' : 'Scholarships & Stipends'}
-              </h4>
-              <p className="home-why-card-desc">
-                {isKhmer
-                  ? 'វគ្គសិក្សាអាហារូបករណ៍ ១០០% របស់រាជរដ្ឋាភិបាល (TVET 1.5M) រៀនដោយឥតគិតថ្លៃ ព្រមទាំងទទួលបានប្រាក់ឧបត្ថម្ភប្រចាំខែ។'
-                  : 'Free tuition and monthly stipends under the National TVET 1.5M training framework.'}
-              </p>
+              <div className="home-why-card-content">
+                <h4 className="home-why-card-title">
+                  {isKhmer ? 'អាហារូបករណ៍ ១០០% & ឧបត្ថម្ភ' : 'Scholarships & Stipends'}
+                </h4>
+                <p className="home-why-card-desc">
+                  {isKhmer
+                    ? 'វគ្គសិក្សាអាហារូបករណ៍ ១០០% របស់រាជរដ្ឋាភិបាល (TVET 1.5M) រៀនដោយឥតគិតថ្លៃ ព្រមទាំងទទួលបានប្រាក់ឧបត្ថម្ភប្រចាំខែ។'
+                    : 'Free tuition and monthly stipends under the National TVET 1.5M training framework.'}
+                </p>
+              </div>
             </div>
           </div>
         </div>

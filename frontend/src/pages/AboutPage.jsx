@@ -377,7 +377,9 @@ export const AboutPage = () => {
                   <Quote size={14} /> {t('about.welcome_from_leadership') || 'សារស្វាគមន៍ពីថ្នាក់ដឹកនាំ'}
                 </span>
                 <h2 className="title" style={{ fontSize: '2rem', fontWeight: 800, color: '#07294D' }}>
-                  {t('about.directorMessageTitle') || 'សាររបស់នាយិកាវិទ្យាស្ថាន'}
+                  {t('about.directorMessageTitle') && t('about.directorMessageTitle') !== 'about.directorMessageTitle'
+                    ? t('about.directorMessageTitle')
+                    : (isKhmer ? 'សាររបស់នាយិកាវិទ្យាស្ថាន' : 'Message from the Institute Director')}
                 </h2>
                 <span className="line" style={{ margin: '12px auto' }}></span>
               </div>
@@ -392,7 +394,11 @@ export const AboutPage = () => {
                 </div>
 
                 <p className="director-message-quote">
-                  "{t('about.directorMessageContent')}"
+                  "{t('about.directorMessageContent') && t('about.directorMessageContent') !== 'about.directorMessageContent'
+                    ? t('about.directorMessageContent')
+                    : (isKhmer 
+                        ? 'វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប ប្តេជ្ញាអភិវឌ្ឍន៍ធនធានមនុស្សប្រកបដោយជំនាញវិជ្ជាជីវៈពិតប្រាកដ សីលធម៌ និងការច្នៃប្រឌិតខ្ពស់ ដើម្បីចូលរួមចំណែកយ៉ាងសកម្មក្នុងការកសាងសេដ្ឋកិច្ចជាតិ និងលើកកម្ពស់ជីវភាពយុវជនកម្ពុជាឱ្យកាន់តែប្រសើរឡើង។'
+                        : 'The Regional Polytechnic Institute Techo Sen Siem Reap is dedicated to developing skilled, professional, and ethical human resources to actively build our national economy and improve the livelihoods of Cambodian youth.')}"
                 </p>
 
                 <div className="director-divider-line"></div>

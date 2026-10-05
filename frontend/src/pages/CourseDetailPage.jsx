@@ -8,7 +8,43 @@ import { courseService } from '../services/courseService';
 
 export const CourseDetailPage = () => {
   const { id } = useParams();
-  const { t } = useLanguage();
+  const { t, currentLanguage, language } = useLanguage();
+  const isKhmer = (currentLanguage || language) === 'km';
+
+  // Khmer numerals conversion helper
+  const toKhmerNumber = (num) => {
+    if (!num) return '';
+    const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+    return String(num).replace(/[0-9]/g, (digit) => khmerDigits[parseInt(digit, 10)]);
+  };
+
+  // Category translation helper
+  const translateCategory = (cat) => {
+    if (!cat) return '';
+    if (!isKhmer) return cat;
+    const mapping = {
+      'Banking': 'ធនាគារ និងហិរញ្ញវត្ថុ',
+      'Information Technology': 'បច្ចេកវិទ្យាព័ត៌មាន (IT)',
+      'Civil Engineering': 'វិស្វកម្មសំណង់ស៊ីវិល',
+      'Electrical Engineering': 'វិស្វកម្មអគ្គិសនី',
+      'Air Conditioning': 'បរិក្ខារត្រជាក់',
+      'Automotive': 'មេកានិចរថយន្ត',
+      'Accounting': 'គណនេយ្យ',
+      'Marketing': 'ទីផ្សារ (Marketing)',
+      'Business English': 'ភាសាអង់គ្លេសពាណិជ្ជកម្ម'
+    };
+    return mapping[cat] || cat;
+  };
+
+  // Academic level translation helper
+  const formatLevel = (lvl) => {
+    if (!lvl) return isKhmer ? 'បរិញ្ញាបត្ររង / បរិញ្ញាបត្រ' : 'Associate / Bachelor';
+    if (!isKhmer) return lvl;
+    if (lvl === 'Associate / Bachelor' || (lvl.includes('Associate') && lvl.includes('Bachelor'))) {
+      return 'បរិញ្ញាបត្ររង / បរិញ្ញាបត្រ';
+    }
+    return lvl;
+  };
 
   const [course, setCourse] = useState(() => {
     const cached = courseService.getCachedCourses();
@@ -100,18 +136,45 @@ export const CourseDetailPage = () => {
             >
               <i className="fas fa-arrow-left"></i> {t('courses.backToCourses') || 'Back to Courses'}
             </Link>
-            <h1
-              style={{
-                color: 'white',
-                fontSize: '2.4rem',
-                fontWeight: '700',
-                marginBottom: '1rem',
-                textShadow: '0 2px 10px rgba(0,0,0,0.2)',
-                lineHeight: '1.3'
-              }}
-            >
-              {course?.title || 'Course Details'}
-            </h1>
+            {(() => {
+              const rawTitle = course?.title || 'Course Details';
+              const titleMatch = rawTitle.match(/^(.*?)\s*\((.*?)\)$/);
+              const displayTitle = isKhmer && titleMatch ? titleMatch[1] : rawTitle;
+              const englishSubtitle = isKhmer && titleMatch ? titleMatch[2] : null;
+
+              return (
+                <>
+                  <h1
+                    style={{
+                      color: 'white',
+                      fontSize: 'clamp(1.5rem, 4vw, 2.4rem)',
+                      fontWeight: '700',
+                      marginBottom: englishSubtitle ? '0.35rem' : '1rem',
+                      textShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                      lineHeight: '1.3',
+                      wordBreak: 'normal',
+                      overflowWrap: 'break-word'
+                    }}
+                  >
+                    {displayTitle}
+                  </h1>
+                  {englishSubtitle && (
+                    <p
+                      style={{
+                        color: 'rgba(255, 255, 255, 0.88)',
+                        fontSize: 'clamp(0.92rem, 2vw, 1.15rem)',
+                        fontWeight: '500',
+                        letterSpacing: '0.01em',
+                        marginBottom: '1rem',
+                        maxWidth: '780px'
+                      }}
+                    >
+                      {englishSubtitle}
+                    </p>
+                  )}
+                </>
+              );
+            })()}
             {categoryName && (
               <div
                 style={{
@@ -125,7 +188,7 @@ export const CourseDetailPage = () => {
                   backdropFilter: 'blur(10px)'
                 }}
               >
-                📚 {categoryName}
+                📚 {translateCategory(categoryName)}
               </div>
             )}
           </div>
@@ -183,7 +246,7 @@ export const CourseDetailPage = () => {
                     <div className="d-flex align-items-center gap-2 mb-4 flex-wrap">
                       {categoryName && (
                         <span style={{ background: '#eff6ff', color: '#1e73be', padding: '6px 14px', borderRadius: '30px', fontSize: '13px', fontWeight: '600' }}>
-                          📚 {categoryName}
+                          📚 {translateCategory(categoryName)}
                         </span>
                       )}
                       <span style={{ background: '#f8fafc', color: '#475569', border: '1px solid #e2e8f0', padding: '6px 14px', borderRadius: '30px', fontSize: '13px', fontWeight: '500' }}>
@@ -191,7 +254,7 @@ export const CourseDetailPage = () => {
                       </span>
                       {course.fee !== undefined && (
                         <span style={{ background: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0', padding: '6px 14px', borderRadius: '30px', fontSize: '13px', fontWeight: '600' }}>
-                          <i className="fas fa-dollar-sign me-1"></i> {course.fee === '0' || course.fee === 0 || course.fee === 'Free' ? (t('courses.freeScholarship') || 'ឥតគិតថ្លៃ / អាហារូបករណ៍') : `$${course.fee}`}
+                          <i className="fas fa-dollar-sign me-1"></i> {!course.fee || course.fee === '0' || course.fee === 0 || course.fee === '0.00' || course.fee === 'Free' || Number(course.fee) === 0 ? (t('courses.freeScholarship') || 'ឥតគិតថ្លៃ / អាហារូបករណ៍') : `$${course.fee}`}
                         </span>
                       )}
                     </div>
@@ -329,56 +392,56 @@ export const CourseDetailPage = () => {
                         </div>
                         <span style={{ color: '#64748b', fontSize: '14px', fontWeight: '500' }}>{t('courses.level') || 'កម្រិតសិក្សា'}</span>
                       </div>
-                      <strong style={{ color: '#0f172a', fontSize: '14px', fontWeight: '600' }}>{course.level || 'Associate / Bachelor'}</strong>
+                      <strong style={{ color: '#0f172a', fontSize: '14px', fontWeight: '600' }}>{formatLevel(course.level)}</strong>
                     </div>
 
                     {/* Duration */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
                         <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#eff6ff', color: '#1e73be', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px' }}>
                           <i className="far fa-clock"></i>
                         </div>
                         <span style={{ color: '#64748b', fontSize: '14px', fontWeight: '500' }}>{t('courses.duration') || 'រយៈពេល'}</span>
                       </div>
-                      <strong style={{ color: '#0f172a', fontSize: '14px', fontWeight: '600' }}>{course.duration || '2-4 Years'}</strong>
+                      <strong style={{ color: '#0f172a', fontSize: '14px', fontWeight: '600', textAlign: 'right' }}>{course.duration || '2-4 Years'}</strong>
                     </div>
 
                     {/* Credits */}
                     {course.credit && (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
                           <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#eff6ff', color: '#1e73be', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px' }}>
                             <i className="fas fa-book"></i>
                           </div>
                           <span style={{ color: '#64748b', fontSize: '14px', fontWeight: '500' }}>{t('courses.credits') || 'ចំនួនក្រេឌីត'}</span>
                         </div>
-                        <strong style={{ color: '#0f172a', fontSize: '14px', fontWeight: '600' }}>{course.credit} Credits</strong>
+                        <strong style={{ color: '#0f172a', fontSize: '14px', fontWeight: '600', textAlign: 'right' }}>{toKhmerNumber(course.credit)} {isKhmer ? 'ក្រេឌីត' : 'Credits'}</strong>
                       </div>
                     )}
 
                     {/* Semesters */}
                     {course.semester && (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
                           <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#eff6ff', color: '#1e73be', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px' }}>
                             <i className="fas fa-calendar-alt"></i>
                           </div>
                           <span style={{ color: '#64748b', fontSize: '14px', fontWeight: '500' }}>{t('courses.semesters') || 'ចំនួនឆមាស'}</span>
                         </div>
-                        <strong style={{ color: '#0f172a', fontSize: '14px', fontWeight: '600' }}>{course.semester} Semesters</strong>
+                        <strong style={{ color: '#0f172a', fontSize: '14px', fontWeight: '600', textAlign: 'right' }}>{toKhmerNumber(course.semester)} {isKhmer ? 'ឆមាស' : 'Semesters'}</strong>
                       </div>
                     )}
 
                     {/* Tuition Fee */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
                         <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#ecfdf5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px' }}>
                           <i className="fas fa-dollar-sign"></i>
                         </div>
                         <span style={{ color: '#64748b', fontSize: '14px', fontWeight: '500' }}>{t('courses.fee') || 'ថ្លៃសិក្សា'}</span>
                       </div>
-                      <strong style={{ color: '#059669', fontSize: '14px', fontWeight: '700' }}>
-                        {course.fee === '0' || course.fee === 0 || course.fee === 'Free' ? (t('courses.freeScholarship') || 'ឥតគិតថ្លៃ / អាហារូបករណ៍') : `$${course.fee || 0}`}
+                      <strong style={{ color: '#059669', fontSize: '14px', fontWeight: '700', textAlign: 'right' }}>
+                        {!course.fee || course.fee === '0' || course.fee === 0 || course.fee === '0.00' || course.fee === 'Free' || Number(course.fee) === 0 ? (t('courses.freeScholarship') || 'ឥតគិតថ្លៃ / អាហារូបករណ៍') : `$${course.fee}`}
                       </strong>
                     </div>
 
@@ -390,7 +453,7 @@ export const CourseDetailPage = () => {
                         </div>
                         <span style={{ color: '#64748b', fontSize: '14px', fontWeight: '500' }}>{t('courses.language') || 'ភាសាបង្រៀន'}</span>
                       </div>
-                      <strong style={{ color: '#0f172a', fontSize: '14px', fontWeight: '600' }}>Khmer / English</strong>
+                      <strong style={{ color: '#0f172a', fontSize: '14px', fontWeight: '600' }}>{isKhmer ? 'ភាសាខ្មែរ / អង់គ្លេស' : 'Khmer / English'}</strong>
                     </div>
 
                     {/* Quality Standard */}
