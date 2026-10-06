@@ -620,7 +620,7 @@ export default {
     "badge_governance": "Institutional Governance & Leadership",
     "trust_subdecree": "Royal Sub-decree No. 117 ANKr.BK",
     "trust_ministry": "Ministry of Labour & Vocational Training (MLVT)",
-    "trust_structure": "Directorate, 6 Depts & 7 Offices-Center",
+    "trust_structure": "Directorate, 7 Depts & 6 Offices-Center",
     "tree_hint": "Click any leadership card or department to preview full profile and responsibilities",
     "searchPlaceholder": "Search name or title...",
     "stat_director": "Director",

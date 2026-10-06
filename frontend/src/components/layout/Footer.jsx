@@ -463,11 +463,10 @@ export const Footer = () => {
                   </span>
                   <div className="contact-numbers-wrap">
                     <a href="tel:0966660306" className="contact-phone-link">096 666 0306</a>
-                    <span className="contact-phone-divider">/</span>
                     <a href="tel:089483623" className="contact-phone-link">089 483 623</a>
                   </div>
                 </div>
-                <a href="tel:0966660306" className="footer-mobile-call-btn">
+                <a href="tel:0966660306" className="footer-mobile-call-btn" title="Call Hotline">
                   <Phone size={12} />
                   <span>{language === 'km' ? 'ហៅចេញ' : 'Call'}</span>
                 </a>
@@ -475,35 +474,39 @@ export const Footer = () => {
 
               <div className="footer-mobile-card-divider"></div>
 
-              {/* 2-Column Quick Gateways */}
+              {/* Institutional Quick Gateways (Telegram & Campus Location) */}
               <div className="footer-mobile-gateways-grid">
                 <a
                   href="https://qrcode.rpitssr.edu.kh/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="footer-mobile-gateway-item"
+                  aria-label="Official Telegram"
                 >
                   <div className="gateway-icon-circle telegram">
                     <TelegramIcon size={16} />
                   </div>
                   <div className="gateway-text-col">
-                    <span className="gateway-lbl">{language === 'km' ? 'តេឡេក្រាមផ្លូវការ' : 'Telegram'}</span>
+                    <span className="gateway-lbl">{language === 'km' ? 'តេឡេក្រាមផ្លូវការ' : 'Official Telegram'}</span>
                     <span className="gateway-val">qrcode.rpitssr.edu.kh</span>
                   </div>
+                  <ChevronRight size={14} className="gateway-arrow-icon" />
                 </a>
 
                 <Link
                   to="/contact"
                   onClick={scrollToTop}
                   className="footer-mobile-gateway-item"
+                  aria-label="Campus Location"
                 >
                   <div className="gateway-icon-circle location">
                     <MapPin size={15} />
                   </div>
                   <div className="gateway-text-col">
                     <span className="gateway-lbl">{language === 'km' ? 'ទីតាំងវិទ្យាស្ថាន' : 'Campus Location'}</span>
-                    <span className="gateway-val">{language === 'km' ? 'ក្រុងសៀមរាប' : 'Siem Reap'}</span>
+                    <span className="gateway-val">{language === 'km' ? 'ក្រុងសៀមរាប, កម្ពុជា' : 'Siem Reap, Cambodia'}</span>
                   </div>
+                  <ChevronRight size={14} className="gateway-arrow-icon" />
                 </Link>
               </div>
 
@@ -512,11 +515,12 @@ export const Footer = () => {
               {/* Working Hours Row */}
               <div className="footer-mobile-hours-row">
                 <Clock size={14} className="hours-gold-icon" />
-                <span>
-                  {language === 'km'
-                    ? 'ម៉ោងធ្វើការ៖ ច័ន្ទ - សុក្រ 07:30 - 17:00 | សៅរ៍ 07:30 - 11:30'
-                    : 'Hours: Mon - Fri 07:30 - 17:00 | Sat 07:30 - 11:30'}
-                </span>
+                <div className="hours-text-wrap">
+                  <span className="hours-title">{language === 'km' ? 'ម៉ោងធ្វើការ៖' : 'Hours:'}</span>
+                  <span className="hours-segment">{language === 'km' ? 'ច័ន្ទ - សុក្រ 07:30 - 17:00' : 'Mon - Fri 07:30 - 17:00'}</span>
+                  <span className="hours-divider">|</span>
+                  <span className="hours-segment">{language === 'km' ? 'សៅរ៍ 07:30 - 11:30' : 'Sat 07:30 - 11:30'}</span>
+                </div>
               </div>
             </div>
 

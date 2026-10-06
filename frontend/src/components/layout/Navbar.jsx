@@ -27,6 +27,8 @@ import {
   Phone,
   Globe,
   BookOpen,
+  PanelRightOpen,
+  PanelRightClose,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -311,18 +313,7 @@ export const Navbar = () => {
           <nav className={`modern-nav ${isSticky ? 'modern-nav-sticky' : ''}`}>
             <div className="modern-container">
               <div className="modern-nav-content">
-                {/* Mobile Left Drawer Toggle Button (Option 1 + Option 2) */}
-                <button
-                  type="button"
-                  className={`modern-mobile-toggle-btn ${mobileMenuOpen ? 'active' : ''}`}
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  aria-label={isKhmer ? 'បើកម៉ឺនុយ' : 'Toggle menu'}
-                  title={isKhmer ? 'បើកម៉ឺនុយ' : 'Menu'}
-                >
-                  <Menu size={22} />
-                </button>
-
-                {/* Institute Logo / Branding (Official Full Banner Logo across Desktop and Mobile) */}
+                {/* Institute Logo / Branding (Official Full Banner Logo across Desktop and Mobile - Left Anchor) */}
                 <Link to="/" className="modern-logo" onClick={closeMobileMenu}>
                   <img
                     src="/images/logo.webp"
@@ -376,6 +367,23 @@ export const Navbar = () => {
                   </li>
                 </ul>
 
+                {/* Mobile Right Drawer Toggle Button (ChatGPT Sidebar Collapse / Expand Style) */}
+                <button
+                  type="button"
+                  className={`modern-mobile-toggle-btn chatgpt-collapse-btn ${mobileMenuOpen ? 'active' : ''}`}
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  aria-label={mobileMenuOpen ? (isKhmer ? 'បង្រួម / បិទម៉ឺនុយ' : 'Collapse sidebar') : (isKhmer ? 'ពង្រីក / បើកម៉ឺនុយ' : 'Expand sidebar')}
+                  aria-expanded={mobileMenuOpen}
+                  title={mobileMenuOpen ? (isKhmer ? 'បិទផ្ទាំងម៉ឺនុយ (Close)' : 'Close sidebar') : (isKhmer ? 'បើកផ្ទាំងម៉ឺនុយ (Open)' : 'Open sidebar')}
+                >
+                  <span className="chatgpt-icon-wrap">
+                    {mobileMenuOpen ? (
+                      <PanelRightClose size={20} className="chatgpt-collapse-icon active" strokeWidth={2} />
+                    ) : (
+                      <PanelRightOpen size={20} className="chatgpt-collapse-icon" strokeWidth={2} />
+                    )}
+                  </span>
+                </button>
               </div>
             </div>
           </nav>

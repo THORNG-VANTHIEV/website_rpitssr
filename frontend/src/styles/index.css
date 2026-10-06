@@ -5134,9 +5134,9 @@ i {
 
   .contact-numbers-wrap {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 2px 6px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
     margin-top: 1px;
   }
 
@@ -5155,12 +5155,6 @@ i {
   .contact-phone-link:active {
     color: #60a5fa !important;
     text-decoration: underline !important;
-  }
-
-  .contact-phone-divider {
-    color: rgba(255, 255, 255, 0.45);
-    font-size: 0.80rem;
-    user-select: none;
   }
 
   .footer-mobile-call-btn {
@@ -5183,28 +5177,41 @@ i {
     transform: scale(0.94);
   }
 
-  /* 2-Column Gateways */
+  /* Gateways: Stacked full-width on mobile (<480px), 2-col on wider screens */
   .footer-mobile-gateways-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  @media (min-width: 480px) {
+    .footer-mobile-gateways-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 10px;
+    }
   }
 
   .footer-mobile-gateway-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
-    padding: 8px 10px;
+    padding: 9px 12px;
     text-decoration: none !important;
     color: #ffffff !important;
-    transition: background 0.2s ease;
+    transition: all 0.2s ease;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .footer-mobile-gateway-item:active {
     background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(30, 115, 190, 0.35);
   }
 
   .gateway-icon-circle {
@@ -5234,27 +5241,39 @@ i {
     display: flex;
     flex-direction: column;
     min-width: 0;
+    flex: 1;
     overflow: hidden;
   }
 
   .gateway-lbl {
-    font-size: 0.66rem;
+    font-size: 0.68rem;
     color: #94a3b8;
     font-weight: 500;
-    line-height: 1.2;
+    line-height: 1.25;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .gateway-val {
-    font-size: 0.82rem;
+    font-size: 0.84rem;
     font-weight: 700;
     color: #ffffff;
-    line-height: 1.25;
+    line-height: 1.3;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .gateway-arrow-icon {
+    color: #64748b;
+    flex-shrink: 0;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  .footer-mobile-gateway-item:active .gateway-arrow-icon {
+    color: #ffaf00;
+    transform: translateX(2px);
   }
 
   /* Working Hours Row */
@@ -5262,7 +5281,7 @@ i {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 7px;
     font-size: 0.74rem;
     color: #cbd5e1;
     text-align: center;
@@ -5272,6 +5291,27 @@ i {
   .hours-gold-icon {
     color: #ffaf00;
     flex-shrink: 0;
+  }
+
+  .hours-text-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2px 6px;
+  }
+
+  .hours-title {
+    color: #ffaf00;
+    font-weight: 700;
+  }
+
+  .hours-segment {
+    white-space: nowrap;
+  }
+
+  .hours-divider {
+    color: rgba(255, 255, 255, 0.35);
   }
 
   /* 3. Mobile Navigation Drawers (Interactive Accordions) */
@@ -5395,7 +5435,7 @@ i {
 
   /* 5. Bottom Links & Copyright */
   .footer-bottom-bar {
-    padding: 16px 0 20px !important;
+    padding: 16px 0 calc(76px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   .footer-bottom-links {
@@ -16878,25 +16918,25 @@ i {
 .modern-mobile-menu {
   position: fixed !important;
   top: 0 !important;
-  left: -100% !important;
-  right: auto !important;
+  right: -100% !important;
+  left: auto !important;
   bottom: 0 !important;
   width: 88% !important;
   max-width: 375px !important;
   height: 100dvh !important;
   background: #ffffff !important;
-  box-shadow: 8px 0 32px rgba(7, 41, 77, 0.18) !important;
+  box-shadow: -8px 0 32px rgba(7, 41, 77, 0.18) !important;
   z-index: 10050 !important;
   display: flex !important;
   flex-direction: column !important;
-  transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
   overflow: hidden !important;
   padding: 0 !important;
 }
 
 .modern-mobile-menu.active {
-  left: 0 !important;
-  right: auto !important;
+  right: 0 !important;
+  left: auto !important;
 }
 
 /* Drawer Header */
@@ -17791,33 +17831,75 @@ i {
 }
 
 /* ==========================================================================
-   MOBILE NAVBAR WITH LEFT DRAWER BUTTON & COMPACT BRAND (OPTION 1 + 2)
+   CHATGPT COLLAPSE / EXPAND SIDEBAR BUTTON STYLE
    ========================================================================== */
 .modern-mobile-toggle-btn {
   display: none;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
-  background: #f8fafc;
+  background: #ffffff;
   border: 1px solid #e2e8f0;
-  color: #07294D;
+  color: #334155;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 6px rgba(7, 41, 77, 0.05);
+  box-shadow: 0 1px 3px rgba(7, 41, 77, 0.05);
   flex-shrink: 0;
+  position: relative;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .modern-mobile-toggle-btn:hover {
-  background: #eff6ff;
-  border-color: #bfdbfe;
-  color: #1e73be;
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #07294D;
+  box-shadow: 0 2px 8px rgba(7, 41, 77, 0.08);
   transform: translateY(-1px);
 }
 
 .modern-mobile-toggle-btn:active {
   transform: scale(0.94);
+  background: #e2e8f0;
+}
+
+/* ChatGPT Sidebar Panel Icon Wrap */
+.chatgpt-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.chatgpt-collapse-icon {
+  color: #475569;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+}
+
+.modern-mobile-toggle-btn:hover .chatgpt-collapse-icon {
+  color: #1e73be;
+  transform: scale(1.08);
+}
+
+/* Active State (Sidebar is open) */
+.modern-mobile-toggle-btn.active {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1e73be;
+  box-shadow: 0 2px 8px rgba(30, 115, 190, 0.12);
+}
+
+.modern-mobile-toggle-btn.active .chatgpt-collapse-icon {
+  color: #1e73be;
+}
+
+.modern-mobile-toggle-btn.active:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #185ca1;
 }
 
 .mobile-navbar-brand {
@@ -17938,6 +18020,8 @@ i {
   }
   .modern-mobile-toggle-btn {
     display: flex !important;
+    margin-left: auto !important;
+    order: 2 !important;
   }
   .desktop-navbar-logo {
     display: none !important;
@@ -17951,9 +18035,10 @@ i {
   .modern-logo {
     display: flex !important;
     align-items: center !important;
-    flex: 1 1 auto !important;
+    flex: 0 1 auto !important;
     min-width: 0 !important;
-    max-width: calc(100% - 50px) !important;
+    max-width: calc(100% - 56px) !important;
+    order: 1 !important;
   }
   .modern-navbar-logo {
     max-height: 38px !important;
@@ -17966,8 +18051,8 @@ i {
   .modern-nav-content {
     display: flex !important;
     align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 10px !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
     padding: 8px 0 !important;
   }
 }
@@ -17983,6 +18068,14 @@ i {
 }
 
 @media (max-width: 360px) {
+  .modern-mobile-toggle-btn {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 9px !important;
+  }
+  .modern-logo {
+    max-width: calc(100% - 48px) !important;
+  }
   .modern-navbar-logo {
     max-height: 28px !important;
     max-width: 100% !important;

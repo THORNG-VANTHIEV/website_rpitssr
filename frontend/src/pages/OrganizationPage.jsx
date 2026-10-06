@@ -10,7 +10,7 @@ const LEADERSHIP_DATA = {
     nameKm: 'លោកស្រី ផង់ ពុទ្ធី',
     nameEn: 'Mrs. Phong Puthy',
     titleKm: 'នាយិកាវិទ្យាស្ថាន',
-    titleEn: 'Director of RPITSSR',
+    titleEn: 'Director of Institute',
     category: 'executive',
     categoryLabelKm: 'គណៈនាយក',
     categoryLabelEn: 'Executive Leadership',
@@ -173,7 +173,7 @@ const LEADERSHIP_DATA = {
     {
       id: 'dept-it',
       nameKm: 'ដេប៉ាតឺម៉ង់ព័ត៌មានវិទ្យា',
-      nameEn: 'Department of Information Technology',
+      nameEn: 'ICT Department',
       headKm: 'លោក កុល សេរីរិទ្ធ',
       headEn: 'Mr. Kol Sereyrith',
       headTitleKm: 'ប្រធានដេប៉ាតឺម៉ង់',
@@ -204,9 +204,9 @@ const LEADERSHIP_DATA = {
     {
       id: 'dept-electrical',
       nameKm: 'ដេប៉ាតឺម៉ង់អគ្គិសនី និងអេឡិចត្រូនិច',
-      nameEn: 'Department of Electricity & Electronics',
-      headKm: 'លោក សោ សុបុណ្យ',
-      headEn: 'Mr. Sao Sobon',
+      nameEn: 'Electricity and Electronic Dept.',
+      headKm: 'លោក ឆែម រ័ត្ន',
+      headEn: 'Mr. Chhem Rath',
       headTitleKm: 'ប្រធានដេប៉ាតឺម៉ង់',
       headTitleEn: 'Head of Department',
       category: 'technical',
@@ -233,9 +233,40 @@ const LEADERSHIP_DATA = {
       qualificationsEn: 'B.Eng. in Electrical Engineering & Industrial Control'
     },
     {
+      id: 'dept-civil',
+      nameKm: 'ដេប៉ាតឺម៉ង់សំណង់ស៊ីវិល',
+      nameEn: 'Civil Construction Dept.',
+      headKm: 'លោក នូ ហ៊ត់',
+      headEn: 'Mr. Nu Hot',
+      headTitleKm: 'ប្រធានដេប៉ាតឺម៉ង់',
+      headTitleEn: 'Head of Department',
+      category: 'technical',
+      categoryLabelKm: 'ដេប៉ាតឺម៉ង់បច្ចេកទេស',
+      categoryLabelEn: 'Technical Department',
+      icon: 'fa-hard-hat',
+      accentColor: '#0284c7',
+      email: 'civil@rpitssr.edu.kh',
+      phone: '(+855) 12 889 901',
+      room: 'រោងជាងសំណង់ស៊ីវិល B (Civil Construction Workshop B)',
+      programsKm: 'សំណង់ស៊ីវិល, ស្ថាបត្យកម្មសំណង់, ការគូរប្លង់បច្ចេកទេស CAD, ការត្រួតពិនិត្យការដ្ឋានសំណង់',
+      programsEn: 'Civil Construction, Building Architecture, Technical CAD Drafting, Site Supervision',
+      responsibilitiesKm: [
+        'ដឹកនាំ និងគ្រប់គ្រងការបណ្តុះបណ្តាលមុខជំនាញសំណង់ស៊ីវិល កម្រិត C1-C3 និងសញ្ញាបត្រជាន់ខ្ពស់បច្ចេកទេស',
+        'គ្រប់គ្រងរោងជាងអនុវត្តការងារសំណង់ បេតុង ដែក និងបន្ទប់អនុវត្តការគូរប្លង់កុំព្យូទ័រ CAD',
+        'សហការជាមួយក្រុមហ៊ុនវិស្វកម្មសំណង់ និងស្ថាបត្យកម្មសម្រាប់កម្មសិក្សា និងការងារសិស្ស'
+      ],
+      responsibilitiesEn: [
+        'Leading training programs in civil construction from TVET certificate to higher diploma levels',
+        'Managing construction technology workshops, masonry labs, and computer-aided drafting (CAD) studios',
+        'Partnering with regional engineering contractors and architectural firms for student internships'
+      ],
+      qualificationsKm: 'វិស្វករសំណង់ស៊ីវិល និងគ្រប់គ្រងគម្រោង (B.Eng. Civil Engineering)',
+      qualificationsEn: 'B.Eng. in Civil Engineering & Construction Management'
+    },
+    {
       id: 'dept-machinery',
       nameKm: 'ដេប៉ាតឺម៉ង់យន្តកម្ម និងគ្រឿងយន្តកសិកម្ម',
-      nameEn: 'Department of Vehicle & Agricultural Machinery',
+      nameEn: 'Vehicle and Agri-Engine Department',
       headKm: 'លោក ម៉ត់ ច័ន្ធក្រឹស្នា',
       headEn: 'Mr. Mot Chankrishna',
       headTitleKm: 'ប្រធានដេប៉ាតឺម៉ង់',
@@ -266,7 +297,7 @@ const LEADERSHIP_DATA = {
     {
       id: 'dept-production',
       nameKm: 'ដេប៉ាតឺម៉ង់ផលិតកម្ម និងសេវាកម្ម',
-      nameEn: 'Department of Production & Services',
+      nameEn: 'Production and Service Dept.',
       headKm: 'លោកស្រី ហម រ៉ូហ្សា',
       headEn: 'Mrs. Horm Rosa',
       headTitleKm: 'ប្រធានដេប៉ាតឺម៉ង់',
@@ -297,10 +328,10 @@ const LEADERSHIP_DATA = {
     {
       id: 'dept-business',
       nameKm: 'ដេប៉ាតឺម៉ង់គ្រប់គ្រងពាណិជ្ជកម្ម',
-      nameEn: 'Department of Business Management',
+      nameEn: 'Business Management Dept.',
       headKm: 'លោក ឡេង ណារ៉ុន',
       headEn: 'Mr. Leng Naron',
-      headTitleKm: 'ថ្នាក់ដឹកនាំដេប៉ាតឺម៉ង់',
+      headTitleKm: 'ប្រធានដេប៉ាតឺម៉ង់',
       headTitleEn: 'Head of Department',
       category: 'technical',
       categoryLabelKm: 'ដេប៉ាតឺម៉ង់បច្ចេកទេស',
@@ -328,10 +359,10 @@ const LEADERSHIP_DATA = {
     {
       id: 'dept-languages',
       nameKm: 'ដេប៉ាតឺម៉ង់ភាសាបរទេស',
-      nameEn: 'Department of Foreign Languages',
+      nameEn: 'Foreign Language Dept.',
       headKm: 'លោក ជួន កុម្ភៈ',
       headEn: 'Mr. Chhuon Kompheak',
-      headTitleKm: 'ថ្នាក់ដឹកនាំដេប៉ាតឺម៉ង់',
+      headTitleKm: 'ប្រធានដេប៉ាតឺម៉ង់',
       headTitleEn: 'Head of Department',
       category: 'technical',
       categoryLabelKm: 'ដេប៉ាតឺម៉ង់បច្ចេកទេស',
@@ -390,44 +421,13 @@ const LEADERSHIP_DATA = {
       qualificationsEn: 'Master of Public Administration (MPA)'
     },
     {
-      id: 'office-education-dev',
-      nameKm: 'ការិយាល័យអភិវឌ្ឍន៍ និងបណ្តុះបណ្តាល',
-      nameEn: 'Education & Training Development Office',
-      headKm: 'លោក ឆែម រ័ត្ន',
-      headEn: 'Mr. Chhem Rath',
-      headTitleKm: 'ប្រធានការិយាល័យ',
-      headTitleEn: 'Head of Education & Training Development Office',
-      category: 'offices',
-      categoryLabelKm: 'ការិយាល័យជំនាញ',
-      categoryLabelEn: 'Administrative Office',
-      icon: 'fa-graduation-cap',
-      accentColor: '#0284c7',
-      email: 'training.dev@rpitssr.edu.kh',
-      phone: '(+855) 63 963 804',
-      room: 'អគាររដ្ឋបាល A - បន្ទប់ ១០៤ (Building A, Rm 104)',
-      servicesKm: 'ការអភិវឌ្ឍកម្មវិធីបណ្តុះបណ្តាល, ផែនការសិក្សា, ការបណ្តុះបណ្តាលគរុកោសល្យគ្រូ, កម្មវិធី CBT',
-      servicesEn: 'Curriculum Development, Training Plans, Pedagogical Training, CBT Standards',
-      responsibilitiesKm: [
-        'រៀបចំ និងអភិវឌ្ឍន៍កម្មវិធីសិក្សាផ្អែកលើសមត្ថភាព (CBT) ស្របតាមស្តង់ដារជាតិ',
-        'រៀបចំផែនការបណ្តុះបណ្តាលប្រចាំឆ្នាំ និងការបំពាក់បំប៉នគរុកោសល្យជូនលោកគ្រូ-អ្នកគ្រូ',
-        'សហការជាមួយក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈក្នុងការធ្វើបច្ចុប្បន្នភាពកញ្ចប់សម្ភារបង្រៀន'
-      ],
-      responsibilitiesEn: [
-        'Developing and refining Competency-Based Training (CBT) curricula aligned with national standards',
-        'Formulating annual institutional training schedules and teacher pedagogical upgrades',
-        'Collaborating with MLVT to update instructional packages and competency standards'
-      ],
-      qualificationsKm: 'អនុបណ្ឌិតអភិវឌ្ឍន៍កម្មវិធីអប់រំបច្ចេកទេស (Master of TVET Curriculum Development)',
-      qualificationsEn: 'Master of Technical Education & Curriculum Development'
-    },
-    {
       id: 'office-education-training',
       nameKm: 'ការិយាល័យអប់រំបណ្ដុះបណ្ដាល',
       nameEn: 'Education and Training Office',
       headKm: 'លោក តូ សុផាណារ៉ា',
       headEn: 'Mr. To Sophanara',
-      headTitleKm: 'ថ្នាក់ដឹកនាំការិយាល័យ',
-      headTitleEn: 'Officer / Education & Training Office',
+      headTitleKm: 'ប្រធានការិយាល័យ',
+      headTitleEn: 'Head of Education and Training Office',
       category: 'offices',
       categoryLabelKm: 'ការិយាល័យជំនាញ',
       categoryLabelEn: 'Administrative Office',
@@ -453,65 +453,65 @@ const LEADERSHIP_DATA = {
     },
     {
       id: 'office-research-industry',
-      nameKm: 'ការិយាល័យស្រាវជ្រាវ និងទំនាក់ទំនងឧស្សាហកម្ម',
-      nameEn: 'Occupational Research & Liaison Industry Office',
-      headKm: 'លោក នូ ហ៊ត់',
-      headEn: 'Mr. Nu Hot',
+      nameKm: 'ការិយាល័យស្រាវជ្រាវមុខរបរ និងទំនាក់ទំនងឧស្សាហកម្ម',
+      nameEn: 'Occupational Research and Liaison Industry Office',
+      headKm: 'លោក មាស ដារ៉ាវុត',
+      headEn: 'Mr. Meas Daravuth',
       headTitleKm: 'ប្រធានការិយាល័យ',
       headTitleEn: 'Head of Occupational Research & Liaison Industry Office',
       category: 'offices',
       categoryLabelKm: 'ការិយាល័យជំនាញ',
       categoryLabelEn: 'Administrative Office',
-      icon: 'fa-industry',
+      icon: 'fa-briefcase',
       accentColor: '#d97706',
       email: 'industry.liaison@rpitssr.edu.kh',
-      phone: '(+855) 63 963 803',
-      room: 'អគាររដ្ឋបាល B - បន្ទប់ ១០១ (Building B, Rm 101)',
-      servicesKm: 'កិច្ចសហការសហគ្រាស និងដៃគូវិស័យឯកជន, ការចុះអនុស្សរណៈយោគយល់ (MoU), ការផ្សារភ្ជាប់ឧស្សាហកម្ម',
-      servicesEn: 'Enterprise Partnerships, Corporate MoUs, Industry Linkages, Technical Cooperation',
-      responsibilitiesKm: [
-        'កសាងទំនាក់ទំនង និងចុះកិច្ចព្រមព្រៀងសហប្រតិបត្តិការ (MoU) ជាមួយសហគ្រាស និងរោងចក្រ',
-        'ជំរុញការចូលរួមរបស់វិស័យឯកជនក្នុងការអភិវឌ្ឍជំនាញបច្ចេកទេស និងការគាំទ្រសម្ភារបច្ចេកទេស',
-        'រៀបចំវេទិកាពិភាក្សា និងសិក្ខាសាលារវាងវិទ្យាស្ថាន និងសហគ្រាសដៃគូ'
-      ],
-      responsibilitiesEn: [
-        'Building partnerships and signing Memorandums of Understanding (MoUs) with industrial enterprises',
-        'Promoting private sector involvement in technical skill development and equipment sponsorship',
-        'Organizing institute-industry dialogue forums and technological partnership roundtables'
-      ],
-      qualificationsKm: 'អនុបណ្ឌិតគ្រប់គ្រងឧស្សាហកម្ម និងទំនាក់ទំនងសហគ្រាស',
-      qualificationsEn: 'Master in Industrial Management & Enterprise Relations'
-    },
-    {
-      id: 'office-research-career',
-      nameKm: 'ការិយាល័យស្រាវជ្រាវមុខរបរ និងទំនាក់ទំនងឧស្សាហកម្ម',
-      nameEn: 'Occupational Research & Industry Linkages Office',
-      headKm: 'លោក មាស ដារ៉ាវុត',
-      headEn: 'Mr. Meas Daravuth',
-      headTitleKm: 'ថ្នាក់ដឹកនាំការិយាល័យ',
-      headTitleEn: 'Officer / Occupational Research & Liaison Industry Office',
-      category: 'offices',
-      categoryLabelKm: 'ការិយាល័យជំនាញ',
-      categoryLabelEn: 'Administrative Office',
-      icon: 'fa-briefcase',
-      accentColor: '#b45309',
-      email: 'career.research@rpitssr.edu.kh',
       phone: '(+855) 63 963 805',
       room: 'អគាររដ្ឋបាល B - បន្ទប់ ១០២ (Building B, Rm 102)',
-      servicesKm: 'ការស្រាវជ្រាវទីផ្សារមុខរបរ, កម្មសិក្សាការងារ (Internship), ការស្វែងរកការងារ និងការតាមដានអតីតនិស្សិត',
-      servicesEn: 'Labor Market Research, Student Internships, Job Placements, Alumni Employment Tracking',
+      servicesKm: 'ការស្រាវជ្រាវទីផ្សារមុខរបរ, ទំនាក់ទំនងឧស្សាហកម្ម, កម្មសិក្សាការងារ (Internship), ការស្វែងរកការងារ និងការតាមដានអតីតនិស្សិត',
+      servicesEn: 'Labor Market Research, Industry Linkages, Student Internships, Job Placements, Alumni Employment Tracking',
       responsibilitiesKm: [
         'សិក្សាស្រាវជ្រាវតម្រូវការទីផ្សារការងារ និងមុខរបរដែលកំពុងត្រូវការក្នុងតំបន់សៀមរាប និងភូមិភាគពាយ័ព្យ',
-        'សម្របសម្រួលការបញ្ជូនសិស្ស-និស្សិតចុះធ្វើកម្មសិក្សា (Internship) នៅតាមក្រុមហ៊ុន និងសហគ្រាស',
-        'រៀបចំពិព័រណ៍ការងារ និងតាមដានការមានការងារធ្វើរបស់និស្សិតបញ្ចប់ការសិក្សា'
+        'កសាងទំនាក់ទំនង និងចុះកិច្ចព្រមព្រៀងសហប្រតិបត្តិការ (MoU) ជាមួយសហគ្រាស រោងចក្រ និងវិស័យឯកជន',
+        'សម្របសម្រួលការបញ្ជូនសិស្ស-និស្សិតចុះធ្វើកម្មសិក្សា (Internship) និងរៀបចំពិព័រណ៍ការងារប្រចាំឆ្នាំ'
       ],
       responsibilitiesEn: [
         'Researching occupational skill demands in Siem Reap and the northwestern economic corridor',
-        'Facilitating student workplace internships and apprentice placements with employer partners',
-        'Organizing annual career fairs and tracking graduate employability outcomes'
+        'Establishing enterprise partnerships and signing Memorandums of Understanding (MoUs) with industry leaders',
+        'Facilitating student workplace internships and organizing annual institutional job fairs'
       ],
       qualificationsKm: 'បរិញ្ញាបត្រគ្រប់គ្រងធនធានមនុស្ស និងទីផ្សារការងារ',
       qualificationsEn: 'Bachelor of Human Resource Management & Labour Economics'
+    },
+    {
+      id: 'office-finance-planning',
+      nameKm: 'ការិយាល័យហិរញ្ញវត្ថុ និងផែនការ',
+      nameEn: 'Finance and Planning Office',
+      headKm: 'លោក សោ សុបុណ្យ',
+      headEn: 'Mr. Sao Sobon',
+      headTitleKm: 'ប្រធានការិយាល័យ',
+      headTitleEn: 'Head of Finance and Planning Office',
+      category: 'offices',
+      categoryLabelKm: 'ការិយាល័យជំនាញ',
+      categoryLabelEn: 'Administrative Office',
+      icon: 'fa-file-invoice-dollar',
+      accentColor: '#16a34a',
+      email: 'finance.planning@rpitssr.edu.kh',
+      phone: '(+855) 63 963 807',
+      room: 'អគាររដ្ឋបាល A - បន្ទប់ ១០៨ (Building A, Rm 108)',
+      servicesKm: 'គ្រប់គ្រងថវិការដ្ឋ និងចំណូល-ចំណាយ, ផែនការហិរញ្ញវត្ថុប្រចាំឆ្នាំ, លទ្ធកម្មសាធារណៈ, របាយការណ៍សវនកម្មហិរញ្ញវត្ថុ',
+      servicesEn: 'Institutional Budgeting, Revenue & Expense Management, Annual Financial Planning, Public Procurement, Financial Audits',
+      responsibilitiesKm: [
+        'រៀបចំផែនការថវិកាជាតិប្រចាំឆ្នាំ និងការគ្រប់គ្រងចំណូល-ចំណាយស្របតាមនីតិវិធីហិរញ្ញវត្ថុសាធារណៈ',
+        'ត្រួតពិនិត្យការបើកផ្តល់បៀវត្ស អាហារូបករណ៍សិស្ស ១.៥ លាននាក់ និងថវិកាដំណើរការស្ថាប័ន',
+        'អនុវត្តការងារលទ្ធកម្មផ្គត់ផ្គង់សម្ភារបច្ចេកទេស និងរៀបចំរបាយការណ៍ហិរញ្ញវត្ថុជូនក្រសួង'
+      ],
+      responsibilitiesEn: [
+        'Formulating annual institutional budget allocations and managing public financial disbursements',
+        'Overseeing payroll disbursements, 1.5M TVET student stipends, and operational institute expenditures',
+        'Executing technical procurement workflows and compiling financial audit compliance reports'
+      ],
+      qualificationsKm: 'អនុបណ្ឌិតហិរញ្ញវត្ថុ និងធនាគារ (Master of Finance & Banking)',
+      qualificationsEn: 'Master of Science in Finance, Banking & Public Accounting'
     },
     {
       id: 'office-qa',
@@ -1420,8 +1420,8 @@ export const OrganizationPage = () => {
                 </h4>
                 <p className="text-muted mb-4" style={{ lineHeight: '2.1', fontSize: '0.98rem' }}>
                   {isKhmer
-                    ? 'វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប (RPITSSR) ត្រូវដឹកនាំដោយនាយិកាវិទ្យាស្ថាន រួមជាមួយនាយករង ៤ រូប ទទួលបន្ទុកការងារតាមផ្នែកជំនាញ ដេប៉ាតឺម៉ង់បច្ចេកទេសចំនួន ៦ និងការិយាល័យ-មជ្ឈមណ្ឌលចំនួន ៧។ រចនាសម្ព័ន្ធនេះរៀបចំឡើងដើម្បីធានានូវអភិបាលកិច្ចប្រកបដោយគុណភាព ការបណ្តុះបណ្តាលស្របតាមតម្រូវការទីផ្សារការងារ និងការបម្រើសេវាសិស្ស-និស្សិតប្រកបដោយតម្លាភាព។'
-                    : 'RPITSSR is administered by the Institute Director supported by 4 Deputy Directors, 6 Technical Departments, and 7 Offices & Centers. This governance model guarantees high pedagogical standards, market-responsive technical education, and transparent student-centered administration.'}
+                    ? `វិទ្យាស្ថានពហុបច្ចេកទេសភូមិភាគតេជោសែនសៀមរាប (RPITSSR) ត្រូវដឹកនាំដោយនាយិកាវិទ្យាស្ថាន រួមជាមួយនាយករង ៤ រូប ទទួលបន្ទុកការងារតាមផ្នែកជំនាញ ដេប៉ាតឺម៉ង់បច្ចេកទេសចំនួន ${toKhmerNumber(LEADERSHIP_DATA.departments.length)} និងការិយាល័យ-មជ្ឈមណ្ឌលចំនួន ${toKhmerNumber(LEADERSHIP_DATA.offices.length)}។ រចនាសម្ព័ន្ធនេះរៀបចំឡើងដើម្បីធានានូវអភិបាលកិច្ចប្រកបដោយគុណភាព ការបណ្តុះបណ្តាលស្របតាមតម្រូវការទីផ្សារការងារ និងការបម្រើសេវាសិស្ស-និស្សិតប្រកបដោយតម្លាភាព។`
+                    : `RPITSSR is administered by the Institute Director supported by 4 Deputy Directors, ${LEADERSHIP_DATA.departments.length} Technical Departments, and ${LEADERSHIP_DATA.offices.length} Offices & Centers. This governance model guarantees high pedagogical standards, market-responsive technical education, and transparent student-centered administration.`}
                 </p>
                 <div className="d-flex flex-wrap justify-content-center justify-content-md-start gap-3 pt-2">
                   <Link to="/about" className="btn btn-outline-primary org-governance-btn">
